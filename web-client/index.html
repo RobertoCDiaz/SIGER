@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SIGER</title>
+        <!-- Montserrat & Open Sans -->
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,600,700&display=swap" rel="stylesheet"> 
+        <link rel="stylesheet" href="styles/global.css">
+        <style>
+            html,
+            body {
+                height: 100%;
+            }
+
+            header {
+                padding: 1em 3em;
+                background-color: #002b7f;
+                color: white;
+            }
+
+            h1,
+            h2 {
+                font-family: "Montserrat";
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .content {
+                background-color: black;
+                color: white;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                background-image: url(assets/index-background.jpg);
+                background-size: cover;
+            }
+
+            .black-overlay {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .main-container {
+                width: 35vw;
+                margin: 0 auto 0 10vw;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .main-container > * {
+                margin: .75em 0;
+            }
+
+            .main-container > h1 {
+                font-size: 2.75em;
+            }
+            .main-container > h2 {
+                font-size: 1.75em;
+            }
+
+            button {
+                background-color: transparent;
+                border: 2px solid white;
+                color: white;
+                padding: .75em 1.25em;
+                font-size: 18px;
+                transition-duration: 150ms;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: white;
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>
+                SIGER
+            </h1>
+        </header>
+        <div class="content">
+            <div class="black-overlay">
+                <div class="main-container">
+                    <h1>Sistema Gestor de Residencias</h1>
+                    <h2>Instituto Tecnológico de Piedras Negras</h2>
+                    <p>
+                        Proceso de Residencias Profesionales en línea para alumnos
+                        del Instituto Tecnológico de Piedras Negras
+                    </p>
+                    <div>
+                        <button>Empezar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
