@@ -4,7 +4,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    background-image: url(assets/images/index-background.jpg);
+    background-image: url(../assets/images/index-background.jpg);
     background-size: cover;
 }
 
