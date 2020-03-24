@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Residentes :: SIGER</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <style>
+        @media only screen and (min-width: 1441px) {
+            :root {
+                --content-vertical-padding: 20vw;
+                --button-width-percentage: 25%; 
+            }
+        }
+
+        @media only screen and (min-width: 1100px) and (max-width: 1440px) {
+            :root {
+                --content-vertical-padding: 15vw;
+                --button-width-percentage: 50%; 
+            }
+        }
+
+        @media only screen and (max-width: 1099px) {
+            :root {
+                --content-vertical-padding: 10vw;
+                --button-width-percentage: 75%; 
+            }
+        }
+        
+
+        .content {
+            padding: 1em var(--content-vertical-padding) 5em;
+        }
+
+        .header-extension::after {
+            content: "\A";
+            position: absolute;
+            width: 100%;
+            height: 10em;
+            background-color: var(--azul-tec);
+            border-bottom-left-radius: 30%;
+            border-bottom-right-radius: 30%;
+            z-index: -5;
+        }
+
+        form {
+            background-color: white;
+            padding: 2.5em 2em;
+            box-shadow: .5em .5em .5em rgba(0, 0, 0, 0.25);
+        }
+
+        form > p {
+            color: var(--secondary-text);
+        }
+
+        hr {
+            margin: 1em 0 3em;
+        }
+
+        .form-input {
+            display: flex;
+            padding: 1em;
+            align-items: center;
+        }
+
+        .form-input > * {
+            flex: 3;
+        }
+
+        .form-input > label {
+            flex: 1;
+        }
+
+        input[type="text"], input[type="password"], select {
+            padding: .5em 1em;
+            background-color: #f2f2f2;
+            border: 1px solid #585858;
+            overflow: hidden;
+        }
+
+        .button-container {
+            display: flex; 
+            justify-content: center;
+            margin-top: 2em;
+        }
+
+        /* button, input[type="button"], input[type="submit"] {
+            width: 50%;
+            margin: 0 auto;
+            color: var(--azul-tec);
+            border: 1px solid var(--azul-tec);
+            background-color: transparent;
+            padding: .5em 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition-duration: var(--animation-duration);
+        }
+
+        button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+            background-color: var(--azul-tec);
+            color: white;
+        } */
+
+        button, input[type="button"], input[type="submit"] {
+            width: var(--button-width-percentage);
+            /* padding: 2em 1em; */
+            margin: 0 auto;
+            color: white;
+            border: 1px solid var(--azul-tec);
+            background-color: var(--azul-tec);
+            border-radius: 2px;
+            padding: .5em 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition-duration: var(--animation-duration);
+        }
+
+        button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+            background-color: var(--azul-tec-light);
+            color: white;
+        }
+
+        footer {
+            padding: 2em;
+            background-color: #272727;
+        }
+
+        footer * {
+            color: white;
+        }
+
+        footer > p {
+            text-align: center;
+        }
+
+        footer > .sections-container {
+            display: flex;
+            margin-bottom: 2em;
+        }
+
+        footer > .sections-container > section {
+            flex: 1;
+        }
+
+        footer .section-item {
+            padding: 1em;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-extension">
+        <div class="bar">
+            <h1>SIGER</h1>
+            <h2>Registro de estudiantes como Residentes</h2>
+        </div>
+    </header>
+
+    <div class="content">
+        <form action="POST">
+            <h3>Configuración de cuenta</h3>
+            <p>Información requerida para la identificación del residente</p>
+            <div class="form-input">
+                <label for="emailView">Correo electrónico</label>
+                <input type="text" placeholder="L16430123@itpiedrasnegras.tecnm.mx" name="emailView" id="emailView">
+            </div>
+            <div class="form-input">
+                <label for="passView">Contraseña</label>
+                <input type="password" name="passView" id="passView">
+            </div>
+            <div class="form-input">
+                <label for="repeatPassView">Vuela a introducir su contraseña</label>
+                <input type="password" name="repeatPassView" id="repeatPassView">
+            </div>
+            <hr>
+            <h3>Configuración del perfil</h3>
+            <p>Información del residente</p>
+            <div class="form-input">
+                <label for="nameView">Nombre completo</label>
+                <input type="text" name="nameView" id="nameView">
+            </div>
+            <div class="form-input">
+                <label for="patSurnameView">Apellido Paterno</label>
+                <input type="text" name="patSurnameView" id="patSurnameView">
+            </div>
+            <div class="form-input">
+                <label for="matSurnameView">Apellido Materno</label>
+                <input type="text" name="matSurnameView" id="matSurnameView">
+            </div>
+            <div class="form-input">
+                <label for="careerView">Carrera</label>
+                <select name="careerView" id="careerView">
+                    <!-- TODO: Cambiar claves de carreras por IDs en la base de datos. -->
+                    <option value="ISC-2010-224">Ingeniería en Sistemas Computacionales</option>
+                    <option value="IIN-2010-110">Ingeniería Industrial</option>
+                    <option value="IME-2010-113">Ingeniería Mecatrónica</option>
+                    <option value="IEL-2010-111">Ingeniería Electrónica</option>
+                    <option value="IGE-2010-011">Ingeniería en Gestión Empresarial</option>
+                    <option value="CON-2010-511">Contabilidad</option>
+                    <option value="ITI-2010-225">Ingeniería en Tecnologías de la Información y Comunicación</option>
+                </select>
+            </div>
+            <!-- <div class="form-input"> -->
+                <div class="button-container">
+                    <input type="submit" value="TERMINAR"/>
+                </div>
+            <!-- </div> -->
+        </form>
+    </div>
+
+    <footer>
+        <div class="sections-container">
+            <section>
+                <h2>Integrantes</h2>
+                <div class="section-item">
+                    <p>Daniel Hernández Sánchez</p>
+                    <p><u>L174300048@piedrasnegras.tecnm.mx</u></p>
+                </div>
+                <div class="section-item">
+                    <p>Roberto Carlos Díaz Sánchez</p>
+                    <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+                </div>
+            </section>
+            <section>
+                <h2>Materias</h2>
+                <div class="section-item">
+                    <p>Administración de Bases de Datos</p>
+                    <p>ABD-1234</p>
+                </div>
+                <div class="section-item">
+                    <p>Ingeniería de Software</p>
+                    <p>ISO-1234</p>
+                </div>
+                <div class="section-item">
+                    <p>Programación Web</p>
+                    <p>PWB-1234</p>
+                </div>
+            </section>
+            <section>
+                <h2>Enlaces de interés</h2>
+                <div class="section-item">
+                    <p><a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a></p>
+                    <p><a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">Documentación y evidencias</a></p>
+                </div>
+            </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+    
+</body>
+</html>

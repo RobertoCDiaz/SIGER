@@ -1,19 +1,41 @@
 @font-face {
     font-family: "GMX";
     src: url(../assets/fonts/GMX.otf);
-    font-style: normal;
-    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url(../assets/fonts/Open_Sans/OpenSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url(../assets/fonts/Montserrat/Montserrat-Regular.ttf);
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url(../assets/fonts/Roboto/Roboto-Regular.ttf);
 }
 
 :root {
     --azul-tec: #002B7F;
+    --azul-tec-light: rgb(16, 75, 192);
     --amarillo-tec: #FFED38;
+
+    --background: #EAEAEA;
+    --primary-text: #212121;
+    --secondary-text: #616161;
+
+    --animation-duration: 150ms;
 }
 
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     font-family: "Open Sans";
+    color: #212121;
 }
 
 html,
@@ -23,14 +45,27 @@ body {
     flex-direction: column;
 }
 
-header {
+body {
+    background-color: var(--background);
+}
+
+header > .bar {
     padding: 1em 3em;
     background-color: var(--azul-tec);
+}
+
+header * {
+    
     color: white;
 }
 
-header > h1 {
+header h1 {
     font-family: "GMX";
+}
+
+header h2 {
+    font-family: "Montserrat";
+    font-weight: 400;
 }
 
 /* Esta clase aplica la fuente oficial del Gobierno de México. */

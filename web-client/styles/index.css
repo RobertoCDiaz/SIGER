@@ -1,11 +1,14 @@
 .content {
     background-color: black;
-    color: white;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     background-image: url(../assets/images/index-background.jpg);
     background-size: cover;
+}
+
+.content * {
+    color: white;
 }
 
 .black-overlay {
@@ -41,7 +44,7 @@ button {
     color: white;
     padding: .75em 1.25em;
     font-size: 18px;
-    transition-duration: 150ms;
+    transition-duration: var(--animation-duration);
     cursor: pointer;
 }
 
