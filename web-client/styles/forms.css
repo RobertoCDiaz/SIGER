@@ -1,0 +1,54 @@
+@media only screen and (min-width: 1441px) {
+    :root {
+        --content-vertical-padding: 20vw;
+        --button-width-percentage: 25%;
+    }
+}
+
+@media only screen and (min-width: 1100px) and (max-width: 1440px) {
+    :root {
+        --content-vertical-padding: 15vw;
+        --button-width-percentage: 50%;
+    }
+}
+
+@media only screen and (max-width: 1099px) {
+    :root {
+        --content-vertical-padding: 10vw;
+        --button-width-percentage: 75%;
+    }
+}
+
+.content {
+    padding: 1em var(--content-vertical-padding) 5em;
+}
+
+form {
+    background-color: var(--content-background);
+    padding: 2.5em 2em;
+    box-shadow: 0.5em 0.5em 0.5em rgba(0, 0, 0, 0.25);
+}
+
+form > p {
+    color: var(--secondary-text);
+}
+
+hr {
+    margin: 1em 0 3em;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="tel"],
+select {
+    padding: 0.5em 1em;
+    background-color: #f2f2f2;
+    border: 1px solid var(--gray-border-color);
+    overflow: hidden;
+}
+
+
+input[type="submit"], input[type="button"], button {
+    width: var(--button-width-percentage);
+    padding: 1em !important;
+}

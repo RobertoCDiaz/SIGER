@@ -3,9 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Registro de Residentes :: SIGER</title>
+        <title>Registro de Docentes :: SIGER</title>
         <link rel="stylesheet" href="styles/global.css" />
         <link rel="stylesheet" href="styles/forms.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
         <style>
             .form-input {
                 display: flex;
@@ -19,6 +21,56 @@
 
             .form-input > label {
                 flex: 1;
+            }
+
+            .subject-picker {
+                border: 1px solid var(--gray-border-color);
+                width: 60%;
+                margin: 1em auto;
+            }
+
+            .subject {
+                display: flex;
+                align-items: stretch;
+                align-content: center;
+                border-bottom: 1px solid var(--gray-border-color);
+            }
+
+            .subject > i {
+                cursor: pointer;
+                padding: 0.3em;
+            }
+
+            .subject > * {
+                display: flex;
+                align-items: center;
+            }
+
+            .subject > i:hover {
+                color: white;
+                background-color: rgb(179, 24, 24);
+            }
+
+            .subject > .subject-name {
+                flex: 1;
+            }
+
+            .subject > .subject-key {
+                font-weight: bold;
+                margin: 0 1em;
+            }
+            
+            .picker {
+                display: flex;
+            }
+
+            .picker > select {
+                flex: 1;
+                border: none;
+            }
+
+            .picker > i {
+                padding: 0.5em;
             }
 
             .button-container {
@@ -36,7 +88,7 @@
         <header class="header-extension">
             <div class="bar">
                 <h1>SIGER</h1>
-                <h2>Registro de estudiantes como Residentes</h2>
+                <h2>Registro de Docentes</h2>
             </div>
         </header>
 
@@ -44,17 +96,16 @@
             <form>
                 <h3>Configuración de cuenta</h3>
                 <p>
-                    Información requerida para la identificación del residente
+                    Información requerida para la identificación del docente
                 </p>
                 <div class="form-input">
                     <label for="emailView">Correo electrónico</label>
                     <input
                         type="text"
-                        placeholder="L16430123@itpiedrasnegras.tecnm.mx"
+                        placeholder="fulanito.dt@itpiedrasnegras.tecnm.mx"
                         name="emailView"
                         id="emailView"
-                        pattern="L[0-9]{8}@itpiedrasnegras.tecnm.mx"
-                        
+                        pattern="[A-z]+.[A-z]{2}@itpiedrasnegras.tecnm.mx"
                     />
                 </div>
                 <div class="form-input">
@@ -79,7 +130,7 @@
                 </div>
                 <hr />
                 <h3>Configuración del perfil</h3>
-                <p>Información del residente</p>
+                <p>Información del docente</p>
                 <div class="form-input">
                     <label for="nameView">Nombre(s)</label>
                     <input type="text" name="nameView" id="nameView" />
@@ -101,35 +152,34 @@
                     />
                 </div>
                 <div class="form-input">
-                    <label for="careerView">Carrera</label>
-                    <select name="careerView" id="careerView">
-                        <!-- TODO: Cambiar claves de carreras por IDs en la base de datos. -->
-                        <option value="ISC-2010-224"
-                            >Ingeniería en Sistemas Computacionales</option
-                        >
-                        <option value="IIN-2010-110"
-                            >Ingeniería Industrial</option
-                        >
-                        <option value="IME-2010-113"
-                            >Ingeniería Mecatrónica</option
-                        >
-                        <option value="IEL-2010-111"
-                            >Ingeniería Electrónica</option
-                        >
-                        <option value="IGE-2010-011"
-                            >Ingeniería en Gestión Empresarial</option
-                        >
-                        <option value="CON-2010-511">Contabilidad</option>
-                        <option value="ITI-2010-225"
-                            >Ingeniería en Tecnologías de la Información y
-                            Comunicación</option
-                        >
-                    </select>
-                </div>
-                <div class="form-input">
                     <label for="phoneNumberView">Número de teléfono</label>
                     <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" name="phoneNumberView" id="phoneNumberView">
                 </div>
+                <hr>
+                <h3>Competencia en materias</h3>
+                <p>De las siguiente lista de materias, seleccione aquellas en las cuales usted se siente hábil como para ayudar a los residentes</p>
+
+                <div class="subject-picker">
+                    <div class="container">
+                        <!-- TODO: Eliminar materias de prueba. Remplazar por material reales de manera dinámica. -->
+                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas</span> <span class="subject-key">(SCD-1010)</span></div>
+                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas</span> <span class="subject-key">(SCD-1010)</span></div>
+                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas</span> <span class="subject-key">(SCD-1010)</span></div>
+                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas Matemáticas Discretas Matemáticas Discretas</span><span class="subject-key">(SCD-1010)</span></div>
+                    </div>
+                    <div class="picker">
+                        <!-- TODO: Llenar usando contenido de la base de datos. -->
+                        <select name="subjectPicker" id="subjectPicker">
+                            <option value="0">Seleccione una materia en la cuál es competente...</option>
+                            <option value="1">Matemáticas Discretas</option>
+                            <option value="2">Lenguajes y Autómatas I</option>
+                            <option value="3">Cálculo Vectorial</option>
+                            <option value="4">Estructuras de Datos</option>
+                        </select>
+                        <i class="material-icons primary-button">add</i>
+                    </div>
+                </div>
+
                 <div class="button-container">
                     <input class="primary-button" type="submit" value="TERMINAR" />
                 </div>

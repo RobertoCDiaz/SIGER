@@ -1,3 +1,8 @@
+/*  =============================================
+
+    Fuentes.
+
+=============================================  */
 @font-face {
     font-family: "GMX";
     src: url(../assets/fonts/GMX.otf);
@@ -19,11 +24,16 @@
 }
 
 :root {
-    --azul-tec: #002B7F;
-    --azul-tec-light: rgb(16, 75, 192);
+    /* --azul-tec: #002B7F; */
+    --azul-tec: #1B396A;
+    --azul-tec-light: #184286;
     --amarillo-tec: #FFED38;
 
-    --background: #EAEAEA;
+    --page-background: #EAEAEA;
+    --content-background: white;
+
+    --gray-border-color: #585858;
+
     --primary-text: #212121;
     --secondary-text: #616161;
 
@@ -46,7 +56,7 @@ body {
 }
 
 body {
-    background-color: var(--background);
+    background-color: var(--page-background);
 }
 
 header > .bar {
@@ -55,7 +65,6 @@ header > .bar {
 }
 
 header * {
-    
     color: white;
 }
 
@@ -68,7 +77,93 @@ header h2 {
     font-weight: 400;
 }
 
+/* Nuevo header */
+.header-extension::after {
+    content: "\A";
+    position: absolute;
+    width: 100%;
+    height: 10em;
+    background-color: var(--azul-tec);
+    border-bottom-left-radius: 30%;
+    border-bottom-right-radius: 30%;
+    z-index: -5;
+}
+
+
+/*  =============================================
+
+    Otros.
+
+=============================================  */
 /* Esta clase aplica la fuente oficial del Gobierno de México. */
 .gmx-font {
     font-family: "GMX";
+}
+
+
+/*  =============================================
+
+    BOTONES.
+
+=============================================  */  
+.primary-button {
+    color: white;
+    border: 1px solid var(--azul-tec);
+    background-color: var(--azul-tec);
+    border-radius: 2px;
+    padding: 0.5em 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition-duration: var(--animation-duration);
+}
+
+.primary-button:hover {
+    background-color: var(--azul-tec-light);
+    color: white;
+}
+
+.secondary-button {
+    color: var(--azul-tec);
+    border: 1px solid var(--azul-tec);
+    background-color: transparent;
+    padding: .5em 1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-sizing: content-box;
+}
+
+.secondary-button:hover {
+    box-shadow: inset 0 0 0 1px var(--azul-tec);
+}
+
+
+/*  =============================================
+
+    Footer.
+
+=============================================  */
+footer {
+    padding: 2em;
+    background-color: #272727;
+}
+
+footer * {
+    color: white;
+}
+
+footer > p {
+    text-align: center;
+}
+
+footer > .sections-container {
+    display: flex;
+    margin-bottom: 2em;
+}
+
+footer > .sections-container > section {
+    flex: 1;
+}
+
+footer .section-item {
+    padding: 1em;
 }
