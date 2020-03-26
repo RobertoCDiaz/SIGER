@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reporte preliminar :: SIGER</title>
+        <link rel="stylesheet" href="styles/global.css">
+        <link rel="stylesheet" href="styles/forms.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <style>
+        /*body
+        {
+            background-color: gainsboro
+        }
+        #formrepreliminar
+        {
+            display: flex;
+            flex-direction: column;
+            margin: 2em 4em 4em 4em;
+            padding: 2em;
+            width: 50%;
+            align-self: center;
+            box-shadow: black 3px 3px 3px;
+            background-color: white;
+        }
+
+        
+
+        .name
+        {
+            width: 16em;
+        }
+        div
+        {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }*/
+
+        textarea
+        {
+            resize:none;
+        }
+
+        .form-input {
+                display: flex;
+                padding: 1em;
+                align-items: center;
+            }
+
+            .form-input > * {
+                flex: 3;
+            }
+
+            .form-input > label {
+                flex: 1;
+            }
+
+            .subject-picker {
+                border: 1px solid var(--gray-border-color);
+                width: 60%;
+                margin: 1em auto;
+            }
+
+            .subject {
+                display: flex;
+                align-items: stretch;
+                align-content: center;
+                border-bottom: 1px solid var(--gray-border-color);
+            }
+
+            .subject > i {
+                cursor: pointer;
+                padding: 0.3em;
+            }
+
+            .subject > * {
+                display: flex;
+                align-items: center;
+            }
+
+            .subject > i:hover {
+                color: white;
+                background-color: rgb(179, 24, 24);
+            }
+
+            .subject > .subject-name {
+                flex: 1;
+            }
+
+            .subject > .subject-key {
+                font-weight: bold;
+                margin: 0 1em;
+            }
+            
+            .picker {
+                display: flex;
+            }
+
+            .picker > select {
+                flex: 1;
+                border: none;
+            }
+
+            .picker > i {
+                padding: 0.5em;
+            }
+
+            .button-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 2em;
+            }
+            
+            .footer-iframe {
+                overflow-y: visible;
+            }
+
+    </style>
+</head>
+<body>
+    <header class="header-extension">
+        <div class="bar">
+            <h1>SIGER</h1>
+            <h2>Reporte preliminar</h2>
+        </div>
+    </header>
+    
+    <div class="content">
+        <form>
+                <p>
+                    Fecha de elaboración: (Automática)
+                </p>
+                <br>
+                <h3>Descripción general del proyecto</h3>
+                <div class="form-input">
+                    <label for="">Nombre del proyecto</label>
+                    <input type="text" name="txtNombreProyecto" id="txtNombreProyecto" autofocus required>
+                </div>
+                <div class="form-input">
+                    <label for="">Objetivo general</label>
+                    <textarea name="txtObjetivo" id="txtObjetivo" cols="30" rows="5" required></textarea>
+                </div>
+                <div class="form-input">
+                    <label for="">Justificación (Problema a resolver):</label>
+                    <textarea name="txtJustifiacion" id="txtJustificacion" cols="30" rows="7" required></textarea>
+                </div>
+                <div class="form-input">
+                    <label for="">Periodo de realización: </label>
+                    <select name="selectPeriodo" id="selectPeriodo" required>
+                        <option value="EJ">Enero-Junio</option>
+                        <option value="AD">Agosto-Diciembre</option>
+                    </select>
+                    <label for="">Año:</label>
+                    <select name="selectYear" id="selectYear" required>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                    </select>
+                </div>
+            
+            <!-------------------------------------------------------------------------->
+            <div class="form-input">
+                <label for="">Descripción de actividades:</label>
+                <textarea name="txtActiviades" id="txtActividades" cols="30" rows="6" required></textarea>
+            </div>
+                <br>
+                <h3>Información sobre la empresa, organismo o dependencia donde se desarrollará el proyecto.</h3>
+                <div class="form-input">
+                    <label for="">Nombre de la empresa: </label>
+                    <input type="text" name="txtEmpresa" id="txtEmpresa" required>  
+                </div>
+                <div class="form-input">
+                    <label for="">Representante legal de la empesa</label>
+                    <input type="text" name="txtRepresentante" id="txtRepresentante" required>
+                </div>
+                <div class="form-input">
+                    <label for="">Dirección: </label>
+                    <input type="text" name="txtDirección" id="txtDirección" required>
+                    
+                        <label for="">Teléfono:</label>
+                        <input type="tel" name="txtTel" id="txtTel" required>
+                        <label for="">Ciudad: </label>
+                        <input type="text" name="txtCiudad" id="txtCiudad" required>
+                    
+                </div>
+                <div class="form-input">
+                    <label for="">Correo electrónico: </label>
+                    <input
+                        type="text"
+                        placeholder="empresa@dominio.com"
+                        name="emailView"
+                        id="emailView"
+                        pattern="[A-z0-9]+@[a-z].[a-z]+"
+                    />
+                </div>
+                <div class="form-input">
+                    <label for="">Departamento o área del desarrollo del proyecto en la empresa: </label>
+                    <input type="text" name="txtDepto" id="txtDepto" required>
+                </div>
+                <br>
+            
+            <!-------------------------------------------------------------------------->
+            <h3>Datos del asesor externo.</h3>
+            <div class="form-input">
+                <label for="">Nombre completo: </label >
+                <input type="text" name="txtNombreAE" id="txtNombreAE" required>
+            </div>
+            <div class="form-input">
+                <label for="">Puesto</label>
+                <input type="text" name="txtPuesto" id="txtPuesto" required>
+            </div>
+            <div class="form-input">
+                <label for="">Grado de estudios: </label>
+                <select name="selectGrado" id="selectGrado" required>
+                    <option value="LIC">Licenciatura</option>
+                    <option value="MAS">Maestría</option>
+                    <option value="DOC">Doctorado</option>
+                    <option value="OTR">Otro</option>
+                    <!--¿habilitar campo para introducir otro?-->
+                </select>
+                <label for="">Teléfono: </label>
+                <input type="tel" name="txtTelAE" id="txtTelAE" required>
+            </div>
+            <div class="form-input">
+                <label for="">Correo electrónico: </label>
+                <input
+                        type="text"
+                        placeholder="fulanito@dominio.com"
+                        name="emailView"
+                        id="emailView"
+                        pattern="[A-z0-9]+@[a-z].[a-z]+"
+                    />
+            </div>
+            <!-------------------------------------------------------------------------->
+            <br>
+            <h3>Datos del residente.</h3>
+            <div class="form-input">
+                <label for="">Nombre: </label>
+                <input class="name" type="text" name="txtNombreR" id="txtNombreR" required>
+            </div>
+            <div class="form-input">
+                <label for="">Apellido paterno: </label>
+                <input class="name" type="text" name="txtAPR" id="txtAPR" required>
+            </div>
+            <div class="form-input">
+                <label for="">Apellido materno: </label>
+                <input class="name" type="text" name="txtAMR" id="txtAMR" required>
+            </div>
+                
+            <div class="form-input">
+                <label for="">Número de control: </label>
+                <input type="text" name="txtNControl" id="txtNControl" required>
+                <label for="">Carrera: </label>
+                <select name="selectCarrera" id="selectCarrera" required>
+                    <option value="ISC">Ingeniería en Sistemas Computacionales</option>
+                    <option value="IM">Ingeniería Mecatrónica</option>
+                    <option value="IE">Ingeniería Electrónica</option>
+                    <option value="IGE">Ingeniería en Gestión Empresarial</option>
+                    <option value="IME">Ingeniería Mecánica</option>
+                    <option value="CP">Contador Público</option>
+                </select>
+            </div>
+            <div class="form-input">
+                <label for="">Teléfono fijo: </label>
+                <input type="tel" name="txtTelFijo" id="txtTelFijo" required>
+                <label for="">Teléfono celular: </label>
+                <input type="tel" name="txtCel" id="txtCel" required>
+            </div>
+                <div class="form-input">
+                    <label for="">Correo electrónico: </label>
+                    <input
+                        type="text"
+                        placeholder="L17430048@piedrasnegras.tecnm.mx"
+                        name="emailView"
+                        id="emailView"
+                        pattern="L[0-9]{2}430[0-9]{3}@piedrasnegras.tecnm.mx"
+                    />
+                </div>
+            <div class="form-input">
+                <label for="">Horario en la empresa: </label>
+                <div>
+                    <div>
+                        <label for="">Entrada:</label>
+                        <input type="time" name="rango1" id="rango1" required>
+                    </div>
+                    <div>
+                        <label for="">Salida:</label>
+                        <input type="time" name="rango2" id="rango2" required>
+                    </div>
+                </div>
+            </div>
+            <br>
+            
+            <div class="button-container">
+                <input class="primary-button" type="submit" value="TERMINAR">
+            </div>
+        </form>
+    </div>
+    <footer>
+        <div class="sections-container">
+            <section>
+                <h2>Integrantes</h2>
+                <div class="section-item">
+                    <p>Daniel Hernández Sánchez</p>
+                    <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+                </div>
+                <div class="section-item">
+                    <p>Roberto Carlos Díaz Sánchez</p>
+                    <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+                </div>
+            </section>
+            <section>
+                <h2>Materias</h2>
+                <div class="section-item">
+                    <p>Administración de Bases de Datos</p>
+                    <p>SCB-1001</p>
+                </div>
+                <div class="section-item">
+                    <p>Ingeniería de Software</p>
+                    <p>SCD-1011</p>
+                </div>
+                <div class="section-item">
+                    <p>Programación Web</p>
+                    <p>AEB-1055</p>
+                </div>
+            </section>
+            <section>
+                <h2>Enlaces de interés</h2>
+                <div class="section-item">
+                    <p>
+                        <a href="https://github.com/RobertoCDiaz/SIGER"
+                            >Repositorio en GitHub</a
+                        >
+                    </p>
+                    <p>
+                        <a
+                            href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw"
+                            >Documentación y evidencias</a
+                        >
+                    </p>
+                </div>
+            </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+</body>
+</html>
