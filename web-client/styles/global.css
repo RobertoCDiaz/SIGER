@@ -136,6 +136,35 @@ header h2 {
     box-shadow: inset 0 0 0 1px var(--azul-tec);
 }
 
+/*  =============================================
+
+    Inputs.
+
+=============================================  */
+input[type="text"],
+input[type="password"],
+input[type="tel"],
+textarea,
+select {
+    padding: 0.5em 1em;
+    background-color: #f2f2f2;
+    border: 1px solid var(--gray-border-color);
+    overflow: hidden;
+    resize: none;
+}
+
+input[type="number"] {
+    appearance: textfield;
+    -ms-progress-appearance: textfield;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+
+    padding: 0.25em 1em;
+    background-color: #f2f2f2;
+    border: 1px solid var(--gray-border-color);
+    font-size: 1em;
+}
+
 
 /*  =============================================
 

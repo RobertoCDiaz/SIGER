@@ -37,17 +37,6 @@ hr {
     margin: 1em 0 3em;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="tel"],
-select {
-    padding: 0.5em 1em;
-    background-color: #f2f2f2;
-    border: 1px solid var(--gray-border-color);
-    overflow: hidden;
-}
-
-
 input[type="submit"], input[type="button"], button {
     width: var(--button-width-percentage);
     padding: 1em !important;

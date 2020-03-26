@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Anexo XXIX (A. externo) :: SIGER</title>
+        <link rel="stylesheet" href="styles/global.css" />
+        <link rel="stylesheet" href="styles/forms.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+        <style>
+            .form-input {
+                display: flex;
+                padding: 1em;
+                align-items: center;
+            }
+
+            .form-input > * {
+                flex: 3;
+            }
+
+            .form-input > label {
+                flex: 1;
+            }
+
+            .button-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 2em;
+            }
+
+            form > h2 {
+                margin-bottom: 1em;
+                font-size: 1.75em;
+            }
+
+            form > p { 
+                margin: 0 .5em .5em .5em;
+                text-align: justify;
+            }
+
+            hr {
+                margin-bottom: 2em;
+            }
+
+            .rubric {
+                margin: 2em 5em;
+            }
+
+            .rubric-entry {
+                /* display: flex; */
+                padding: .5em;
+                align-items: center;
+
+                display: grid;
+                grid-template-areas: "text range input";
+                grid-template-columns: 8fr 1fr 1fr;
+            }
+
+            .rubric-entry > h3 {
+                text-align: center;
+            }
+
+            .entry-text {
+                padding: .5em;
+            }
+
+            .entry-range {
+                text-align: center;
+            }
+
+            .rubric-entry > input {
+                width: 5vw;
+                margin: 0 auto;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="header-extension">
+            <div class="bar">
+                <h1>SIGER</h1>
+                <h2>Formato de evaluación y seguimiento de residencia profesional - Asesor Externo</h2>
+            </div>
+        </header>
+
+        <div class="content">
+            <form>
+                <h2>Anexo XXIX</h2>
+                <hr>
+                <!-- <p>El objetivo de este formulario es el de evaluar el avance hasta el momento de la Residencia Profesional del estudiante <b>[NOMBRE DEL ESTUDIANTE]</b>, con número de control <b>[NO.CONTROL]</b>.</p> -->
+                <p>El objetivo de este formulario es el de evaluar el avance hasta el momento de la Residencia Profesional del estudiante <b>ROBERTO CARLOS DÍAZ SÁNCHEZ</b>, con número de control <b>17430057</b>.</p>
+                <p>A continuación, evalúe cada uno de los rubros que se indican con un valor numérico dentro del rango especificado, siendo 0 la calificación más baja. Después, podrá escribir sus observaciones personales.</p>
+                <div class="rubric">
+                    <div class="rubric-entry">
+                        <h3>Criterio a evaluar</h3>
+                        <h3>Rango</h3>
+                        <h3>Valor</h3>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Asiste puntualmente en el horario establecido.</p>
+                        <p class="entry-range">0 - 5</p>
+                        <input type="number" min="0" max="5">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Trabaja en equipo y se comunica de forma efectiva (oral y escrita).</p>
+                        <p class="entry-range">0 - 10</p>
+                        <input type="number" min="0" max="10">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Tiene iniciativa para colaborar.</p>
+                        <p class="entry-range">0 - 5</p>
+                        <input type="number" min="0" max="5">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Propone mejoras al proyecto.</p>
+                        <p class="entry-range">0 - 10</p>
+                        <input type="number" min="0" max="10">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Cumple con los objetivos correspondientes al proyecto.</p>
+                        <p class="entry-range">0 - 15</p>
+                        <input type="number" min="0" max="15">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Es ordenado y cumple satisfactoriamente con las actividades encomendadas en los tiempos establecidos del cronograma.</p>
+                        <p class="entry-range">0 - 15</p>
+                        <input type="number" min="0" max="15">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Desmuestra liderazgo en su actuar.</p>
+                        <p class="entry-range">0 - 10</p>
+                        <input type="number" min="0" max="10">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Demuestra conocimiento en el área de su especialidad.</p>
+                        <p class="entry-range">0 - 20</p>
+                        <input type="number" min="0" max="20">
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Desmuestra un comportamiento ético (es disciplinado, acata órdenes, respeta a sus compañeros de trabajo, entre otros).</p>
+                        <p class="entry-range">0 - 10</p>
+                        <input type="number" min="0" max="10">
+                    </div>
+                </div>
+                <h3>Observaciones</h3>
+                <div style="display: flex;">
+                    <textarea placeholder="Escriba aquí sus observaciones personales (limitado a 128 caracteres)..." rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
+                </div>
+                <div class="button-container">
+                    <button class="primary-button">TERMINAR</button>
+                </div>
+            </form>
+        </div>
+
+        <footer>
+            <div class="sections-container">
+                <section>
+                    <h2>Integrantes</h2>
+                    <div class="section-item">
+                        <p>Daniel Hernández Sánchez</p>
+                        <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+                    </div>
+                    <div class="section-item">
+                        <p>Roberto Carlos Díaz Sánchez</p>
+                        <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Materias</h2>
+                    <div class="section-item">
+                        <p>Administración de Bases de Datos</p>
+                        <p>SCB-1001</p>
+                    </div>
+                    <div class="section-item">
+                        <p>Ingeniería de Software</p>
+                        <p>SCD-1011</p>
+                    </div>
+                    <div class="section-item">
+                        <p>Programación Web</p>
+                        <p>AEB-1055</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Enlaces de interés</h2>
+                    <div class="section-item">
+                        <p>
+                            <a href="https://github.com/RobertoCDiaz/SIGER"
+                                >Repositorio en GitHub</a
+                            >
+                        </p>
+                        <p>
+                            <a
+                                href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw"
+                                >Documentación y evidencias</a
+                            >
+                        </p>
+                    </div>
+                </section>
+            </div>
+            <p>Instituto Tecnológico de Piedras Negras</p>
+            <p>Ingeniería en Sistemas Computacionales</p>
+        </footer>
+    </body>
+</html>
