@@ -339,7 +339,42 @@ DELIMITER ;;
 
 DROP PROCEDURE IF EXISTS SP_MostrarCarreras;;
 CREATE PROCEDURE SP_MostrarCarreras() BEGIN
-	select clave, nombre_carrera from carreras;
+	select clave, nombre_carrera from carreras order by nombre_carrera;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_RegistroResidente;;
+CREATE PROCEDURE SP_RegistroResidente(
+  v_email VARCHAR(64),
+  v_contrasena VARCHAR(160),
+  v_nombre VARCHAR(48),
+  v_apellido_paterno VARCHAR(48),
+  v_apellido_materno VARCHAR(48),
+  v_clave_carrera CHAR(13),
+  v_tel_cel CHAR(10),
+  v_tel_fijo CHAR(10),
+  OUT v_out TINYINT
+) BEGIN
+  DECLARE exit handler for SQLEXCEPTION
+  BEGIN
+    SET v_out = 0;
+    ROLLBACK;
+  END;
+
+  START TRANSACTION;
+    INSERT INTO `siger`.`residentes`
+      (email, contrasena, nombre, apellido_paterno, apellido_materno, clave_carrera)
+    VALUES
+      (v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_clave_carrera);
+
+    INSERT INTO `siger`.`telefonos_residentes` 
+      (telefono, email_residente, fijo)
+    VALUES
+      (v_tel_cel, v_email, 0),
+      (v_tel_fijo, v_email, 1);
+
+    SET v_out = 1;
+
+  COMMIT
 END;;
 
 DELIMITER ;
@@ -375,4 +410,4 @@ VALUES
 	('imce-2010-229', 'Ingeniería Mecatrónica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('imec-2010-228', 'Ingeniería Mecánica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('isic-2010-204', 'Ingeniería en Sistemas Computacionales', 'roberto.ds@piedrasnegras.tecnm.mx'),
-	('itic-2010-225', 'Ingeniería Mecánica', 'roberto.ds@piedrasnegras.tecnm.mx');
+	('itic-2010-225', 'Ingeniería en TIC\'s', 'roberto.ds@piedrasnegras.tecnm.mx');

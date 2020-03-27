@@ -51,16 +51,17 @@
                         name="emailView"
                         id="emailView"
                         pattern="L[0-9]{8}@itpiedrasnegras.tecnm.mx"
-                        
+                        required="required"
                     />
                 </div>
                 <div class="form-input">
                     <label for="passView">Contraseña</label>
                     <input
                         type="password"
-                        placeholder="********"
+                        placeholder="Mínimo 8 caracteres"
                         name="passView"
                         id="passView"
+                        required="required"
                         pattern=".{8,}"
                     />
                 </div>
@@ -68,10 +69,11 @@
                     <label for="repeatPassView">Vuelva a introducir su contraseña</label>
                     <input
                         type="password"
-                        placeholder="********"
+                        placeholder="Repita la contraseña anterior"
                         name="repeatPassView"
+                        required="required"
                         id="repeatPassView"
-                        pattern="[.]+"
+                        pattern=".{8,}"
                     />
                 </div>
                 <hr />
@@ -79,7 +81,7 @@
                 <p>Información del residente</p>
                 <div class="form-input">
                     <label for="nameView">Nombre(s)</label>
-                    <input type="text" name="nameView" id="nameView" />
+                    <input type="text" name="nameView" id="nameView" required="required"/>
                 </div>
                 <div class="form-input">
                     <label for="patSurnameView">Apellido Paterno</label>
@@ -87,6 +89,7 @@
                         type="text"
                         name="patSurnameView"
                         id="patSurnameView"
+                        required="required"
                     />
                 </div>
                 <div class="form-input">
@@ -99,33 +102,39 @@
                 </div>
                 <div class="form-input">
                     <label for="careerView">Carrera</label>
-                    <select name="careerView" id="careerView">
-                        <!-- TODO: Cambiar claves de carreras por IDs en la base de datos. -->
-                        <option value="ISC-2010-224"
-                            >Ingeniería en Sistemas Computacionales</option
-                        >
-                        <option value="IIN-2010-110"
-                            >Ingeniería Industrial</option
-                        >
-                        <option value="IME-2010-113"
-                            >Ingeniería Mecatrónica</option
-                        >
-                        <option value="IEL-2010-111"
-                            >Ingeniería Electrónica</option
-                        >
-                        <option value="IGE-2010-011"
-                            >Ingeniería en Gestión Empresarial</option
-                        >
-                        <option value="CON-2010-511">Contabilidad</option>
-                        <option value="ITI-2010-225"
-                            >Ingeniería en Tecnologías de la Información y
-                            Comunicación</option
-                        >
+                    <select name="careerView" id="careerView" required="required">
+                        <option value="">Escoja una carrera</option>
                     </select>
                 </div>
+                <script>
+                    const careerView = document.getElementById('careerView');
+
+                    const optionView = (key, name) => `<option value="${key}">${name}</option>`;
+
+                    const getCareers = () => {
+                        let xhr = new XMLHttpRequest();
+                        xhr.open('get', `http://localhost:8080/listaSimpleDeCarreras`, true);
+                        xhr.onload = () => {
+                            let response = JSON.parse(xhr.responseText);
+                            
+                            console.log(response);
+                            for (let i = 0; i < response.length; ++i) {
+                                let c = response[i];
+                                careerView.innerHTML += optionView(c['clave'], c['nombre_carrera']);
+                            }
+                        }
+                        xhr.send();
+                    }
+
+                    getCareers();
+                </script>
                 <div class="form-input">
-                    <label for="phoneNumberView">Número de teléfono</label>
-                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" name="phoneNumberView" id="phoneNumberView">
+                    <label for="cellNumberView">Número de teléfono celular</label>
+                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="cellNumberView" id="cellNumberView">
+                </div>
+                <div class="form-input">
+                    <label for="phoneNumberView">Número de teléfono fijo</label>
+                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="phoneNumberView" id="phoneNumberView">
                 </div>
                 <div class="button-container">
                     <input class="primary-button" type="submit" value="TERMINAR" />
