@@ -72,7 +72,7 @@ server.post('/registrarResidente', (req, res) => {
     con.query(
         'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?);',
         [
-            req.body.email, req.body.pass, req.body.name, req.body.patSurname,
+            req.body.email, encrypt(req.body.pass), req.body.name, req.body.patSurname,
             (req.body.matSurname || "null"), req.body.career, req.body.cellNumber, 
             req.body.phoneNumber    
         ],
