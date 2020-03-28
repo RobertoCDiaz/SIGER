@@ -144,6 +144,7 @@ header h2 {
 input[type="text"],
 input[type="password"],
 input[type="tel"],
+input[type="email"],
 textarea,
 select {
     padding: 0.5em 1em;

@@ -351,12 +351,15 @@ CREATE PROCEDURE SP_RegistroResidente(
   v_apellido_materno VARCHAR(48),
   v_clave_carrera CHAR(13),
   v_tel_cel CHAR(10),
-  v_tel_fijo CHAR(10),
-  OUT v_out TINYINT
+  v_tel_fijo CHAR(10)
 ) BEGIN
   DECLARE exit handler for SQLEXCEPTION
   BEGIN
-    SET v_out = 0;
+    GET DIAGNOSTICS CONDITION 1
+    @p2 = MESSAGE_TEXT;
+    
+    SELECT "0" AS output, @p2 AS message;
+    
     ROLLBACK;
   END;
 
@@ -366,21 +369,18 @@ CREATE PROCEDURE SP_RegistroResidente(
     VALUES
       (v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_clave_carrera);
 
+	
     INSERT INTO `siger`.`telefonos_residentes` 
       (telefono, email_residente, fijo)
     VALUES
       (v_tel_cel, v_email, 0),
       (v_tel_fijo, v_email, 1);
 
-    SET v_out = 1;
-
-  COMMIT
+    SELECT "1" AS output, "Transaction commited successfully" AS message;
+  COMMIT;
 END;;
 
 DELIMITER ;
-
-call SP_MostrarCarreras;
-
 
 /* --------------------------------------------------------
 

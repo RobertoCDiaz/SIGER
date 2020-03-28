@@ -1,6 +1,7 @@
 import { Keys } from "./Keys";
 
 const express   = require("express");
+const bParser   = require("body-parser");
 const mysql     = require("mysql");
 const AES       = require("aes.js-wrapper");
 
@@ -27,6 +28,8 @@ const con = mysql.createConnection({
 
 ================================================================================================ */
 server.use(express.static("../web-client/"));
+server.use(bParser.json());
+server.use(bParser.urlencoded({ extended: true }));
 
 /* ================================================================================================
 
@@ -51,6 +54,42 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
         }
     );
 });
+
+server.post('/registrarResidente', (req, res) => {
+    if (
+        !req.body.email ||
+        !req.body.pass ||
+        !req.body.name ||
+        !req.body.patSurname ||
+        !req.body.career ||
+        !req.body.cellNumber ||
+        !req.body.phoneNumber
+    ) {
+        res.send("0");
+        return;
+    }
+
+    con.query(
+        'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?);',
+        [
+            req.body.email, req.body.pass, req.body.name, req.body.patSurname,
+            (req.body.matSurname || "null"), req.body.career, req.body.cellNumber, 
+            req.body.phoneNumber    
+        ],
+        (e, rows, f) => {
+
+            if (e) {
+                console.log(e);
+                res.send(e);
+                return;
+            }
+
+            res.send(rows[0][0]);
+            return;
+        }
+    );
+});
+
 
 /* ================================================================================================
 

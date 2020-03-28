@@ -38,39 +38,38 @@
         </header>
 
         <div class="content">
-            <form>
+            <form id="form">
                 <h3>Configuración de cuenta</h3>
                 <p>
                     Información requerida para la identificación del residente
                 </p>
                 <div class="form-input">
-                    <label for="emailView">Correo electrónico</label>
+                    <label>Correo electrónico*</label>
                     <input
-                        type="text"
-                        placeholder="L16430123@itpiedrasnegras.tecnm.mx"
-                        name="emailView"
+                        type="email"
+                        placeholder="L16430123@piedrasnegras.tecnm.mx"
+                        name="email"
                         id="emailView"
-                        pattern="L[0-9]{8}@itpiedrasnegras.tecnm.mx"
+                        pattern="[L|l][0-9]{8}@piedrasnegras.tecnm.mx"
                         required="required"
                     />
                 </div>
                 <div class="form-input">
-                    <label for="passView">Contraseña</label>
+                    <label>Contraseña*</label>
                     <input
                         type="password"
                         placeholder="Mínimo 8 caracteres"
-                        name="passView"
+                        name="pass"
                         id="passView"
                         required="required"
                         pattern=".{8,}"
                     />
                 </div>
                 <div class="form-input">
-                    <label for="repeatPassView">Vuelva a introducir su contraseña</label>
+                    <label>Vuelva a introducir su contraseña*</label>
                     <input
                         type="password"
                         placeholder="Repita la contraseña anterior"
-                        name="repeatPassView"
                         required="required"
                         id="repeatPassView"
                         pattern=".{8,}"
@@ -80,64 +79,43 @@
                 <h3>Configuración del perfil</h3>
                 <p>Información del residente</p>
                 <div class="form-input">
-                    <label for="nameView">Nombre(s)</label>
-                    <input type="text" name="nameView" id="nameView" required="required"/>
+                    <label>Nombre(s)*</label>
+                    <input type="text" name="name" id="nameView" required="required"/>
                 </div>
                 <div class="form-input">
-                    <label for="patSurnameView">Apellido Paterno</label>
+                    <label>Apellido Paterno*</label>
                     <input
                         type="text"
-                        name="patSurnameView"
+                        name="patSurname"
                         id="patSurnameView"
                         required="required"
                     />
                 </div>
                 <div class="form-input">
-                    <label for="matSurnameView">Apellido Materno</label>
+                    <label>Apellido Materno</label>
                     <input
                         type="text"
-                        name="matSurnameView"
+                        name="matSurname"
                         id="matSurnameView"
                     />
                 </div>
                 <div class="form-input">
-                    <label for="careerView">Carrera</label>
-                    <select name="careerView" id="careerView" required="required">
+                    <label>Carrera*</label>
+                    <select name="career" id="careerView" required="required">
                         <option value="">Escoja una carrera</option>
                     </select>
                 </div>
-                <script>
-                    const careerView = document.getElementById('careerView');
-
-                    const optionView = (key, name) => `<option value="${key}">${name}</option>`;
-
-                    const getCareers = () => {
-                        let xhr = new XMLHttpRequest();
-                        xhr.open('get', `http://localhost:8080/listaSimpleDeCarreras`, true);
-                        xhr.onload = () => {
-                            let response = JSON.parse(xhr.responseText);
-                            
-                            console.log(response);
-                            for (let i = 0; i < response.length; ++i) {
-                                let c = response[i];
-                                careerView.innerHTML += optionView(c['clave'], c['nombre_carrera']);
-                            }
-                        }
-                        xhr.send();
-                    }
-
-                    getCareers();
-                </script>
+                
                 <div class="form-input">
-                    <label for="cellNumberView">Número de teléfono celular</label>
-                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="cellNumberView" id="cellNumberView">
+                    <label>Número de teléfono celular*</label>
+                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="cellNumber" id="cellNumberView">
                 </div>
                 <div class="form-input">
-                    <label for="phoneNumberView">Número de teléfono fijo</label>
-                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="phoneNumberView" id="phoneNumberView">
+                    <label>Número de teléfono fijo*</label>
+                    <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="phoneNumber" id="phoneNumberView">
                 </div>
                 <div class="button-container">
-                    <input class="primary-button" type="submit" value="TERMINAR" />
+                    <button type="button" id="submitButtonView" class="primary-button">TERMINAR</button>
                 </div>
             </form>
         </div>
@@ -190,5 +168,92 @@
             <p>Instituto Tecnológico de Piedras Negras</p>
             <p>Ingeniería en Sistemas Computacionales</p>
         </footer>
+        <script>
+            const emailView = document.getElementById('emailView');
+            const passView = document.getElementById('passView');
+            const repeatPassView = document.getElementById('repeatPassView');
+            const nameView = document.getElementById('nameView');
+            const patSurnameView = document.getElementById('patSurnameView');
+            const matSurnameView = document.getElementById('matSurnameView');
+            const careerView = document.getElementById('careerView');
+            const cellNumberView = document.getElementById('cellNumberView');
+            const phoneNumberView = document.getElementById('phoneNumberView');
+
+            const submitButtonView = document.getElementById('submitButtonView');
+
+            const optionView = (key, name) => `<option value="${key}">${name}</option>`;
+
+            const getCareers = () => {
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', `/listaSimpleDeCarreras`, true);
+                xhr.onload = () => {
+                    let response = JSON.parse(xhr.responseText);
+                    
+                    for (let i = 0; i < response.length; ++i) {
+                        let c = response[i];
+                        careerView.innerHTML += optionView(c['clave'], c['nombre_carrera']);
+                    }
+                }
+                xhr.send();
+            }
+
+            getCareers();
+
+            submitButtonView.onclick = () => {
+                // Validaciones.
+                if (
+                    emailView.value.trim() == "" ||
+                    passView.value == "" ||
+                    nameView.value.trim() == "" ||
+                    patSurnameView.value.trim() == "" ||
+                    careerView.value.trim() == "0" ||
+                    cellNumberView.value.trim() == "" ||
+                    phoneNumberView.value.trim() == ""
+                ) {
+                    alert("Por favor, llene todos los campos obligatorios (marcados con un asterisco).");
+                    return;
+                }
+
+                if (passView.value != repeatPassView.value) {
+                    alert("Las contraseñas no coinciden.");
+                    return;
+                }
+
+                // Registro de residente.
+                let xhr = new XMLHttpRequest();
+
+                xhr.open('POST', '/registrarResidente', true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                xhr.onload = () => {
+                    let res = JSON.parse(xhr.responseText);
+
+                    if (res == '0') {
+                        alert('Ha ocurrido un error en el registro, por favor, revise todos los campos e inténtelo de nuevo.');
+                        return;
+                    }
+
+                    if (res['output'] == 0) {
+                        alert(`Ha ocurrido un error: ${res['message']}.`);
+                        return;
+                    }
+
+                    if (res['output'] == 1) {
+                        window.open('/index.html', '_selft');
+                    }
+                }
+
+                xhr.send(
+                    `email=${encodeURI(emailView.value.trim())}&` +
+                    `pass=${encodeURI(passView.value)}&` +
+                    `name=${encodeURI(nameView.value.trim())}&` +
+                    `patSurname=${encodeURI(patSurnameView.value.trim())}&` +
+                    `matSurname=${encodeURI(matSurnameView.value.trim())}&` +
+                    `career=${encodeURI(careerView.value.trim())}&` +
+                    `cellNumber=${encodeURI(cellNumberView.value.trim())}&` +
+                    `phoneNumber=${encodeURI(phoneNumberView.value.trim())}`
+                );
+            };
+        </script>
     </body>
 </html>
