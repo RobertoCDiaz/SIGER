@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`carreras` (
   `nombre_carrera` VARCHAR(45) NOT NULL,
   `admin_email` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`clave`),
-  INDEX `fk_carreras_admin1_idx` (`admin_email` ASC) VISIBLE,
+  INDEX `fk_carreras_admin1_idx` (`admin_email` ASC), -- VISIBLE,
   CONSTRAINT `fk_carreras_admin1`
     FOREIGN KEY (`admin_email`)
     REFERENCES `siger`.`administradores` (`email`)
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`residentes` (
   `aprobado` TINYINT NOT NULL DEFAULT 0,
   `clave_carrera` CHAR(13) NOT NULL,
   PRIMARY KEY (`email`),
-  INDEX `fk_residentes_carreras1_idx` (`clave_carrera` ASC) VISIBLE,
+  INDEX `fk_residentes_carreras1_idx` (`clave_carrera` ASC), -- VISIBLE,
   CONSTRAINT `fk_residentes_carreras1`
     FOREIGN KEY (`clave_carrera`)
     REFERENCES `siger`.`carreras` (`clave`)
@@ -108,8 +108,8 @@ CREATE TABLE IF NOT EXISTS `siger`.`competente` (
   `email_docente` VARCHAR(64) NOT NULL,
   `clave_materia` CHAR(8) NOT NULL,
   PRIMARY KEY (`email_docente`, `clave_materia`),
-  INDEX `fk_docentes_has_materias_materias1_idx` (`clave_materia` ASC) VISIBLE,
-  INDEX `fk_docentes_has_materias_docentes1_idx` (`email_docente` ASC) VISIBLE,
+  INDEX `fk_docentes_has_materias_materias1_idx` (`clave_materia` ASC), -- VISIBLE,
+  INDEX `fk_docentes_has_materias_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
   CONSTRAINT `fk_docentes_has_materias_docentes1`
     FOREIGN KEY (`email_docente`)
     REFERENCES `siger`.`docentes` (`email`)
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`telefonos_residentes` (
   `fijo` TINYINT NOT NULL DEFAULT 0,
   `email_residente` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`telefono`),
-  INDEX `fk_telefonos_residentes_residentes1_idx` (`email_residente` ASC) VISIBLE,
+  INDEX `fk_telefonos_residentes_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
   CONSTRAINT `fk_telefonos_residentes_residentes1`
     FOREIGN KEY (`email_residente`)
     REFERENCES `siger`.`residentes` (`email`)
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`telefonos_docentes` (
   `fijo` TINYINT NOT NULL DEFAULT 0,
   `email_docente` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`telefono`),
-  INDEX `fk_telefonos_docentes_docentes1_idx` (`email_docente` ASC) VISIBLE,
+  INDEX `fk_telefonos_docentes_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
   CONSTRAINT `fk_telefonos_docentes_docentes1`
     FOREIGN KEY (`email_docente`)
     REFERENCES `siger`.`docentes` (`email`)
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`residencias` (
   `email_residente` VARCHAR(64) NOT NULL,
   `fecha_elaboracion` INT NOT NULL,
   PRIMARY KEY (`idresidencia`),
-  INDEX `fk_residencia_residentes1_idx` (`email_residente` ASC) VISIBLE,
+  INDEX `fk_residencia_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
   CONSTRAINT `fk_residencia_residentes1`
     FOREIGN KEY (`email_residente`)
     REFERENCES `siger`.`residentes` (`email`)
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`empresas` (
   `departamento` VARCHAR(64) NOT NULL,
   `id_residencia` INT NOT NULL,
   PRIMARY KEY (`idempresa`),
-  INDEX `fk_empresa_residencia1_idx` (`id_residencia` ASC) VISIBLE,
+  INDEX `fk_empresa_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
   CONSTRAINT `fk_empresa_residencia1`
     FOREIGN KEY (`id_residencia`)
     REFERENCES `siger`.`residencias` (`idresidencia`)
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`asesores_externos` (
   `telefono` CHAR(10) NOT NULL,
   `id_residencia` INT NOT NULL,
   PRIMARY KEY (`idasesores_externos`),
-  INDEX `fk_asesores_externos_residencia1_idx` (`id_residencia` ASC) VISIBLE,
+  INDEX `fk_asesores_externos_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
   CONSTRAINT `fk_asesores_externos_residencia1`
     FOREIGN KEY (`id_residencia`)
     REFERENCES `siger`.`residencias` (`idresidencia`)
@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`horarios` (
   `fin` CHAR(5) NOT NULL,
   `id_residencia` INT NOT NULL,
   PRIMARY KEY (`idhorarios`),
-  INDEX `fk_horarios_residencia1_idx` (`id_residencia` ASC) VISIBLE,
+  INDEX `fk_horarios_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
   CONSTRAINT `fk_horarios_residencia1`
     FOREIGN KEY (`id_residencia`)
     REFERENCES `siger`.`residencias` (`idresidencia`)
@@ -265,8 +265,8 @@ CREATE TABLE IF NOT EXISTS `siger`.`involucrados` (
   `id_residencia` INT NOT NULL,
   `es_asesor` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`email_docente`, `id_residencia`),
-  INDEX `fk_docentes_has_residencia_residencia1_idx` (`id_residencia` ASC) VISIBLE,
-  INDEX `fk_docentes_has_residencia_docentes1_idx` (`email_docente` ASC) VISIBLE,
+  INDEX `fk_docentes_has_residencia_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
+  INDEX `fk_docentes_has_residencia_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
   CONSTRAINT `fk_docentes_has_residencia_docentes1`
     FOREIGN KEY (`email_docente`)
     REFERENCES `siger`.`docentes` (`email`)
@@ -294,7 +294,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`anexo_29` (
   `observaciones_internas` VARCHAR(128) NOT NULL,
   `id_residencia` INT NOT NULL,
   PRIMARY KEY (`idanexo_29`),
-  INDEX `fk_anexo_29_residencia1_idx` (`id_residencia` ASC) VISIBLE,
+  INDEX `fk_anexo_29_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
   CONSTRAINT `fk_anexo_29_residencia1`
     FOREIGN KEY (`id_residencia`)
     REFERENCES `siger`.`residencias` (`idresidencia`)
@@ -317,7 +317,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
   `observaciones_internas` VARCHAR(128) NOT NULL,
   `id_residencia` INT NOT NULL,
   PRIMARY KEY (`idanexo_30`),
-  INDEX `fk_anexo_30_residencia1_idx` (`id_residencia` ASC) VISIBLE,
+  INDEX `fk_anexo_30_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
   CONSTRAINT `fk_anexo_30_residencia1`
     FOREIGN KEY (`id_residencia`)
     REFERENCES `siger`.`residencias` (`idresidencia`)
