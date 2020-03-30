@@ -376,7 +376,7 @@ CREATE PROCEDURE SP_RegistroResidente(
       (v_tel_cel, v_email, 0),
       (v_tel_fijo, v_email, 1);
 
-    SELECT "1" AS output, "Transaction commited successfully" AS message;
+    SELECT "1" AS output, "Transaction committed successfully" AS message;
   COMMIT;
 END;;
 
