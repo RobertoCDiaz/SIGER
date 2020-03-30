@@ -152,15 +152,12 @@
                     <h2>Enlaces de interés</h2>
                     <div class="section-item">
                         <p>
-                            <a href="https://github.com/RobertoCDiaz/SIGER"
-                                >Repositorio en GitHub</a
-                            >
+                            <a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a>
                         </p>
                         <p>
-                            <a
-                                href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw"
-                                >Documentación y evidencias</a
-                            >
+                            <a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">
+                                Documentación y evidencias
+                            </a>
                         </p>
                     </div>
                 </section>
@@ -213,6 +210,20 @@
                     alert("Por favor, llene todos los campos obligatorios (marcados con un asterisco).");
                     return;
                 }
+
+                if (!(new RegExp("[L|l][0-9]{8}@piedrasnegras.tecnm.mx").test(emailView.value.trim()))) {
+                    alert("El email no tiene la estructura correcta. Ejemplo: L16430123@piedrasnegras.tecnm.mx")
+                    return;
+                }
+
+                if (
+                    !(new RegExp("[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})").test(cellNumberView.value.trim())) ||
+                    !(new RegExp("[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})").test(phoneNumberView.value.trim()))
+                ) {
+                    alert("Por favor, introduzca un número de teléfono válido.");
+                    return;
+                }
+
 
                 if (passView.value != repeatPassView.value) {
                     alert("Las contraseñas no coinciden.");
