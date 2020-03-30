@@ -44,7 +44,7 @@
     </header>
     
         <div class="content">
-            <form>
+            <form id="form">
                 <div id="mainform">
                     <h2>Iniciar sesión</h2>
                 <br>
@@ -53,7 +53,7 @@
                     <input
                         type="text"
                         placeholder="L12345678@piedrasnegras.tecnm.mx"
-                        name="emailView"
+                        name="email"
                         id="emailView"
                         pattern="L[0-9]{2}430[0-9]{3}@piedrasnegras.tecnm.mx"
                     />
@@ -63,8 +63,8 @@
                     <label for="">Contraseña: </label>
                     <input
                         type="password"
-                        name="txtContrasena"
-                        id="txtContrasena"
+                        name="pass"
+                        id="passView"
                         placeholder="**********"
                     >
                 </div>
@@ -84,7 +84,7 @@
                 <br>
                 </div>
                 <div class="button-container" id="bot">
-                    <input class="primary-button" type="submit" value="INGRESAR"/>
+                    <button type="button" id="submitButtonView" class="primary-button">Ingresar</button>
                 </div>
             </form>
             
@@ -137,5 +137,31 @@
             <p>Instituto Tecnológico de Piedras Negras</p>
             <p>Ingeniería en Sistemas Computacionales</p>
         </footer>
+        <script>
+            const emailView = document.getElementById('emailView');
+            const passView = document.getElementById('passView');
+            const submitButton = document.getElementById('submitButtonView');
+            submitButton.onclick = () =>{
+                if(
+                    emailView.value.trim() == "" ||
+                    passView.value == ""
+                ){
+                    alert("Por favor, llene todos los campos.")
+                }
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST','/auth',true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                
+                xhr.onreadystatechange = ()=>{
+                    if(xhr.readyState==4 && xhr.status==200){
+                        alert(xhr.responseText);
+                    }
+                };
+                xhr.send(
+                    `email=${encodeURI(emailView.value.trim())}&` +
+                    `pass=${encodeURI(passView.value)}`
+                );
+            };
+        </script>
 </body>
 </html>

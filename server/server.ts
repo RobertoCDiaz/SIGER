@@ -1,9 +1,11 @@
 import { Keys } from "./Keys";
 
 const express   = require("express");
+const session   = require("express-session");
 const bParser   = require("body-parser");
 const mysql     = require("mysql");
 const AES       = require("aes.js-wrapper");
+const path      = require("path");
 
 const server = express();
 const port: number = 8080;
@@ -16,7 +18,7 @@ const port: number = 8080;
 const con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Rcds161198*',
+    password: 'Tec_123*',
 
     database: 'siger',
     multipleStatements: true,
@@ -30,6 +32,11 @@ const con = mysql.createConnection({
 server.use(express.static("../web-client/"));
 server.use(bParser.json());
 server.use(bParser.urlencoded({ extended: true }));
+server.use(session({
+    secret:'secret',
+    resave: true,
+    saveUninitialized: true
+}));
 
 /* ================================================================================================
 
@@ -88,6 +95,73 @@ server.post('/registrarResidente', (req, res) => {
             return;
         }
     );
+});
+
+/**
+ * Login simple
+ * 
+ * Si ocurre algún error, regresará un objeto de error al cliente.
+ */
+
+server.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname + '/../web-client/login.html')); });
+    
+server.post('/auth', (req,res) =>{
+    const email = req.body.email;
+    const pass = req.body.pass;
+    let nombre = null;
+    if (!email || !pass) { // Esto es por si falta algún parámetro. Solo por si acaso.
+        res.send("0");
+        return
+    }
+
+    con.query('select nombre, contrasena from residentes where email = ?',[email],(e,results,fi)=>
+    {
+        if (results.length == 0) {
+            res.send('El correo electrónico ingresado no está registrado.'); 
+            return;
+        }
+
+        if (pass != decrypt(results[0]['contrasena'])) {
+            res.send('La contraseña no es correcta, verifique.');
+            return;
+        }
+
+        res.send('Bienvenido(a), '+results[0]['nombre']+'.');
+    });
+
+    // if(email && pass){con.query('select * from residentes where email = ? and contrasena = ?',
+    //     [email,contra],(e,resp,f)=>{
+    //         if(resp.length>0){
+    //             console.log(req.session.email)
+    //             req.session.loggedin = true;
+    //             req.session.email = email;
+    //             resp.send(1);
+    //             return;
+    //         }
+    //         else{
+    //             resp.send('0');
+    //             return;}
+    //         resp.send(-1);
+    //     });
+    // }
+    // else{
+    //     res.send({errorCode: '0'}); 
+    //     res.end();
+    // }
+});
+
+server.get('/home',(req,res)=>
+{
+    if(req.session.loggedin)
+    {
+        res.send('Bienvenido, ' + req.session.email + '.');
+    }
+    else
+    {
+        res.send('Inicia sesión para ingresar al sistema.');
+    }
+    res.end();
 });
 
 
