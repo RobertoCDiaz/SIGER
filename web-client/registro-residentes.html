@@ -180,6 +180,17 @@
             const cellNumberView = document.getElementById('cellNumberView');
             const phoneNumberView = document.getElementById('phoneNumberView');
 
+            const fill = () => {
+                emailView.value = 'L17430057@piedrasnegras.tecnm.mx';;
+                passView.value = 'Rcds161198*';
+                repeatPassView.value = 'Rcds161198*';
+                nameView.value = "Roberto Carlos";
+                patSurnameView.value = 'Díaz';
+                matSurnameView.value = 'Sánchez';
+                cellNumberView.value = '8781097283';
+                phoneNumberView.value = '8787958068';
+            }
+
             const submitButtonView = document.getElementById('submitButtonView');
 
             const optionView = (key, name) => `<option value="${key}">${name}</option>`;
@@ -188,7 +199,7 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open('get', `/listaSimpleDeCarreras`, true);
                 xhr.onload = () => {
-                    let response = JSON.parse(xhr.responseText);
+                    let response = JSON.parse(xhr.responseText).object;
                     
                     for (let i = 0; i < response.length; ++i) {
                         let c = response[i];

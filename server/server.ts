@@ -291,7 +291,25 @@ server.get('/logout', (req, res) => {
     req.session.loggedin = false;
 
     res.redirect('/');
-}) 
+});
+
+server.get('/nuevo-residente', (req, res) => {
+    if (req.session.loggedin) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('registro-residentes.html', { root: '../web-client/' })
+});
+server.get('/nuevo-docente', (req, res) => {
+    if (req.session.loggedin) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('registro-docentes.html', { root: '../web-client/' })
+});
+
 
 /* ================================================================================================
 
