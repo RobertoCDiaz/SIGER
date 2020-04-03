@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de residentes:: SIGER</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/forms.css">
+    <style>
+        @media only screen and (min-width: 1441px) {
+            :root {
+                --popup-width-percentage: 30%;
+            }
+        }
+
+        @media only screen and (min-width: 1100px) and (max-width: 1440px) {
+            :root {
+                --popup-width-percentage: 50%;
+            }
+        }
+
+        @media only screen and (max-width: 1099px) {
+            :root {
+                --popup-width-percentage: 75%;
+            }
+        }
+
+        .list {
+            border: 1px solid var(--gray-border-color);
+            border-radius: 2px;
+            margin: 2em 5%;
+        }
+
+        .list > div {
+            display: grid;
+            grid-template-columns: 1fr 3fr 1fr;
+            padding: .5em;
+            align-items: center;
+        }
+
+        .list > div:not(:first-child) {
+            border-top: 1px solid var(--gray-border-color);
+        }
+
+        .list-header {
+            font-weight: bold;
+            background-color: #f1f8ff;
+        }
+
+        .list-item {
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            color: white;
+            background-color: var(--gray-border-color);
+        }
+
+        .list-item > p {
+            color: inherit;
+        }
+
+        form > p {
+            margin-bottom: 1em;
+        }
+
+        .residente-container {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+
+            /* opacity: 0; */
+            display: none;
+        }
+
+        .residente {
+            background-color: white;
+            width: var(--popup-width-percentage);
+            padding: 1em 3em;
+        }
+
+        .info-item {
+            margin: 1em 0;
+        }
+
+        .info-item > .value {
+            font-weight: bold;
+        }
+
+        .residente > .options-container {
+            display: flex; 
+            flex-direction: row; 
+            justify-content: space-between;
+            margin-top: 2em;
+        }
+
+        .residente > .options-container > button:first-child {
+            margin-right: 2em;
+        }
+
+    </style>
+</head>
+<body>
+    <header class="header-extension">
+        <div class="bar">
+            <h1>SIGER</h1>
+            <h2>Validación de registo de Residentes</h2>
+        </div>
+    </header>
+
+    <div class="content">
+        <form>
+            <h2>Residentes no confirmados</h2>
+            <p>A continuación aparecerán los residentes cuyo registro está terminado, pero que aún no están validados. Los residentes no-validados no podrán crear un reporte preeliminar, y por lo tanto, no podrán comenzar con su Residencia Profesional.</p>
+            <p>Para validar a un residente, presione el elemento deseado, lea la información del prospecto, y presione <b>VALIDAR</b>.</p>
+
+            <div class="list">
+                <div class="list-header">
+                    <p>No. de Control</p>
+                    <p>Nombre completo</p>
+                    <p>Fecha de registro</p>
+                </div>
+                <!-- TODO: Generar a partir del contenido de la BD. -->
+                <div class="list-item" onclick="openInfo();">
+                    <p class="controlNumber">17430048</p>
+                    <p class="fullName">DANIEL HERNÁNDEZ SÁNCHEZ</p>
+                    <p class="date">28 de marzo del 2020</p>
+                </div>
+                <div class="list-item" onclick="openInfo();">
+                    <p class="controlNumber">17430057</p>
+                    <p class="fullName">ROBERTO CARLOS DÍAZ SÁNCHEZ</p>
+                    <p class="date">4 de abril del 2020</p>
+                </div>
+                <div class="list-item" onclick="openInfo();">
+                    <p class="controlNumber">17430003</p>
+                    <p class="fullName">HÉCTOR ARROYO VALVERDE</p>
+                    <p class="date">8 de abril del 2020</p>
+                </div>
+                <div class="list-item" onclick="openInfo();">
+                    <p class="controlNumber">17430321</p>
+                    <p class="fullName">NOELIA PIEDRABUENA CUÉLLAR</p>
+                    <p class="date">9 de abril del 2020</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- TODO: Reemplazar datos por la información del residente seleccionado. -->
+    <div id="residenteView" class="residente-container">
+        <div class="residente">
+            <div class="info-item">
+                <p class="title">Nombre completo</p>
+                <p class="value">NOELIA PIEDRABUENA CUÉLLAR</p>
+            </div>
+            <div class="info-item">
+                <p class="title">Número de Control</p>
+                <p class="value">17430321</p>
+            </div>
+            <div class="info-item">
+                <p class="title">Carrera</p>
+                <p class="value">Ingeniería en Sistemas Computacionales</p>
+            </div>
+            <div class="info-item">
+                <p class="title">Fecha de registro</p>
+                <p class="value">9 de abril del 2020</p>
+            </div>
+            <div class="info-item">
+                <p class="title">Contacto</p>
+                <p class="value">L17430321@piedrasnegras.tecnm.mx</p>
+                <p class="value">8787894561</p>
+                <p class="value">8781236548</p>
+            </div>
+            <div class="options-container">
+                <button type="button" class="secondary-button" onclick="closeInfo();">CERRAR</button>
+                <!-- TODO: Validar un residente al dar click. -->
+                <button type="button" class="primary-button">VALIDAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const residenteView = document.getElementById('residenteView');
+
+        const openInfo = () => {
+            // residenteView.style.opacity = 100;
+            residenteView.style.display = 'flex';
+        }
+
+        const closeInfo = () => {
+            residenteView.style.display = 'none';
+        }
+    </script>
+
+    <footer>
+        <div class="sections-container">
+        <section>
+            <h2>Integrantes</h2>
+            <div class="section-item">
+                <p>Daniel Hernández Sánchez</p>
+                <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+            </div>
+            <div class="section-item">
+                <p>Roberto Carlos Díaz Sánchez</p>
+                <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+            </div>
+        </section>
+        <section>
+            <h2>Materias</h2>
+            <div class="section-item">
+                <p>Administración de Bases de Datos</p>
+                <p>SCB-1001</p>
+            </div>
+            <div class="section-item">
+                <p>Ingeniería de Software</p>
+                <p>SCD-1011</p>
+            </div>
+            <div class="section-item">
+                <p>Programación Web</p>
+                <p>AEB-1055</p>
+            </div>
+        </section>
+        <section>
+            <h2>Enlaces de interés</h2>
+            <div class="section-item">
+                <p><a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a></p>
+                <p><a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">
+                    Documentación y evidencias
+                </a></p>
+            </div>
+        </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+</body>
+</html>

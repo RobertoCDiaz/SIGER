@@ -31,6 +31,7 @@ form {
 
 form > p {
     color: var(--secondary-text);
+    text-align: justify;
 }
 
 hr {

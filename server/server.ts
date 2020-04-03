@@ -1,11 +1,11 @@
 import { Keys } from "./Keys";
+import { Response } from "./Response";
 
 const express   = require("express");
 const session   = require("express-session");
 const bParser   = require("body-parser");
 const mysql     = require("mysql");
 const AES       = require("aes.js-wrapper");
-const path      = require("path");
 
 const server = express();
 const port: number = 8080;
@@ -16,9 +16,9 @@ const port: number = 8080;
 
 ================================================================================================ */
 const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Tec_123*',
+    host: Keys.DB_CONNECTION.host,
+    user: Keys.DB_CONNECTION.user,
+    password: Keys.DB_CONNECTION.password,
 
     database: 'siger',
     multipleStatements: true,
@@ -38,6 +38,12 @@ server.use(session({
     saveUninitialized: true
 }));
 
+enum USER_CLASSES {
+    RESIDENTE = 1,
+    ADMIN = 2,
+    DOCENTE = 3
+}
+
 /* ================================================================================================
 
     Petitions.
@@ -54,10 +60,11 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
         `call SP_MostrarCarreras()`,
         (e, rows, f) => {
             if (e) {
-                res.send({errorCode: '-1', errorMessage: e}); 
+                res.send(Response.unknownError(e.toString()));
                 return;
             }
-            res.send(rows[0]);
+
+            res.send(Response.success(rows[0]));
         }
     );
 });
@@ -87,11 +94,17 @@ server.post('/registrarResidente', (req, res) => {
 
             if (e) {
                 console.log(e);
-                res.send(e);
+                Response.unknownError(e.toString());
                 return;
             }
 
-            res.send(rows[0][0]);
+            if (rows[0][0]['output'] != 1) {
+                Response.sqlError(rows[0][0]['message']);
+                return;
+            }
+
+            Response.success();
+            // res.send(rows[0][0]);
             return;
         }
     );
@@ -102,68 +115,89 @@ server.post('/registrarResidente', (req, res) => {
  * 
  * Si ocurre algún error, regresará un objeto de error al cliente.
  */
-
 server.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname + '/../web-client/login.html')); });
+    if (req.session.loggedin) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile("login.html", { root: "../web-client/" }); 
+});
     
 server.post('/auth', (req,res) =>{
     const email = req.body.email;
     const pass = req.body.pass;
-    let nombre = null;
+
     if (!email || !pass) { // Esto es por si falta algún parámetro. Solo por si acaso.
         res.send("0");
         return
     }
 
-    con.query('select nombre, contrasena from residentes where email = ?',[email],(e,results,fi)=>
-    {
+    con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
+        if (e) {
+            // res.send(e);
+            res.send(Response.unknownError(e.toString()));
+            return;
+        }
+        
         if (results.length == 0) {
-            res.send('El correo electrónico ingresado no está registrado.'); 
+            // res.send('El correo electrónico ingresado no está registrado.'); 
+            res.send(Response.userError("El correo electrónico ingresado no está registrado."));
             return;
         }
 
         if (pass != decrypt(results[0]['contrasena'])) {
-            res.send('La contraseña no es correcta, verifique.');
+            // res.send('La contraseña no es correcta, verifique.');
+            res.send(Response.userError("La contraseña no es correcta, verifique."));
             return;
         }
 
-        res.send('Bienvenido(a), '+results[0]['nombre']+'.');
+        req.session.user = {
+            class: USER_CLASSES.RESIDENTE,
+            info: {
+                email: results[0]['email'],
+                nombre: results[0]['nombre'],
+                apellido_paterno: results[0]['apellido_paterno'],
+                apellido_materno: results[0]['apellido_materno']
+            }
+        };
+
+        req.session.loggedin = true;
+
+        // res.redirect('/home');
+        res.send(Response.success());
     });
-
-    // if(email && pass){con.query('select * from residentes where email = ? and contrasena = ?',
-    //     [email,contra],(e,resp,f)=>{
-    //         if(resp.length>0){
-    //             console.log(req.session.email)
-    //             req.session.loggedin = true;
-    //             req.session.email = email;
-    //             resp.send(1);
-    //             return;
-    //         }
-    //         else{
-    //             resp.send('0');
-    //             return;}
-    //         resp.send(-1);
-    //     });
-    // }
-    // else{
-    //     res.send({errorCode: '0'}); 
-    //     res.end();
-    // }
 });
 
-server.get('/home',(req,res)=>
-{
-    if(req.session.loggedin)
-    {
-        res.send('Bienvenido, ' + req.session.email + '.');
+server.get('/home',(req,res)=> {
+    if(req.session.loggedin){
+        if (req.session.info.class = USER_CLASSES.RESIDENTE) {
+            res.sendFile("registro-residentes.html", { root: "../web-client/" });
+            return
+        }
+
+        res.sendFile("registro-docentes.html", { root: "../web-client/" });
+        return;
     }
-    else
-    {
-        res.send('Inicia sesión para ingresar al sistema.');
-    }
-    res.end();
+    res.redirect('/login');    
 });
 
+server.get('/validar-residentes', (req, res) => {
+    /*
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.ADMIN) {
+        // TODO: Agregar pantalla de Acesson No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    */
+
+    res.sendFile('validar-residente.html', { root: '../web-client/' });
+});
 
 /* ================================================================================================
 

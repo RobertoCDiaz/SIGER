@@ -27,7 +27,7 @@
     /* --azul-tec: #002B7F; */
     --azul-tec: #1B396A;
     --azul-tec-light: #184286;
-    --amarillo-tec: #FFED38;
+    --amarillo-tec: rgb(10, 10, 8);
 
     --page-background: #EAEAEA;
     --content-background: white;
@@ -89,6 +89,11 @@ header h2 {
     z-index: -5;
 }
 
+header a {
+    font-family: inherit;
+    text-decoration: none;
+}
+
 
 /*  =============================================
 
@@ -110,11 +115,11 @@ header h2 {
     color: white;
     border: 1px solid var(--azul-tec);
     background-color: var(--azul-tec);
-    border-radius: 2px;
     padding: 0.5em 1em;
     font-weight: bold;
     cursor: pointer;
     transition-duration: var(--animation-duration);
+    box-sizing: content-box;
 }
 
 .primary-button:hover {

@@ -38,7 +38,7 @@
     font-size: 1.5em;
 }
 
-button {
+.button {
     background-color: transparent;
     border: 2px solid white;
     color: white;
@@ -46,9 +46,10 @@ button {
     font-size: 18px;
     transition-duration: var(--animation-duration);
     cursor: pointer;
+    text-decoration: none;
 }
 
-button:hover {
+.button:hover {
     background-color: white;
     color: black;
 }

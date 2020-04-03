@@ -27,18 +27,13 @@
         .divs
         {
             margin: 2em;
-        }
-        .footer-iframe {
-                overflow-y: visible;
-            }
-
-        
+        }        
     </style>
 </head>
 <body>
     <header class="header-extension">
         <div class="bar">
-            <h1>SIGER</h1>
+            <h1><a href="/home">SIGER</a></h1>
             <h2>Login</h2>
         </div>
     </header>
@@ -146,7 +141,8 @@
                     emailView.value.trim() == "" ||
                     passView.value == ""
                 ){
-                    alert("Por favor, llene todos los campos.")
+                    alert("Por favor, llene todos los campos.");
+                    return;
                 }
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST','/auth',true);
