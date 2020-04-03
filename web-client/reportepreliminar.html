@@ -9,34 +9,6 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
     <style>
-        /*body
-        {
-            background-color: gainsboro
-        }
-        #formrepreliminar
-        {
-            display: flex;
-            flex-direction: column;
-            margin: 2em 4em 4em 4em;
-            padding: 2em;
-            width: 50%;
-            align-self: center;
-            box-shadow: black 3px 3px 3px;
-            background-color: white;
-        }
-
-        
-
-        .name
-        {
-            width: 16em;
-        }
-        div
-        {
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }*/
-
         textarea
         {
             resize:none;
@@ -119,6 +91,16 @@
     </style>
 </head>
 <body>
+    <button id="fixedbutton"><img src="assets/images/menu.png" onclick="openNav()"></button>
+    
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#"><img src="assets/images/reporte.png"> Reporte preliminar</a>
+            <a href="#"><img src="assets/images/progreso.png"> Progreso actual</a>
+            <a href="#"><img src="assets/images/brief.png"> Documentos</a>
+            <a href="#"><img src="assets/images/chat.png"> Contacto con docentes</a>
+        </div>
+
     <header class="header-extension">
         <div class="bar">
             <h1>SIGER</h1>
@@ -233,7 +215,7 @@
                 <label for="">Correo electrónico: </label>
                 <input
                         type="text"
-                        placeholder="fulanito@dominio.com"
+                        placeholder="correo@dominio.com"
                         name="emailView"
                         id="emailView"
                         pattern="[A-z0-9]+@[a-z].[a-z]+"
@@ -352,5 +334,6 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
+    <script src="scripts/sidebar.js"></script>
 </body>
 </html>
