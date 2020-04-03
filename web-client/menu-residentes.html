@@ -109,6 +109,10 @@
                 font-size: 18px;
                 text-align: center;
             }
+
+            a {
+                text-decoration: none;
+            }
         </style>
     </head>
     <body>
@@ -126,26 +130,36 @@
                 <div class="main-container">
                     <div class="title">Bienvenido, Roberto Carlos</div>
                     <div class="options-container">
-                        <div class="menu-item">
-                            <i class="material-icons">note_add</i>
-                            <p>Nuevo proyecto</p>
-                        </div>
-                        <div class="menu-item">
-                            <i class="material-icons">flag</i>
-                            <p>Progreso actual</p>
-                        </div>
-                        <div class="menu-item">
-                            <i class="material-icons">description</i>
-                            <p>Documentos</p>
-                        </div>
-                        <div class="menu-item">
-                            <i class="material-icons">chat</i>
-                            <p>Chat</p>
-                        </div>
-                        <div class="menu-item">
-                            <i class="material-icons">exit_to_app</i>
-                            <p>Cerrar sesión</p>
-                        </div>
+                        <a href="/nuevo-proyecto">
+                            <div class="menu-item">
+                                <i class="material-icons">note_add</i>
+                                <p>Nuevo proyecto</p>
+                            </div>
+                        </a>
+                        <a href="/avance-proyecto">
+                            <div class="menu-item">
+                                <i class="material-icons">flag</i>
+                                <p>Progreso actual</p>
+                            </div>
+                        </a>
+                        <a href="/docs">
+                            <div class="menu-item">
+                                <i class="material-icons">description</i>
+                                <p>Documentos</p>
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div class="menu-item">
+                                <i class="material-icons">chat</i>
+                                <p>Chat</p>
+                            </div>
+                        </a>
+                        <a href="/logout">
+                            <div class="menu-item">
+                                <i class="material-icons">exit_to_app</i>
+                                <p>Cerrar sesión</p>
+                            </div>
+                        </a>
                         <!-- <div class="menu-item">
                             <i class="material-icons">exit_to_app</i>
                             <p>Cerrar sesión</p>

@@ -134,7 +134,7 @@ server.post('/auth', (req,res) =>{
         return
     }
 
-    switch (userClass) {
+    switch (parseInt(userClass)) {
         case USER_CLASSES.RESIDENTE: {
             con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
                 if (e) {
@@ -204,7 +204,6 @@ server.post('/auth', (req,res) =>{
                 res.send(Response.success());
             });  
             break;  
-
         }
     }
 
@@ -212,12 +211,12 @@ server.post('/auth', (req,res) =>{
 
 server.get('/home',(req,res)=> {
     if(req.session.loggedin){
-        if (req.session.info.class = USER_CLASSES.RESIDENTE) {
+        if (req.session.user.class == USER_CLASSES.RESIDENTE) {
             res.sendFile("menu-residentes.html", { root: "../web-client/" });
             return
         }
 
-        if (req.session.info.class = USER_CLASSES.ADMIN) {
+        if (req.session.user.class == USER_CLASSES.ADMIN) {
             res.sendFile("menu-admin.html", { root: "../web-client/" });
             return
         }
@@ -242,6 +241,57 @@ server.get('/validar-residentes', (req, res) => {
 
     res.sendFile('validar-residente.html', { root: '../web-client/' });
 });
+
+server.get('/nuevo-proyecto', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesson No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('reportepreliminar.html', { root: '../web-client/' });
+});
+
+server.get('/avance-proyecto', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesson No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('avance.html', { root: '../web-client/' });
+});
+
+server.get('/docs', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesson No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('documentos.html', { root: '../web-client/' });
+});
+
+server.get('/logout', (req, res) => {
+    req.session.loggedin = false;
+
+    res.redirect('/');
+}) 
 
 /* ================================================================================================
 
