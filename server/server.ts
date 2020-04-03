@@ -127,52 +127,98 @@ server.get('/login', (req, res) => {
 server.post('/auth', (req,res) =>{
     const email = req.body.email;
     const pass = req.body.pass;
+    const userClass = req.body.class;
 
-    if (!email || !pass) { // Esto es por si falta algún parámetro. Solo por si acaso.
+    if (!email || !pass || !userClass) { // Esto es por si falta algún parámetro. Solo por si acaso.
         res.send("0");
         return
     }
 
-    con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
-        if (e) {
-            // res.send(e);
-            res.send(Response.unknownError(e.toString()));
-            return;
-        }
+    switch (userClass) {
+        case USER_CLASSES.RESIDENTE: {
+            con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
+                if (e) {
+                    // res.send(e);
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+                
+                if (results.length == 0) {
+                    // res.send('El correo electrónico ingresado no está registrado.'); 
+                    res.send(Response.userError("El correo electrónico ingresado no está registrado."));
+                    return;
+                }
         
-        if (results.length == 0) {
-            // res.send('El correo electrónico ingresado no está registrado.'); 
-            res.send(Response.userError("El correo electrónico ingresado no está registrado."));
-            return;
+                if (pass != decrypt(results[0]['contrasena'])) {
+                    // res.send('La contraseña no es correcta, verifique.');
+                    res.send(Response.userError("La contraseña no es correcta, verifique."));
+                    return;
+                }
+        
+                req.session.user = {
+                    class: USER_CLASSES.RESIDENTE,
+                    info: {
+                        email: results[0]['email'],
+                        nombre: results[0]['nombre'],
+                        apellido_paterno: results[0]['apellido_paterno'],
+                        apellido_materno: results[0]['apellido_materno']
+                    }
+                };
+        
+                req.session.loggedin = true;
+        
+                res.send(Response.success());
+            });  
+            break;  
+        }     
+
+        case USER_CLASSES.ADMIN: {
+            con.query('select * from administradores where email = ?',[email],(e,results,fi)=> {
+                if (e) {
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+                
+                if (results.length == 0) {
+                    res.send(Response.userError("El correo electrónico ingresado no está registrado."));
+                    return;
+                }
+        
+                if (pass != decrypt(results[0]['contrasena'])) {
+                    res.send(Response.userError("La contraseña no es correcta, verifique."));
+                    return;
+                }
+        
+                req.session.user = {
+                    class: USER_CLASSES.ADMIN,
+                    info: {
+                        email: results[0]['email'],
+                        nombre: results[0]['nombre'],
+                        apellido_paterno: results[0]['apellido_paterno'],
+                        apellido_materno: results[0]['apellido_materno']
+                    }
+                };
+        
+                req.session.loggedin = true;
+        
+                res.send(Response.success());
+            });  
+            break;  
+
         }
+    }
 
-        if (pass != decrypt(results[0]['contrasena'])) {
-            // res.send('La contraseña no es correcta, verifique.');
-            res.send(Response.userError("La contraseña no es correcta, verifique."));
-            return;
-        }
-
-        req.session.user = {
-            class: USER_CLASSES.RESIDENTE,
-            info: {
-                email: results[0]['email'],
-                nombre: results[0]['nombre'],
-                apellido_paterno: results[0]['apellido_paterno'],
-                apellido_materno: results[0]['apellido_materno']
-            }
-        };
-
-        req.session.loggedin = true;
-
-        // res.redirect('/home');
-        res.send(Response.success());
-    });
 });
 
 server.get('/home',(req,res)=> {
     if(req.session.loggedin){
         if (req.session.info.class = USER_CLASSES.RESIDENTE) {
-            res.sendFile("registro-residentes.html", { root: "../web-client/" });
+            res.sendFile("menu-residentes.html", { root: "../web-client/" });
+            return
+        }
+
+        if (req.session.info.class = USER_CLASSES.ADMIN) {
+            res.sendFile("menu-admin.html", { root: "../web-client/" });
             return
         }
 
@@ -183,7 +229,6 @@ server.get('/home',(req,res)=> {
 });
 
 server.get('/validar-residentes', (req, res) => {
-    /*
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
@@ -194,7 +239,6 @@ server.get('/validar-residentes', (req, res) => {
         res.redirect('/home');
         return;
     }
-    */
 
     res.sendFile('validar-residente.html', { root: '../web-client/' });
 });

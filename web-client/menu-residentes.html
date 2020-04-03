@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Residente :: SIGER</title>
+        <link rel="stylesheet" href="styles/global.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            .content {
+                background-color: black;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                background-image: url(../assets/images/residentes-menu-background.jpg);
+                background-size: cover;
+            }
+
+            .content * {
+                color: white;
+            }
+
+            .black-overlay {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.75);
+                /* background: linear-gradient(rgba(234, 234, 234, 0.7), var(--page-background)); */
+            }
+
+            .main-container {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                align-content: center;
+                margin: 0 20vw;
+            }
+
+            .main-container > * {
+                margin: .75em 0;
+            }
+
+            .main-container > h1 {
+                font-size: 2.75em;
+            }
+            .main-container > h2 {
+                font-size: 1.5em;
+            }
+
+            .button {
+                background-color: transparent;
+                border: 2px solid white;
+                color: white;
+                padding: .75em 1.25em;
+                font-size: 18px;
+                transition-duration: var(--animation-duration);
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            .button:hover {
+                background-color: white;
+                color: black;
+            }
+
+            .main-container > .title {
+                font-size: 2em;
+                margin-bottom: 2em;
+            }
+
+            .options-container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-content: center;
+                justify-content: center;
+            }
+
+            .menu-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 2em;
+                flex: 1;
+                cursor: pointer;
+                min-width: 20vw;
+                max-width: 20vw;
+                /* transition-duration: var(--animation-duration); */
+            }
+
+            .menu-item:hover {
+                color: black;
+                background-color: rgba(255, 255, 255, 1);
+            }
+
+            .menu-item > * {
+                color: inherit;
+            }
+
+            .menu-item > i {
+                font-size: 3em;
+                margin-bottom: 0.5em;
+            }
+
+            .menu-item > p {
+                font-size: 18px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="bar">
+                <!-- <h1>SIGER</h1> -->
+                <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                    <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                    <h1 style="margin-left: .5em;">SIGER</h1>
+                </a>
+            </div>
+        </header>
+        <div class="content">
+            <div class="black-overlay">
+                <div class="main-container">
+                    <div class="title">Bienvenido, Roberto Carlos</div>
+                    <div class="options-container">
+                        <div class="menu-item">
+                            <i class="material-icons">note_add</i>
+                            <p>Nuevo proyecto</p>
+                        </div>
+                        <div class="menu-item">
+                            <i class="material-icons">flag</i>
+                            <p>Progreso actual</p>
+                        </div>
+                        <div class="menu-item">
+                            <i class="material-icons">description</i>
+                            <p>Documentos</p>
+                        </div>
+                        <div class="menu-item">
+                            <i class="material-icons">chat</i>
+                            <p>Chat</p>
+                        </div>
+                        <div class="menu-item">
+                            <i class="material-icons">exit_to_app</i>
+                            <p>Cerrar sesión</p>
+                        </div>
+                        <!-- <div class="menu-item">
+                            <i class="material-icons">exit_to_app</i>
+                            <p>Cerrar sesión</p>
+                        </div>
+                        <div class="menu-item">
+                            <i class="material-icons">exit_to_app</i>
+                            <p>Cerrar sesión</p>
+                        </div>
+                        <div class="menu-item">
+                            <i class="material-icons">exit_to_app</i>
+                            <p>Cerrar sesión</p>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
