@@ -12,6 +12,11 @@
             float: left;
             width: 25%;
             }
+
+            img:hover
+            {
+                cursor: pointer;
+            }
     
             /* Clear floats after rows */
             .row:after {
