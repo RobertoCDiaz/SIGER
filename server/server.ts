@@ -103,7 +103,7 @@ server.post('/registrarResidente', (req, res) => {
                 return;
             }
 
-            Response.success();
+            res.send(Response.success());
             // res.send(rows[0][0]);
             return;
         }

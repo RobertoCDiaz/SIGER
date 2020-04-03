@@ -253,18 +253,19 @@
 
                 xhr.onload = () => {
                     let res = JSON.parse(xhr.responseText);
+                    console.log(res);
 
-                    if (res == '0') {
+                    if (res['code'] == 0) {
                         alert('Ha ocurrido un error en el registro, por favor, revise todos los campos e inténtelo de nuevo.');
                         return;
                     }
 
-                    if (res['output'] == 0) {
+                    if (res['code'] == -2) {
                         alert(`Ha ocurrido un error: ${res['message']}.`);
                         return;
                     }
 
-                    if (res['output'] == 1) {
+                    if (res['code'] == 1) {
                         window.open('/', '_self');
                     }
                 }
