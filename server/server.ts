@@ -69,6 +69,28 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
     );
 });
 
+server.get('/residentesNoValidados', (req, res) => {
+    // Para proteger la información de los residentes, solo administradores tendrán
+    // acceso a esta petición. En caso de no ser un administador, se regresará
+    // al cliente una Response.authError().
+    // if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    //     res.send(Response.authError());
+    //     return;
+    // }
+
+    con.query(
+        `call SP_ResidentesNoValidados();`,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
 server.post('/registrarResidente', (req, res) => {
     if (
         !req.body.email ||
@@ -79,32 +101,31 @@ server.post('/registrarResidente', (req, res) => {
         !req.body.cellNumber ||
         !req.body.phoneNumber
     ) {
-        res.send("0");
+        res.send(Response.noParamsError());
         return;
     }
 
     con.query(
-        'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?);',
+        'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?, ?);',
         [
             req.body.email, encrypt(req.body.pass), req.body.name, req.body.patSurname,
-            (req.body.matSurname || "null"), req.body.career, req.body.cellNumber, 
+            (req.body.matSurname || "null"), new Date().getTime().toString(), req.body.career, req.body.cellNumber, 
             req.body.phoneNumber    
         ],
         (e, rows, f) => {
 
             if (e) {
                 console.log(e);
-                Response.unknownError(e.toString());
+                res.send(Response.unknownError(e.toString()));
                 return;
             }
 
             if (rows[0][0]['output'] != 1) {
-                Response.sqlError(rows[0][0]['message']);
+                res.send(Response.sqlError(rows[0][0]['message']));
                 return;
             }
 
             res.send(Response.success());
-            // res.send(rows[0][0]);
             return;
         }
     );
@@ -130,7 +151,7 @@ server.post('/auth', (req,res) =>{
     const userClass = req.body.class;
 
     if (!email || !pass || !userClass) { // Esto es por si falta algún parámetro. Solo por si acaso.
-        res.send("0");
+        res.send(Response.noParamsError());
         return
     }
 

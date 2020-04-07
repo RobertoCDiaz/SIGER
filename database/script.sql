@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`residentes` (
   `apellido_paterno` VARCHAR(48) NOT NULL,
   `apellido_materno` VARCHAR(48) NULL,
   `aprobado` TINYINT NOT NULL DEFAULT 0,
+  `fecha_creacion` VARCHAR(14) NOT NULL,
   `clave_carrera` CHAR(13) NOT NULL,
   PRIMARY KEY (`email`),
   INDEX `fk_residentes_carreras1_idx` (`clave_carrera` ASC), -- VISIBLE,
@@ -175,8 +176,8 @@ CREATE TABLE IF NOT EXISTS `siger`.`residencias` (
   `ano` CHAR(4) NOT NULL,
   `descripcion_actividades` VARCHAR(1024) NOT NULL,
   `aprobado` TINYINT NOT NULL DEFAULT 0,
+  `fecha_elaboracion` VARCHAR(14) NOT NULL,
   `email_residente` VARCHAR(64) NOT NULL,
-  `fecha_elaboracion` INT NOT NULL,
   PRIMARY KEY (`idresidencia`),
   INDEX `fk_residencia_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
   CONSTRAINT `fk_residencia_residentes1`
@@ -287,7 +288,7 @@ DROP TABLE IF EXISTS `siger`.`anexo_29` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`anexo_29` (
   `idanexo_29` INT NOT NULL AUTO_INCREMENT,
-  `fecha` INT NOT NULL,
+  `fecha` VARCHAR(14) NOT NULL,
   `evaluacion_externa` VARCHAR(24) NOT NULL,
   `observaciones_externas` VARCHAR(128) NOT NULL,
   `evaluacion_interna` VARCHAR(17) NOT NULL,
@@ -310,7 +311,7 @@ DROP TABLE IF EXISTS `siger`.`anexo_30` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
   `idanexo_30` INT NOT NULL AUTO_INCREMENT,
-  `fecha` INT NOT NULL,
+  `fecha` VARCHAR(14) NOT NULL,
   `evaluacion_externa` VARCHAR(28) NOT NULL,
   `observaciones_externas` VARCHAR(128) NOT NULL,
   `evaluacion_interna` VARCHAR(28) NOT NULL,
@@ -349,6 +350,7 @@ CREATE PROCEDURE SP_RegistroResidente(
   v_nombre VARCHAR(48),
   v_apellido_paterno VARCHAR(48),
   v_apellido_materno VARCHAR(48),
+  v_fecha_creacion VARCHAR(14),
   v_clave_carrera CHAR(13),
   v_tel_cel CHAR(10),
   v_tel_fijo CHAR(10)
@@ -365,9 +367,9 @@ CREATE PROCEDURE SP_RegistroResidente(
 
   START TRANSACTION;
     INSERT INTO `siger`.`residentes`
-      (email, contrasena, nombre, apellido_paterno, apellido_materno, clave_carrera)
+      (email, contrasena, nombre, apellido_paterno, apellido_materno, fecha_creacion, clave_carrera)
     VALUES
-      (v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_clave_carrera);
+      (v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_fecha_creacion, v_clave_carrera);
 
 	
     INSERT INTO `siger`.`telefonos_residentes` 
@@ -378,6 +380,24 @@ CREATE PROCEDURE SP_RegistroResidente(
 
     SELECT "1" AS output, "Transaction committed successfully" AS message;
   COMMIT;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_ResidentesNoValidados;;
+CREATE PROCEDURE SP_ResidentesNoValidados() BEGIN
+  
+  select 
+    r.email, substring(r.email, 2, 8) as `noControl`, r.nombre, r.apellido_paterno, r.apellido_materno,
+    (select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 0) as `celular`,
+    (select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 1) as `tel`,
+    r.fecha_creacion, c.nombre_carrera as `carrera`
+  from 
+    residentes as r join carreras as c 
+      on c.clave = r.clave_carrera
+  where 
+    aprobado = 0
+  order by 
+    r.fecha_creacion, `noControl`;
+
 END;;
 
 DELIMITER ;
@@ -410,4 +430,4 @@ VALUES
 	('imce-2010-229', 'Ingeniería Mecatrónica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('imec-2010-228', 'Ingeniería Mecánica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('isic-2010-204', 'Ingeniería en Sistemas Computacionales', 'roberto.ds@piedrasnegras.tecnm.mx'),
-	('itic-2010-225', 'Ingeniería en TIC\'s', 'roberto.ds@piedrasnegras.tecnm.mx');
+	('itic-2010-225', 'Ingeniería en TICs', 'roberto.ds@piedrasnegras.tecnm.mx');
