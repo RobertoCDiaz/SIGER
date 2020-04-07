@@ -384,7 +384,6 @@ END;;
 
 DROP PROCEDURE IF EXISTS SP_ResidentesNoValidados;;
 CREATE PROCEDURE SP_ResidentesNoValidados() BEGIN
-  
   select 
     r.email, substring(r.email, 2, 8) as `noControl`, r.nombre, r.apellido_paterno, r.apellido_materno,
     (select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 0) as `celular`,
@@ -397,7 +396,38 @@ CREATE PROCEDURE SP_ResidentesNoValidados() BEGIN
     aprobado = 0
   order by 
     r.fecha_creacion, `noControl`;
+END;;
 
+DROP PROCEDURE IF EXISTS SP_ValidarResidente;;
+CREATE PROCEDURE SP_ValidarResidente(
+  v_email_residente VARCHAR(64)
+) BEGIN
+  DECLARE exit handler for SQLEXCEPTION
+  BEGIN
+    GET DIAGNOSTICS CONDITION 1
+    @p2 = MESSAGE_TEXT;
+    
+    SELECT "0" AS output, @p2 AS message;
+    
+    ROLLBACK;
+  END;
+
+  START TRANSACTION;
+
+    IF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente) = 0
+    THEN BEGIN
+      SELECT "0" AS output, "No existe un residente con este email" AS message;
+    END; 
+    ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente AND r.aprobado = 0) = 0
+    THEN BEGIN
+      SELECT "0" AS output, "Este residente ya está validado" AS message;
+    END; ELSE BEGIN
+      UPDATE `siger`.`residentes` AS r SET r.aprobado = 1 WHERE r.email = v_email_residente;
+
+      SELECT "1" AS output, "Residente validado con éxito" AS message; 
+    END; END IF;
+  
+  COMMIT;
 END;;
 
 DELIMITER ;

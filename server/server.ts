@@ -70,13 +70,10 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
 });
 
 server.get('/residentesNoValidados', (req, res) => {
-    // Para proteger la información de los residentes, solo administradores tendrán
-    // acceso a esta petición. En caso de no ser un administador, se regresará
-    // al cliente una Response.authError().
-    // if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
-    //     res.send(Response.authError());
-    //     return;
-    // }
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
 
     con.query(
         `call SP_ResidentesNoValidados();`,
@@ -91,6 +88,33 @@ server.get('/residentesNoValidados', (req, res) => {
     );
 });
 
+server.post('/validarResidente', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const emailResidente = req.body.email_residente;
+    if (!emailResidente) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_ValidarResidente(?)`,
+        emailResidente,
+        (e, rows, f) => {
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success(undefined, rows[0][0]['message']));
+        }
+    );
+
+});
+
 server.post('/registrarResidente', (req, res) => {
     if (
         !req.body.email ||
@@ -101,7 +125,7 @@ server.post('/registrarResidente', (req, res) => {
         !req.body.cellNumber ||
         !req.body.phoneNumber
     ) {
-        res.send(Response.noParamsError());
+        res.send(Response.notEnoughParams());
         return;
     }
 
@@ -151,7 +175,7 @@ server.post('/auth', (req,res) =>{
     const userClass = req.body.class;
 
     if (!email || !pass || !userClass) { // Esto es por si falta algún parámetro. Solo por si acaso.
-        res.send(Response.noParamsError());
+        res.send(Response.notEnoughParams());
         return
     }
 

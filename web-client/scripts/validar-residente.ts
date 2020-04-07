@@ -62,6 +62,7 @@ const dateView = document.getElementById('dateView');
 const emailView = document.getElementById('emailView');
 const cellPhoneView = document.getElementById('cellPhoneView');
 const phoneView = document.getElementById('phoneView');
+const validateButtonView = document.getElementById('validateButtonView');
 
 const openInfo = (r) => {
     nameView.innerHTML = `${r.nombre} ${r.apellido_paterno} ${r.apellido_materno ?? ""}`;
@@ -72,9 +73,32 @@ const openInfo = (r) => {
     cellPhoneView.innerHTML = r['celular'];
     phoneView.innerHTML = r['tel'];
 
+    validateButtonView.onclick = () => validar(r['email']);
+
     residenteView.style.display = 'flex';
 }
 
 const closeInfo = () => {
     residenteView.style.display = 'none';
+}
+
+/* ================================================================================================
+
+    Validar residente.
+
+================================================================================================ */
+const validar = (email: string) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open('post', '/validarResidente', true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = () => {
+        const response = JSON.parse(xhr.response);
+
+        alert(response['message']);
+
+        location.reload();
+    };
+    
+    xhr.send(`email_residente=${email}`);
 }

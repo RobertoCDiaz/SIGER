@@ -24,11 +24,11 @@ export class Response {
     static authError = (msg: string = "No cuenta con la autorización necesaria para realizar esta acción"): Response => 
         new Response(Response.codes.AUTH_ERROR, msg);
 
-    static noParamsError = (): Response => 
-        new Response(Response.codes.NO_PARAMS, "A la petición le faltan parámetros para llevarse a cabo correctamente");
+    static notEnoughParams = (): Response => 
+        new Response(Response.codes.NOT_ENOUGH_PARAMS, "A la petición le faltan parámetros para llevarse a cabo correctamente");
 
     static codes = {
-        NO_PARAMS: 0,
+        NOT_ENOUGH_PARAMS: 0,
         SUCCESS: 1,
 
         UNKNOWN_ERROR: -1,
