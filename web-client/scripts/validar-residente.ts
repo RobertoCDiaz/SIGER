@@ -1,3 +1,6 @@
+// import { Response } from "../../server/Response";
+
+
 /* ================================================================================================
 
     Cargar residentes no validados.
@@ -11,8 +14,10 @@ const getResidentsList = (): Promise<Object> => new Promise((resolve, reject) =>
 
     xhr.onload = () => {
         let response = JSON.parse(xhr.response);
+        // let response: Response = Response.fromStringifiedJSON(xhr.response);
 
         if (response['code'] != 1) {
+        // if (!response.isSuccessful()) {
             reject(response['message']);
             return;
         }

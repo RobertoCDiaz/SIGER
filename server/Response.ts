@@ -9,6 +9,25 @@ export class Response {
         this.object = obj;
     }
 
+    static fromJSON = (obj: Object): Response => 
+        new Response(obj['code'], obj['message'], obj['object']);
+
+    static fromStringifiedJSON = (str: string): Response =>
+        Response.fromJSON(JSON.parse(str));    
+        
+    /* ================================================================================================
+    
+        Methods.
+    
+    ================================================================================================ */
+    isSuccessful = () : boolean => 
+        this.code == Response.codes.SUCCESS;
+
+    /* ================================================================================================
+    
+        Common responses.
+    
+    ================================================================================================ */
     static success = (obj: Object = {}, msg: string = "Success"): Response =>
         new Response(Response.codes.SUCCESS, msg, obj);
 

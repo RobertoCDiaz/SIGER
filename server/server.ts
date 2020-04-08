@@ -218,7 +218,7 @@ server.post('/auth', (req,res) =>{
         }     
 
         case USER_CLASSES.ADMIN: {
-            con.query('select * from administradores where email = ?',[email],(e,results,fi)=> {
+            con.query('select * from administradores where email = ?',[email],(e,results,fi) => {
                 if (e) {
                     res.send(Response.unknownError(e.toString()));
                     return;
