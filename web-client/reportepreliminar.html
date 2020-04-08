@@ -114,9 +114,6 @@
     
     <div class="content">
         <form>
-                <p>
-                    Fecha de elaboración: (Automática)
-                </p>
                 <br>
                 <h3>Descripción general del proyecto</h3>
                 <div class="form-input">
@@ -129,13 +126,13 @@
                 </div>
                 <div class="form-input">
                     <label for="">Justificación (Problema a resolver):</label>
-                    <textarea name="txtJustifiacion" id="txtJustificacion" cols="30" rows="7" required></textarea>
+                    <textarea name="txtJustificacion" id="txtJustificacion" cols="30" rows="7" required></textarea>
                 </div>
                 <div class="form-input">
                     <label for="">Periodo de realización: </label>
                     <select name="selectPeriodo" id="selectPeriodo" required>
-                        <option value="EJ">Enero-Junio</option>
-                        <option value="AD">Agosto-Diciembre</option>
+                        <option value="1">Enero-Junio</option>
+                        <option value="2">Agosto-Diciembre</option>
                     </select>
                     <label for="">Año:</label>
                     <select name="selectYear" id="selectYear" required>
@@ -169,7 +166,7 @@
                 </div>
                 <div class="form-input">
                     <label for="">Dirección: </label>
-                    <input type="text" name="txtDirección" id="txtDirección" required>
+                    <input type="text" name="txtDirección" id="txtDireccion" required>
                     
                         <label for="">Teléfono:</label>
                         <input type="tel" name="txtTel" id="txtTel" required>
@@ -182,9 +179,9 @@
                     <input
                         type="text"
                         placeholder="empresa@dominio.com"
-                        name="emailView"
-                        id="emailView"
-                        pattern="[A-z0-9]+@[a-z].[a-z]+"
+                        name="emailEmpresa"
+                        id="emailEmpresa"
+                        
                     />
                 </div>
                 <div class="form-input">
@@ -206,10 +203,10 @@
             <div class="form-input">
                 <label for="">Grado de estudios: </label>
                 <select name="selectGrado" id="selectGrado" required>
-                    <option value="LIC">Licenciatura</option>
-                    <option value="MAS">Maestría</option>
-                    <option value="DOC">Doctorado</option>
-                    <option value="OTR">Otro</option>
+                    <option value="Licenciatura">Licenciatura</option>
+                    <option value="Maestría">Maestría</option>
+                    <option value="Doctorado">Doctorado</option>
+                    <option value="Otro">Otro</option>
                     <!--¿habilitar campo para introducir otro?-->
                 </select>
                 <label for="">Teléfono: </label>
@@ -221,55 +218,13 @@
                         type="text"
                         placeholder="correo@dominio.com"
                         name="emailView"
-                        id="emailView"
-                        pattern="[A-z0-9]+@[a-z].[a-z]+"
+                        id="emailAE"
+                        
                     />
             </div>
             <!-------------------------------------------------------------------------->
-            <br>
-            <h3>Datos del residente.</h3>
-            <div class="form-input">
-                <label for="">Nombre: </label>
-                <input class="name" type="text" name="txtNombreR" id="txtNombreR" required>
-            </div>
-            <div class="form-input">
-                <label for="">Apellido paterno: </label>
-                <input class="name" type="text" name="txtAPR" id="txtAPR" required>
-            </div>
-            <div class="form-input">
-                <label for="">Apellido materno: </label>
-                <input class="name" type="text" name="txtAMR" id="txtAMR" required>
-            </div>
-                
-            <div class="form-input">
-                <label for="">Número de control: </label>
-                <input type="text" name="txtNControl" id="txtNControl" required>
-                <label for="">Carrera: </label>
-                <select name="selectCarrera" id="selectCarrera" required>
-                    <option value="ISC">Ingeniería en Sistemas Computacionales</option>
-                    <option value="IM">Ingeniería Mecatrónica</option>
-                    <option value="IE">Ingeniería Electrónica</option>
-                    <option value="IGE">Ingeniería en Gestión Empresarial</option>
-                    <option value="IME">Ingeniería Mecánica</option>
-                    <option value="CP">Contador Público</option>
-                </select>
-            </div>
-            <div class="form-input">
-                <label for="">Teléfono fijo: </label>
-                <input type="tel" name="txtTelFijo" id="txtTelFijo" required>
-                <label for="">Teléfono celular: </label>
-                <input type="tel" name="txtCel" id="txtCel" required>
-            </div>
-                <div class="form-input">
-                    <label for="">Correo electrónico: </label>
-                    <input
-                        type="text"
-                        placeholder="L17430048@piedrasnegras.tecnm.mx"
-                        name="emailView"
-                        id="emailView"
-                        pattern="L[0-9]{2}430[0-9]{3}@piedrasnegras.tecnm.mx"
-                    />
-                </div>
+            <!--Implementar elemento dinámico para horarios-->
+            
             <div class="form-input">
                 <label for="">Horario en la empresa: </label>
                 <div>
@@ -286,7 +241,7 @@
             <br>
             
             <div class="button-container">
-                <input class="primary-button" type="submit" value="TERMINAR">
+                <input id="subm" class="primary-button" type="button" value="TERMINAR">
             </div>
         </form>
     </div>
@@ -339,5 +294,83 @@
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
     <script src="scripts/sidebar.js"></script>
+    <script>
+        const nombre_proyecto    = document.getElementById("txtNombreProyecto");
+        const objetivo           = document.getElementById("txtObjetivo");
+        const justificacion      = document.getElementById("txtJustificacion");
+        const periodo            = document.getElementById("selectPeriodo");
+        const ano                = document.getElementById("selectYear");
+        const actividades        = document.getElementById("txtActividades");
+        const fecha_elaboracion  = new Date().getTime();
+        const empresa           = document.getElementById("txtEmpresa");
+        const representante     = document.getElementById("txtRepresentante");
+        const direccion         = document.getElementById("txtDireccion");
+        const telEmpresa        = document.getElementById("txtTel");
+        const ciudad            = document.getElementById("txtCiudad");
+        const emailEmpresa      = document.getElementById("emailEmpresa");
+        const depto             = document.getElementById("txtDepto");
+        const nombreAE          = document.getElementById("txtNombreAE");
+        const puesto            = document.getElementById("txtPuesto");
+        const grado             = document.getElementById("selectGrado");
+        const telAE             = document.getElementById("txtTelAE");
+        const emailAE           = document.getElementById("emailAE");
+
+        const subm              = document.getElementById("subm");
+
+        subm.onclick=()=>{
+            if(nombre_proyecto==""||objetivo==""||justificacion==""||periodo==""||
+            ano==""||actividades==""||empresa==""||representante==""||direccion==""||
+            telEmpresa==""||ciudad==""||emailEmpresa==""||depto==""||nombreAE==""||
+            puesto==""||grado==""||telAE==""||emailAE==""){
+                alert("Por favor, llene todos los campos.");
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST','/registro-residencia',true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            xhr.onreadystatechange = () => {
+                    if(xhr.readyState==4 && xhr.status==200){
+                        
+                        let response = JSON.parse(xhr.responseText);
+                        
+                        if (response.code < 0) {
+                            alert(response['message']);
+                            return;
+                        }
+                        if (response.code == 1) {
+                            alert(response['message']);
+                            window.open('/home', '_self');
+                        }
+                    }
+                };
+
+            xhr.send(
+                `nombre_proyecto=${encodeURI(nombre_proyecto.value)}&` +
+                `objetivo=${encodeURI(objetivo.value)}&` +
+                `justificacion=${encodeURI(justificacion.value)}&` +
+                `periodo=${encodeURI(periodo.value)}&` +
+                `ano=${encodeURI(ano.value)}&` +
+                `fecha_elaboracion=${encodeURI(fecha_elaboracion)}&` +
+                `actividades=${encodeURI(actividades.value)}&` +
+                `empresa=${encodeURI(empresa.value)}&` +
+                `representante=${encodeURI(representante.value)}&` +
+                `direccion=${encodeURI(direccion.value)}&` +
+                `telEmpresa=${encodeURI(telEmpresa.value)}&` +
+                `ciudad=${encodeURI(ciudad.value)}&` +
+                `emailEmpresa=${encodeURI(emailEmpresa.value)}&` +
+                `depto=${encodeURI(depto.value)}&` +
+                `nombreAE=${encodeURI(nombreAE.value)}&` +
+                `puesto=${encodeURI(puesto.value)}&` +
+                `grado=${encodeURI(grado.value)}&` +
+                `telAE=${encodeURI(telAE.value)}&` +
+                `emailAE=${encodeURI(emailAE.value)}`
+            );
+
+            
+
+        };
+    </script>
 </body>
 </html>
