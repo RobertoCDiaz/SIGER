@@ -257,6 +257,71 @@ server.get('/nuevo-proyecto', (req, res) => {
     res.sendFile('reportepreliminar.html', { root: '../web-client/' });
 });
 
+//Registro de residencia
+server.post('/registro-residencia',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        console.log("Se redirige a home por no tener sesión iniciada")
+        res.redirect('/home');
+        return;
+    }
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesson No Autorizado.
+        console.log("Se redirige a home porque no es residente")
+        res.redirect('/home');
+        return;
+    }
+    const nombre_proyecto = req.body.nombre_proyecto;
+    const objetivo = req.body.objetivo;
+    const justificacion = req.body.justificacion;
+    const periodo = req.body.periodo;
+    const ano = req.body.ano;
+    const actividades = req.body.actividades;
+    const fecha_elaboracion = req.body.fecha_elaboracion;
+    const empresa = req.body.empresa;
+    const representante = req.body.representante;
+    const direccion = req.body.direccion;
+    const telEmpresa = req.body.telEmpresa;
+    const ciudad = req.body.ciudad;
+    const emailEmpresa = req.body.emailEmpresa;
+    const depto = req.body.depto;
+    const nombreAE = req.body.nombreAE;
+    const puesto = req.body.puesto;
+    const grado = req.body.grado;
+    const telAE = req.body.telAE;
+    const emailAE = req.body.emailAE;
+    const emailResidente = req.session.user.info.email;
+    const aprobado = 0;
+
+    con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
+    [
+        nombre_proyecto,objetivo,justificacion,periodo,ano,actividades,aprobado,
+        emailResidente,fecha_elaboracion,empresa,representante,direccion,ciudad,
+        telEmpresa,emailEmpresa,depto,emailAE,nombreAE,puesto,grado,telAE
+    ],
+    (e,rows,f)=>
+        {
+            if(e)
+            {
+                console.log(e);
+                Response.unknownError(e.toString());
+                return;
+            }
+            if(rows[0][0]['output']!=1)
+            {
+                Response.sqlError(rows[0][0]['message']);
+                return;
+            }
+            
+            //Avisar que ya se creó
+            //Deshabilitar opción, no se puede tener más de una residencia
+            Response.success();
+            console.log('Residencia creada correctamente');
+        }
+    );
+    
+});
+
 server.get('/avance-proyecto', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -309,6 +374,10 @@ server.get('/nuevo-docente', (req, res) => {
 
     res.sendFile('registro-docentes.html', { root: '../web-client/' })
 });
+
+
+
+
 
 
 /* ================================================================================================
