@@ -130,6 +130,19 @@ header a {
     box-sizing: content-box;
 }
 
+.add-button
+{
+    color: white;
+    border: 1px solid var(--azul-tec);
+    background-color: var(--azul-tec);
+    /*padding: 0.5em 1em;*/
+    font-weight: bold;
+    cursor: pointer;
+    transition-duration: var(--animation-duration);
+    width: 10px;
+    /*box-sizing: content-box;*/
+}
+
 .primary-button:hover {
     background-color: var(--azul-tec-light);
     color: white;
