@@ -6,9 +6,26 @@
         <title>Reporte preliminar :: SIGER</title>
         <link rel="stylesheet" href="styles/global.css">
         <link rel="stylesheet" href="styles/forms.css">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script>
+            window.onload = function()
+            {
+                creaHorarios();
+                let btnAdd = document.getElementById('btnHorarios');
+                btnAdd.onclick = creaHorarios;
+
+                let btnDel = document.getElementById('btnElimina');
+                btnDel.onclick=eliminaHorario;
+            } 
+        </script>
     <style>
+        #contBotones
+        {
+            display: flex;
+            flex-direction: row;
+            align-self: center;
+        }
+
         textarea
         {
             resize:none;
@@ -83,9 +100,24 @@
                 justify-content: center;
                 margin-top: 2em;
             }
+
+            .button-add-del
+            {
+                display: flex;
+                justify-content: center;
+                width: 6em;
+                margin: 1em;
+                /*margin-top: 2em;*/
+            }
             
             .footer-iframe {
                 overflow-y: visible;
+            }
+
+            #padre
+            {
+                display: flex;
+                flex-direction: column;
             }
 
     </style>
@@ -223,26 +255,29 @@
                     />
             </div>
             <!-------------------------------------------------------------------------->
-            <!--Implementar elemento dinámico para horarios-->
             
-            <div class="form-input">
-                <label for="">Horario en la empresa: </label>
-                <div>
-                    <div>
-                        <label for="">Entrada:</label>
-                        <input type="time" name="rango1" id="rango1" required>
+            <div>
+                <h3>Horarios</h3>
+                <label>Pulsa "+" para agregar un horario. En caso de equivocación, presiona "-" para eliminar el último horario ingresado.</label>
+                <div id="contBotones">
+                    <div class="button-add-del">
+                        <input id="btnHorarios" class="primary-button" type="button" value="+">
                     </div>
-                    <div>
-                        <label for="">Salida:</label>
-                        <input type="time" name="rango2" id="rango2" required>
+                    <div class="button-add-del">
+                        <input id="btnElimina" class="secondary-button" type="button" value="-">
                     </div>
                 </div>
             </div>
+            <div id="padre">
+
+            </div>
             <br>
+            
             
             <div class="button-container">
                 <input id="subm" class="primary-button" type="button" value="TERMINAR">
             </div>
+
         </form>
     </div>
     <footer>
@@ -295,6 +330,67 @@
     </footer>
     <script src="scripts/sidebar.js"></script>
     <script>
+        let contadorHorarios = 0;
+        function creaHorarios()
+            {
+                contadorHorarios++;
+                let contador = document.createElement('h3');
+                contador.innerText='Horario '+contadorHorarios+'  ';
+                contador.style.marginRight='1em';
+                let espacio = document.createElement('br');
+                let contenedor = document.createElement('div');
+                contenedor.style.display='flex';
+                contenedor.style.flexDirection='row';
+                contenedor.id='cont'+contadorHorarios;
+                contenedor.style.margin='1em';
+
+                let padre = document.getElementById('padre');
+                padre.style.alignItems='center';
+                padre.style.display='flex';
+                padre.style.flexDirection='column';
+
+                let caja1 = document.createElement('div');
+                caja1.style.display='flex'
+                caja1.style.flexDirection='row'
+                let caja2 = document.createElement('div');
+                caja2.style.display='flex'
+                caja2.style.flexDirection='row'
+                let lentrada = document.createElement('label');
+                lentrada.innerText='Entrada: ';
+                let entrada = document.createElement('input');
+                entrada.type='time';
+                entrada.style.marginLeft='1em';
+                entrada.style.marginRight='1em';
+                entrada.required='true';
+                let lsalida = document.createElement('label');
+                lsalida.innerText='   Salida: ';
+                let salida = document.createElement('input');
+                salida.type='time';
+                salida.style.marginRight='1em';
+                salida.style.marginLeft='1em';
+                salida.required='true';
+                caja1.appendChild(lentrada);
+                caja1.appendChild(entrada);
+                caja2.appendChild(lsalida);
+                caja2.appendChild(salida);
+                contenedor.appendChild(contador);
+                contenedor.appendChild(caja1);
+                contenedor.appendChild(caja2);
+                contenedor.appendChild(espacio);
+                padre.appendChild(contenedor);
+            }
+
+            function eliminaHorario()
+            {
+                let cont = document.getElementById('cont'+contadorHorarios)
+                if(contadorHorarios>1)
+                {
+                    let pa = cont.parentNode;
+                    pa.removeChild(cont);
+                    contadorHorarios--;
+                }
+            }
+
         const nombre_proyecto    = document.getElementById("txtNombreProyecto");
         const objetivo           = document.getElementById("txtObjetivo");
         const justificacion      = document.getElementById("txtJustificacion");
@@ -318,6 +414,9 @@
         const subm              = document.getElementById("subm");
 
         subm.onclick=()=>{
+            
+            
+
             if(nombre_proyecto==""||objetivo==""||justificacion==""||periodo==""||
             ano==""||actividades==""||empresa==""||representante==""||direccion==""||
             telEmpresa==""||ciudad==""||emailEmpresa==""||depto==""||nombreAE==""||
@@ -340,7 +439,7 @@
                             return;
                         }
                         if (response.code == 1) {
-                            alert(response['message']);
+                            alert('Residencia creada con éxito.');
                             window.open('/home', '_self');
                         }
                     }
@@ -367,8 +466,6 @@
                 `telAE=${encodeURI(telAE.value)}&` +
                 `emailAE=${encodeURI(emailAE.value)}`
             );
-
-            
 
         };
     </script>
