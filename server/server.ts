@@ -304,18 +304,18 @@ server.post('/registro-residencia',(req,res)=>
             if(e)
             {
                 console.log(e);
-                Response.unknownError(e.toString());
+                res.send(Response.unknownError(e.toString()));
                 return;
             }
             if(rows[0][0]['output']!=1)
             {
-                Response.sqlError(rows[0][0]['message']);
+                res.send(Response.sqlError(rows[0][0]['message']));
                 return;
             }
             
             //Avisar que ya se creó
             //Deshabilitar opción, no se puede tener más de una residencia
-            Response.success();
+            res.send(Response.success());
             console.log('Residencia creada correctamente');
         }
     );
