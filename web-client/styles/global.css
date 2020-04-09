@@ -19,6 +19,12 @@
 }
 
 @font-face {
+    font-family: "Montserrat";
+    src: url(../assets/fonts/Montserrat/Montserrat-Bold.ttf);
+    font-weight: bold;
+}
+
+@font-face {
     font-family: "Roboto";
     src: url(../assets/fonts/Roboto/Roboto-Regular.ttf);
 }
@@ -27,7 +33,7 @@
     /* --azul-tec: #002B7F; */
     --azul-tec: #1B396A;
     --azul-tec-light: #184286;
-    --amarillo-tec: rgb(10, 10, 8);
+    --amarillo-tec: #FFED38;
 
     --page-background: #EAEAEA;
     --content-background: white;
@@ -45,7 +51,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Open Sans";
-    color: #212121;
+    color: var(--primary-text);
 }
 
 html,

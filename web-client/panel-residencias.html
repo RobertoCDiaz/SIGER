@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Residencias :: SIGER</title>
+    <link rel="stylesheet" href="styles/global.css">
+</head>
+<body>
+    <header>
+        <div class="bar">
+            <!-- <h1><a href="/home">SIGER</a></h1> -->
+            <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                <h1 style="margin-left: .5em;">SIGER</h1>
+            </a>
+            <!-- <h2>Registro de Docentes</h2> -->
+        </div>
+    </header>
+
+    <style>
+        @media only screen and (min-width: 1441px) {
+            :root {
+                --main-vertical-padding: 15vw;
+            }
+        }
+        
+        @media only screen and (min-width: 1100px) and (max-width: 1440px) {
+            :root {
+                --main-vertical-padding: 7.5vw;
+            }
+        }
+        
+        @media only screen and (max-width: 1099px) {
+            :root {
+                --main-vertical-padding: 5vw;
+            }
+        }
+        .content > .title {
+            padding: 5vh var(--main-vertical-padding);
+        }
+
+        h3 {
+            font-weight: normal;
+        }
+
+        .content > .title  * {
+            font-family: 'Montserrat';
+        }
+
+        .content > .title > p {
+            font-family: 'Open Sans';
+            margin-top: 1em;
+            text-align: justify;
+            color: var(--secondary-text);
+        }
+
+        .content > hr {
+            margin: 0 25vw;
+            border-color: var(--azul-tec);
+        }
+
+        #container {
+            padding: 5vh var(--main-vertical-padding);
+        }
+
+        .residencia {
+            background-color: white;
+            padding: 1em 3em;
+            margin-bottom: 1em;
+            cursor: pointer;
+            box-sizing: border-box;
+            width: 100%;
+            transition: var(--animation-duration);
+        }
+
+        .residencia:hover {
+            border-left: 5px solid var(--azul-tec);
+        }
+
+        .residencia > .title {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 1em;
+        }
+
+        .residencia > .title > .projectNameContainer {
+            flex: 1;
+        }
+
+        .residencia > .title > .projectNameContainer > .projectName {
+            font-size: 1.75em;
+            color: var(--azul-tec);
+            font-weight: bold;
+        }
+
+        .residencia > .title > .period {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .residencia > .title > .period > p {
+            color: var(--secondary-text);
+        }
+    </style>
+    <div class="content">
+        <div class="title">
+            <h1>Panel de Residencias</h1>
+            <h3>usuario.us@piedrasnegras.tecnm.mx</h3>
+            <p>A continuación se desplegarán todos aquellos proyectos de residencias profesionales que aún no han sido aprobados. Presione la Residencia de la que desea conocer más información para abrirla en una nueva pestaña.</p>
+        </div>
+        <hr>
+        <div id="container">
+            <div class="residencia">
+                <div class="title">
+                    <div class="projectNameContainer">
+                        <p class="projectName">Sistema Gestor de Residencias</p>
+                        <p>Instituto Tecnológico de Piedras Negras</p>
+                    </div>
+                    
+                    <div class="period">
+                        <p>Enero - Junio</p>
+                        <p>2020</p>        
+                    </div>
+                </div>
+                <p>Ingeniería en Sistemas Computacionales</p>
+                <p>Daniel Hernández Sánchez</p>   
+                <p>9 de abril del 2020</p> 
+            </div>
+            <div class="residencia">
+                <div class="title">
+                    <div class="projectNameContainer">
+                        <p class="projectName">Sistema para el Control de Evidencias de Proyectos Individuales</p>
+                        <p>Cavern Productions</p>
+                    </div>
+                    
+                    <div class="period">
+                        <p>Agosto - Diciembre</p>
+                        <p>2019</p>        
+                    </div>
+                </div>
+                <p>Ingeniería en TICs</p>
+                <p>Roberto Carlos Díaz Sánchez</p>   
+                <p>9 de abril del 2020</p> 
+            </div>
+            <div class="residencia">
+                <div class="title">
+                    <div class="projectNameContainer">
+                        <p class="projectName">Sistema para la No-Gestión de Residencias</p>
+                        <p>Topiary Arts</p>
+                    </div>
+                    
+                    <div class="period">
+                        <p>Agosto - Diciembre</p>
+                        <p>2020</p>        
+                    </div>
+                </div>
+                <p>Ingeniería Electrónica</p>
+                <p>Noelia Piedrabuena Cuéllar</p>   
+                <p>9 de abril del 2020</p> 
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="sections-container">
+        <section>
+            <h2>Integrantes</h2>
+            <div class="section-item">
+                <p>Daniel Hernández Sánchez</p>
+                <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+            </div>
+            <div class="section-item">
+                <p>Roberto Carlos Díaz Sánchez</p>
+                <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+            </div>
+        </section>
+        <section>
+            <h2>Materias</h2>
+            <div class="section-item">
+                <p>Administración de Bases de Datos</p>
+                <p>SCB-1001</p>
+            </div>
+            <div class="section-item">
+                <p>Ingeniería de Software</p>
+                <p>SCD-1011</p>
+            </div>
+            <div class="section-item">
+                <p>Programación Web</p>
+                <p>AEB-1055</p>
+            </div>
+        </section>
+        <section>
+            <h2>Enlaces de interés</h2>
+            <div class="section-item">
+                <p><a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a></p>
+                <p><a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">
+                    Documentación y evidencias
+                </a></p>
+            </div>
+        </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+</body>
+</html>
