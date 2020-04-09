@@ -10,6 +10,7 @@
         <script>
             window.onload = function()
             {
+                creaEtiquetas();
                 creaHorarios();
                 let btnAdd = document.getElementById('btnHorarios');
                 btnAdd.onclick = creaHorarios;
@@ -19,11 +20,17 @@
             } 
         </script>
     <style>
+        #etiquetas
+        {
+            display: flex;
+            flex-direction: row;
+        }
+
         #contBotones
         {
             display: flex;
             flex-direction: row;
-            align-self: center;
+            justify-content: center;
         }
 
         textarea
@@ -331,6 +338,50 @@
     <script src="scripts/sidebar.js"></script>
     <script>
         let contadorHorarios = 0;
+
+        function creaEtiquetas()
+            {
+                let contador = document.createElement('h3');
+                contador.innerText='Horario '+contadorHorarios+'  ';
+                contador.style.marginRight='0.8em';
+                contador.style.opacity='0';
+                let espacio = document.createElement('br');
+                let contenedor = document.createElement('div');
+                contenedor.style.display='flex';
+                contenedor.style.flexDirection='row';
+                contenedor.id='cont'+contadorHorarios;
+                contenedor.style.margin='1em';
+
+                let padre = document.getElementById('padre');
+                padre.style.alignItems='center';
+                padre.style.display='flex';
+                padre.style.flexDirection='column';
+
+                let caja1 = document.createElement('div');
+                caja1.style.display='flex'
+                caja1.style.flexDirection='row'
+                let caja2 = document.createElement('div');
+                caja2.style.display='flex'
+                caja2.style.flexDirection='row'
+                let entrada = document.createElement('h3');
+                entrada.innerText='Entrada'
+                entrada.style.marginLeft='0.7em';
+                entrada.style.marginRight='0.7em';
+                entrada.id='e'+contadorHorarios;
+                let salida = document.createElement('h3');
+                salida.innerText='Salida';
+                salida.style.marginRight='1em';
+                salida.style.marginLeft='1em';
+                salida.id='s'+contadorHorarios;
+                caja1.appendChild(entrada);
+                caja2.appendChild(salida);
+                contenedor.appendChild(contador);
+                contenedor.appendChild(caja1);
+                contenedor.appendChild(caja2);
+                contenedor.appendChild(espacio);
+                padre.appendChild(contenedor);
+            }
+
         function creaHorarios()
             {
                 contadorHorarios++;
@@ -445,12 +496,17 @@
                 console.log('Entradas chidas: '+ entradas[i]);
             }
             
+            if(!salidas[0])
+            {
+                alert('Ingresa un horario de salida válido');
+                return;
+            }
 
 
-            if(nombre_proyecto==""||objetivo==""||justificacion==""||periodo==""||
-            ano==""||actividades==""||empresa==""||representante==""||direccion==""||
-            telEmpresa==""||ciudad==""||emailEmpresa==""||depto==""||nombreAE==""||
-            puesto==""||grado==""||telAE==""||emailAE==""){
+            if(nombre_proyecto.value==""||objetivo.value==""||justificacion.value==""||periodo.value==""||
+            ano.value==""||actividades.value==""||empresa.value==""||representante.value==""||direccion.value==""||
+            telEmpresa.value==""||ciudad.value==""||emailEmpresa.value==""||depto.value==""||nombreAE.value==""||
+            puesto.value==""||grado.value==""||telAE.value==""||emailAE.value==""||!entradas[0]||!salidas[0]){
                 alert("Por favor, llene todos los campos.");
                 return;
             }

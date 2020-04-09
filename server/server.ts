@@ -321,9 +321,6 @@ server.post('/registro-residencia',(req,res)=>
 
             for(let i = 0;i<counter;i++)
             {
-                console.log(entradas[i]);
-                console.log(salidas[i]);
-                console.log(idres);
                 con.query('call SP_RegistraHorarios(?,?,?);',
                     [
                         entradas[i],salidas[i],idres

@@ -193,7 +193,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`empresas` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`empresas` (
-  `idempresa` INT NOT NULL,
+  `idempresa` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(128) NOT NULL,
   `representante` VARCHAR(128) NOT NULL,
   `direccion` VARCHAR(128) NOT NULL,
@@ -241,7 +241,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`horarios` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`horarios` (
-  `idhorarios` INT NOT NULL,
+  `idhorarios` INT NOT NULL AUTO_INCREMENT,
   `inicio` CHAR(5) NOT NULL,
   `fin` CHAR(5) NOT NULL,
   `id_residencia` INT NOT NULL,
