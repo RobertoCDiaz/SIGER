@@ -495,8 +495,8 @@
                 `grado=${encodeURI(grado.value)}&` +
                 `telAE=${encodeURI(telAE.value)}&` +
                 `emailAE=${encodeURI(emailAE.value)}&` +
-                `entradas=${encodeURI(entradas)}&` +
-                `salidas=${encodeURI(salidas)}&` +
+                `entradas=${encodeURI(JSON.stringify(entradas))}&` +
+                `salidas=${encodeURI(JSON.stringify(salidas))}&` +
                 `counter=${encodeURI(contadorHorarios)}` 
             );
         };

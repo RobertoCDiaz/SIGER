@@ -294,8 +294,8 @@ server.post('/registro-residencia',(req,res)=>
     const emailResidente = req.session.user.info.email;
     const aprobado = 0;
     let idres=0;
-    const entradas = req.body.entradas;
-    const salidas = req.body.salidas;
+    const entradas = JSON.parse(req.body.entradas);
+    const salidas = JSON.parse(req.body.salidas);
     const counter = req.body.counter;
 
     con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
@@ -318,44 +318,33 @@ server.post('/registro-residencia',(req,res)=>
                 return;
             }
             idres=Number(rows[0][0]['idresidencia']);
-            console.log('ID de residencia:');
-            console.log(rows[0][0]['idresidencia']);
-            console.log(idres);
+
+            for(let i = 0;i<counter;i++)
+            {
+                console.log(entradas[i]);
+                console.log(salidas[i]);
+                console.log(idres);
+                con.query('call SP_RegistraHorarios(?,?,?);',
+                    [
+                        entradas[i],salidas[i],idres
+                    ],
+                (er,r,fi)=>
+                {
+                    if(er)
+                    {
+                        console.log(er);
+                        return;
+                    }
+                    if(rows[0][0]['output']!=1)
+                    {
+                        console.log(rows[0][0]['message']);
+                        return;
+                    }
+                });
+            }
             res.send(Response.success());
-            console.log('Residencia creada correctamente');
         }
     );
-        console.log('Contador: '+ counter);
-        console.log('Entradas:');
-        for(let i = 0 ; i<counter ; i++)
-        {
-            console.log(String(entradas[i]));
-        }
-
-    for(let i = 0;i<counter;i++)
-    {
-        console.log(entradas[i]);
-        console.log(salidas[i]);
-        console.log(idres);
-        con.query('call SP_RegistraHorarios(?,?,?);',
-            [
-                entradas[i],salidas[i],idres
-            ],
-        (e,rows,f)=>
-        {
-            if(e)
-            {
-                console.log(e);
-                return;
-            }
-            if(rows[0][0]['output']!=1)
-            {
-                console.log(rows[0][0]['message']);
-                return;
-            }
-        });
-    }
-    
 });
 
 server.get('/avance-proyecto', (req, res) => {
