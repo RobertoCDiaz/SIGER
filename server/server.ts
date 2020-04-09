@@ -69,6 +69,10 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
     );
 });
 
+/**
+ * Regresa al cliente una lista de los residentes sin confirmar de las 
+ * carreras que el administrador actual maneja.
+ */
 server.get('/residentesNoValidados', (req, res) => {
     if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
         res.send(Response.authError());
@@ -76,7 +80,8 @@ server.get('/residentesNoValidados', (req, res) => {
     }
 
     con.query(
-        `call SP_ResidentesNoValidados();`,
+        `call SP_ResidentesNoValidados(?);`,
+        req.session.user.info.email,
         (e, rows, f) => {
             if (e) {
                 res.send(Response.unknownError(e.toString()));
@@ -88,6 +93,11 @@ server.get('/residentesNoValidados', (req, res) => {
     );
 });
 
+
+/**
+ * Valida la cuenta de residente registrada bajo el correo
+ * electrónico que se pase al argumento [email_residente].
+ */
 server.post('/validarResidente', (req, res) => {
     if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
         res.send(Response.authError());
@@ -101,8 +111,8 @@ server.post('/validarResidente', (req, res) => {
     }
 
     con.query(
-        `call SP_ValidarResidente(?)`,
-        emailResidente,
+        `call SP_ValidarResidente(?, ?);`,
+        [emailResidente, req.session.user.info.email],
         (e, rows, f) => {
             if (rows[0][0]['output'] != 1) {
                 res.send(Response.sqlError(rows[0][0]['message']));
@@ -115,6 +125,11 @@ server.post('/validarResidente', (req, res) => {
 
 });
 
+
+/**
+ * Con la información proporcionada desde el cliente, esta petición intentará
+ * registrar a un nuevo residente en el sistema.
+ */
 server.post('/registrarResidente', (req, res) => {
     if (
         !req.body.email ||
@@ -155,6 +170,7 @@ server.post('/registrarResidente', (req, res) => {
     );
 });
 
+
 /**
  * Login simple
  * 
@@ -169,12 +185,33 @@ server.get('/login', (req, res) => {
     res.sendFile("login.html", { root: "../web-client/" }); 
 });
     
+
+/**
+ * Intenta autenticar una cuenta de usuario del sistema.
+ * 
+ * Dependiendo del tipo de usuario que intenta logearse (adminstradores, 
+ * docentes, o residentes) se ejecutará la lógica apropiada.
+ * 
+ * En caso de que el login tenga éxito, se registrará la información
+ * básica del usuario que podría usarse en el server en [req.session.user].
+ * Actualmente, el objeto [req.session.user] tiene esta estructura:
+ * 
+ * {
+ *      'class': Tipo de usuario identificado. Ver enum [USER_CLASSES].
+ *      'info': { Información del usuario
+ *          'email': Correo electrónico asociado a la cuenta abierta.
+ *          'nombre': Nombre almacenado en la base de datos.
+ *          'apellido_paterno': Dato almacenado en la base de datos.
+ *          'apellido_materno': Dato almacenado en la base de datos.
+ *      }
+ * }
+ */
 server.post('/auth', (req,res) =>{
     const email = req.body.email;
     const pass = req.body.pass;
     const userClass = req.body.class;
 
-    if (!email || !pass || !userClass) { // Esto es por si falta algún parámetro. Solo por si acaso.
+    if (!email || !pass || !userClass) { 
         res.send(Response.notEnoughParams());
         return
     }
@@ -183,19 +220,16 @@ server.post('/auth', (req,res) =>{
         case USER_CLASSES.RESIDENTE: {
             con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
                 if (e) {
-                    // res.send(e);
                     res.send(Response.unknownError(e.toString()));
                     return;
                 }
                 
                 if (results.length == 0) {
-                    // res.send('El correo electrónico ingresado no está registrado.'); 
                     res.send(Response.userError("El correo electrónico ingresado no está registrado."));
                     return;
                 }
         
                 if (pass != decrypt(results[0]['contrasena'])) {
-                    // res.send('La contraseña no es correcta, verifique.');
                     res.send(Response.userError("La contraseña no es correcta, verifique."));
                     return;
                 }
