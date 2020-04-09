@@ -438,6 +438,35 @@ BEGIN
   COMMIT;
 END;;
 
+DROP procedure IF EXISTS `SP_RegistraHorarios`;
+CREATE PROCEDURE `SP_RegistraHorarios`(
+  v_inicio CHAR(5),
+  v_fin CHAR(5),
+  v_idresidencia INT
+)
+BEGIN
+  DECLARE exit handler for SQLEXCEPTION
+  BEGIN
+    GET DIAGNOSTICS CONDITION 1
+    @p2 = MESSAGE_TEXT;
+    
+    SELECT "0" AS output, @p2 AS message;
+    
+    ROLLBACK;
+  END;
+
+  START TRANSACTION;
+    INSERT INTO `siger`.`horarios`
+      (inicio, fin, idresidencia)
+    VALUES
+      (v_inicio, v_fin, v_idresidencia);
+
+    SELECT "1" AS output, "Transaction commited successfully" AS message;
+  COMMIT;
+END$$
+
+DELIMITER ;
+
 DELIMITER ;
 
 /* --------------------------------------------------------

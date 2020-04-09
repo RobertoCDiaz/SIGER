@@ -260,6 +260,7 @@ server.get('/nuevo-proyecto', (req, res) => {
 //Registro de residencia
 server.post('/registro-residencia',(req,res)=>
 {
+    
     if (!req.session.loggedin) {
         console.log("Se redirige a home por no tener sesión iniciada")
         res.redirect('/home');
@@ -292,6 +293,10 @@ server.post('/registro-residencia',(req,res)=>
     const emailAE = req.body.emailAE;
     const emailResidente = req.session.user.info.email;
     const aprobado = 0;
+    let idres=0;
+    const entradas = req.body.entradas;
+    const salidas = req.body.salidas;
+    const counter = req.body.counter;
 
     con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
     [
@@ -312,13 +317,44 @@ server.post('/registro-residencia',(req,res)=>
                 res.send(Response.sqlError(rows[0][0]['message']));
                 return;
             }
-            
-            //Avisar que ya se creó
-            //Deshabilitar opción, no se puede tener más de una residencia
+            idres=Number(rows[0][0]['idresidencia']);
+            console.log('ID de residencia:');
+            console.log(rows[0][0]['idresidencia']);
+            console.log(idres);
             res.send(Response.success());
             console.log('Residencia creada correctamente');
         }
     );
+        console.log('Contador: '+ counter);
+        console.log('Entradas:');
+        for(let i = 0 ; i<counter ; i++)
+        {
+            console.log(String(entradas[i]));
+        }
+
+    for(let i = 0;i<counter;i++)
+    {
+        console.log(entradas[i]);
+        console.log(salidas[i]);
+        console.log(idres);
+        con.query('call SP_RegistraHorarios(?,?,?);',
+            [
+                entradas[i],salidas[i],idres
+            ],
+        (e,rows,f)=>
+        {
+            if(e)
+            {
+                console.log(e);
+                return;
+            }
+            if(rows[0][0]['output']!=1)
+            {
+                console.log(rows[0][0]['message']);
+                return;
+            }
+        });
+    }
     
 });
 

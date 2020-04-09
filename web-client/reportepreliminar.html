@@ -355,23 +355,17 @@
                 let caja2 = document.createElement('div');
                 caja2.style.display='flex'
                 caja2.style.flexDirection='row'
-                let lentrada = document.createElement('label');
-                lentrada.innerText='Entrada: ';
                 let entrada = document.createElement('input');
                 entrada.type='time';
                 entrada.style.marginLeft='1em';
                 entrada.style.marginRight='1em';
-                entrada.required='true';
-                let lsalida = document.createElement('label');
-                lsalida.innerText='   Salida: ';
+                entrada.id='e'+contadorHorarios;
                 let salida = document.createElement('input');
                 salida.type='time';
                 salida.style.marginRight='1em';
                 salida.style.marginLeft='1em';
-                salida.required='true';
-                caja1.appendChild(lentrada);
+                salida.id='s'+contadorHorarios;
                 caja1.appendChild(entrada);
-                caja2.appendChild(lsalida);
                 caja2.appendChild(salida);
                 contenedor.appendChild(contador);
                 contenedor.appendChild(caja1);
@@ -414,8 +408,44 @@
         const subm              = document.getElementById("subm");
 
         subm.onclick=()=>{
+            let pe = String(document.getElementById('e1').value);
+            let pee = pe.substring(0,5);
+            let entradas = [pee];
+            let ps = String(document.getElementById('s1').value);
+            let pss = ps.substring(0,5);
+            let salidas = [pss];
+
+            let parent = document.getElementById('padre');
+            let c = document.getElementById('padre').children;
+
+            for (let i = 0; i < c.length; i++) {
+                let ch = c[i].children;
+                for (let j = 0; j < ch.length; j++) {
+                    let chi = ch[j].children;
+                    for (let k = 0; k < chi.length; k++) {
+                        if(j%2!=0)
+                        {
+                            pe = String(chi[k].value);
+                            pee = pe.substring(0,5);
+                            entradas.push(pee);
+                            console.log('Entrada: ' + pee);
+                        }
+                        else
+                        {
+                            ps = String(chi[k].value);
+                            pss = ps.substring(0,5);
+                            salidas.push(pss);
+                            console.log('Salida: ' + pss);
+                        }
+                    }
+                }
+            }
+
+            for (let i = 0; i < entradas.length; i++) {
+                console.log('Entradas chidas: '+ entradas[i]);
+            }
             
-            
+
 
             if(nombre_proyecto==""||objetivo==""||justificacion==""||periodo==""||
             ano==""||actividades==""||empresa==""||representante==""||direccion==""||
@@ -464,9 +494,11 @@
                 `puesto=${encodeURI(puesto.value)}&` +
                 `grado=${encodeURI(grado.value)}&` +
                 `telAE=${encodeURI(telAE.value)}&` +
-                `emailAE=${encodeURI(emailAE.value)}`
+                `emailAE=${encodeURI(emailAE.value)}&` +
+                `entradas=${encodeURI(entradas)}&` +
+                `salidas=${encodeURI(salidas)}&` +
+                `counter=${encodeURI(contadorHorarios)}` 
             );
-
         };
     </script>
 </body>
