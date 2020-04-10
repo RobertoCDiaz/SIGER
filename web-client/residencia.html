@@ -3,9 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Registro de Residentes :: SIGER</title>
+        <title>Detalles de Residencia Profesional :: SIGER</title>
         <link rel="stylesheet" href="styles/global.css" />
         <link rel="stylesheet" href="styles/forms.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <style>
             .form-input {
                 display: flex;
@@ -27,7 +28,7 @@
                 margin-top: 2em;
             }
 
-            form * {
+            form p {
                 font-family: 'Arial';
                 color: var(--primary-text) !important; 
             }
@@ -75,6 +76,17 @@
             .field-bundle > p:not(:first-child) {
                 margin-left: 1em;
             }
+
+            .buttons-container {
+                margin-top: 3em;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            hr {
+                margin: 5em 5vw;
+            }
             
         </style>
     </head>
@@ -83,10 +95,10 @@
             <div class="bar">
                 <!-- <h1><a href="/home">SIGER</a></h1> -->
                 <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
-                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
-                <h1 style="margin-left: .5em;">SIGER</h1>
-            </a>
-                <h2>Registro de estudiantes como Residentes</h2>
+                    <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                    <h1 style="margin-left: .5em;">SIGER</h1>
+                </a>
+                <h2>Detalles de Residencia Profesional</h2>
             </div>
         </header>
 
@@ -148,7 +160,136 @@
                     <p>Correo electrónico: <b>[EMAIL]</b></p>
                     <p>Horario(s) en la Empresa: <b>[HORARIOS, SEPARADOS POR COMA]</b></p>
                 </div>
+                <div class="buttons-container">
+                    <!-- TODO: Implementar descarga de formato. -->
+                    <button class="primary-button">DESCARGAR FORMATO</button>
+                </div>
             </form>
+
+            <hr>
+
+            <style>
+                .assigner-container > p {
+                    margin-top: 1em;
+                    text-align: justify;
+                }
+
+                .assigner {
+                    background-color: white;
+                    border: 1px solid var(--gray-border-color);
+                    border-radius: 4px;
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: 3em;
+                    overflow: hidden;
+                }
+
+                .assigner > .searchBar {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: stretch;
+                }
+
+                .assigner > .searchBar > * {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .assigner > .searchBar > input {
+                    flex: 1;
+                    border: none;
+                    border-bottom: 1px solid var(--gray-border-color);
+                }
+
+                .assigner > .searchBar > i {
+                    background-color: var(--azul-tec);
+                    color: white;
+                    padding: .5em;
+                }
+
+                .teacher > .title {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    background-color: var(--gray-content-color);
+                }
+
+                .teacher > .title > * {
+                    color: var(--secondary-text);
+                    padding: .25em;
+                    color: white;
+                }
+
+                .teacher > .teacherName {
+                    padding: .25em 1em;
+                }
+
+                .result {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    cursor: pointer;
+                }
+
+                .result > * {
+                    padding: .25em;
+                }
+
+                .result:hover > i {
+                    background-color: green;
+                    color: white;
+                }
+            </style>
+            <div class="assigner-container">
+                <h2>Asignar asesor interno y revisores</h2>
+                <p>Con este buscador podrá encontrar docentes registrados en el SIGER y asignarlos al proyecto como asesor interno o revisores. El buscador hace consultas basadas en nombre, apellidos, o correo electrónico. Para seleccionar a un docente, simplemente haga click en el resultado deseado.</p>
+                <p>Tendrá que seleccionar exactamente tres docentes distintos. El primero que seleccione será asignado al proyecto como asesor interno, mientras que los dos restantes serán revisores de la Residencia Profesional.</p>
+                <p>Una vez asignado un docente a algún cargo, puede presionar la cruz al lado de su nombre para eliminarlo si cometió alguna equivocación.</p>
+
+                <div class="assigner">
+                    <div class="searchBar">
+                        <input type="text" placeholder="Nombre o correo del docente">
+                        <i class="material-icons">search</i>
+                    </div>
+                    <div class="resultsContainer">
+                        <p style="padding: 1em;">No hay ningún resultado que satisfaga el criterio de búsqueda actual</p>
+                        <!-- <div class="result">
+                            <i class="material-icons">person_add</i>
+                            <p>Daniel Hernández Sánchez (daniel.hs@piedrasnegras.tecnm.mx)</p>
+                        </div>
+                        <div class="result">
+                            <i class="material-icons">person_add</i>
+                            <p>Roberto Carlos Sánchez (roberto.ds@piedrasnegras.tecnm.mx)</p>
+                        </div> -->
+                    </div>
+                </div>
+
+                <div class="assigner">
+                    <div class="teacherContainer">
+                        <div class="teacher">
+                            <div class="title">
+                                <i class="material-icons">supervisor_account</i>
+                                <p>Asesor interno</p>
+                            </div>
+                            <p class="teacherName">Aún no hay un docente asignado</p>
+                        </div>
+                        <div class="teacher">
+                            <div class="title">
+                                <i class="material-icons">person</i>
+                                <p>Revisor</p>
+                            </div>
+                            <p class="teacherName">Aún no hay un docente asignado</p>
+                        </div>
+                        <div class="teacher">
+                            <div class="title">
+                                <i class="material-icons">person</i>
+                                <p>Revisor</p>
+                            </div>
+                            <p class="teacherName">Aún no hay un docente asignado</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <footer>
