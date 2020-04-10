@@ -351,12 +351,29 @@ server.get('/avance-proyecto', (req, res) => {
     }
 
     if (req.session.user.class != USER_CLASSES.RESIDENTE) {
-        // TODO: Agregar pantalla de Acesson No Autorizado.
+        // TODO: Agregar pantalla de Acesso No Autorizado.
         res.redirect('/home');
         return;
     }
 
     res.sendFile('avance.html', { root: '../web-client/' });
+});
+
+server.get('/progreso',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    const email = req.user.info.email;
+    //con.query('select ')
 });
 
 server.get('/docs', (req, res) => {
