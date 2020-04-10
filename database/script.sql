@@ -593,7 +593,31 @@ BEGIN
   COMMIT;
 END;;
 
-DELIMITER ;
+DROP PROCEDURE IF EXISTS SP_ListaResidenciasSinDocentes;;
+CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
+	v_email_admin VARCHAR(64),
+	v_query VARCHAR(128)
+) BEGIN
+
+	SELECT 
+		r.nombre_proyecto AS 'nombre_p', e.nombre AS 'empresa', c.nombre_carrera AS 'carrera',
+		concat(res.nombre, " ", res.apellido_paterno, " ", res.apellido_materno) AS 'residente',
+		r.fecha_elaboracion AS 'fecha', r.periodo AS 'periodo', r.ano AS 'ano'
+	FROM 
+		residencias AS r JOIN empresas AS e
+			on r.idresidencia = e.id_residencia
+		JOIN residentes AS res
+			on r.email_residente = res.email
+		JOIN carreras AS c
+			on c.clave = res.clave_carrera
+	WHERE 
+		c.admin_email = v_email_admin AND (
+			r.nombre_proyecto LIKE v_query OR
+			e.nombre LIKE v_query OR
+			CONCAT(res.nombre, " ", res.apellido_paterno, " ", res.apellido_materno) LIKE v_query
+		);
+	
+END;;
 
 DELIMITER ;
 

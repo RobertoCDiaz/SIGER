@@ -1,5 +1,6 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
+import { runInNewContext } from "vm";
 
 const express   = require("express");
 const session   = require("express-session");
@@ -320,6 +321,15 @@ server.get('/validar-residentes', (req, res) => {
     res.sendFile('validar-residente.html', { root: '../web-client/' });
 });
 
+server.get('/user-info', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError("No hay ninguna sesión iniciada"));
+        return;
+    }
+
+    res.send(Response.success(req.session.user.info));
+});
+
 server.get('/nuevo-proyecto', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -339,17 +349,10 @@ server.get('/nuevo-proyecto', (req, res) => {
 server.post('/registro-residencia',(req,res)=>
 {
     
-    if (!req.session.loggedin) {
-        res.redirect('/home');
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.RESIDENTE) {
+        res.send(Response.authError());
         return;
     }
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
-        // TODO: Agregar pantalla de Acesson No Autorizado.
-        res.redirect('/home');
-        return;
-    }
-
-    console.log(req.body);
 
     const nombre_proyecto = req.body.nombre_proyecto;
     const objetivo = req.body.objetivo;

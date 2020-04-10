@@ -40,7 +40,7 @@ export class Response {
     static sqlError = (msg: string): Response => 
         new Response(Response.codes.SQL_ERROR, msg);
 
-    static authError = (msg: string = "No cuenta con la autorización necesaria para realizar esta acción"): Response => 
+    static authError = (msg: string = "No cuenta con los privilegios necesarios para realizar esta acción"): Response => 
         new Response(Response.codes.AUTH_ERROR, msg);
 
     static notEnoughParams = (): Response => 
