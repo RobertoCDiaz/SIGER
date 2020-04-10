@@ -325,6 +325,21 @@ server.get('/panel-residencias', (req, res) => {
     res.sendFile('panel-residencias.html', { root: '../web-client/' });
 });
 
+server.get('/residencia', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.ADMIN) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('residencia.html', { root: '../web-client/' });
+});
+
 
 /* ================================================================================================
 

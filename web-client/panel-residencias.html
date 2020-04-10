@@ -113,7 +113,7 @@
         </div>
         <hr>
         <div id="container">
-            <div class="residencia">
+            <div class="residencia" onclick="openInfo();">
                 <div class="title">
                     <div class="projectNameContainer">
                         <p class="projectName">Sistema Gestor de Residencias</p>
@@ -129,7 +129,7 @@
                 <p>Daniel Hernández Sánchez</p>   
                 <p>9 de abril del 2020</p> 
             </div>
-            <div class="residencia">
+            <div class="residencia" onclick="openInfo();">
                 <div class="title">
                     <div class="projectNameContainer">
                         <p class="projectName">Sistema para el Control de Evidencias de Proyectos Individuales</p>
@@ -145,7 +145,7 @@
                 <p>Roberto Carlos Díaz Sánchez</p>   
                 <p>9 de abril del 2020</p> 
             </div>
-            <div class="residencia">
+            <div class="residencia" onclick="openInfo();">
                 <div class="title">
                     <div class="projectNameContainer">
                         <p class="projectName">Sistema para la No-Gestión de Residencias</p>
@@ -163,6 +163,11 @@
             </div>
         </div>
     </div>
+    <script>
+        const openInfo = () => {
+            window.open('/residencia');
+        }
+    </script>
 
     <footer>
         <div class="sections-container">
