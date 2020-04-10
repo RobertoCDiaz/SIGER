@@ -21,12 +21,12 @@ USE `siger` ;
 DROP TABLE IF EXISTS `siger`.`administradores` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`administradores` (
-  `email` VARCHAR(64) NOT NULL,
-  `contrasena` VARCHAR(160) NOT NULL,
-  `nombre` VARCHAR(48) NOT NULL,
-  `apellido_paterno` VARCHAR(48) NOT NULL,
-  `apellido_materno` VARCHAR(48) NOT NULL,
-  PRIMARY KEY (`email`))
+	`email` VARCHAR(64) NOT NULL,
+	`contrasena` VARCHAR(160) NOT NULL,
+	`nombre` VARCHAR(48) NOT NULL,
+	`apellido_paterno` VARCHAR(48) NOT NULL,
+	`apellido_materno` VARCHAR(48) NOT NULL,
+	PRIMARY KEY (`email`))
 ENGINE = InnoDB;
 
 
@@ -36,16 +36,16 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`carreras` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`carreras` (
-  `clave` CHAR(13) NOT NULL,
-  `nombre_carrera` VARCHAR(45) NOT NULL,
-  `admin_email` VARCHAR(64) NOT NULL,
-  PRIMARY KEY (`clave`),
-  INDEX `fk_carreras_admin1_idx` (`admin_email` ASC), -- VISIBLE,
-  CONSTRAINT `fk_carreras_admin1`
-    FOREIGN KEY (`admin_email`)
-    REFERENCES `siger`.`administradores` (`email`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`clave` CHAR(13) NOT NULL,
+	`nombre_carrera` VARCHAR(45) NOT NULL,
+	`admin_email` VARCHAR(64) NOT NULL,
+	PRIMARY KEY (`clave`),
+	INDEX `fk_carreras_admin1_idx` (`admin_email` ASC), -- VISIBLE,
+	CONSTRAINT `fk_carreras_admin1`
+		FOREIGN KEY (`admin_email`)
+		REFERENCES `siger`.`administradores` (`email`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -55,20 +55,21 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`residentes` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`residentes` (
-  `email` VARCHAR(64) NOT NULL,
-  `contrasena` VARCHAR(160) NOT NULL,
-  `nombre` VARCHAR(48) NOT NULL,
-  `apellido_paterno` VARCHAR(48) NOT NULL,
-  `apellido_materno` VARCHAR(48) NULL,
-  `aprobado` TINYINT NOT NULL DEFAULT 0,
-  `clave_carrera` CHAR(13) NOT NULL,
-  PRIMARY KEY (`email`),
-  INDEX `fk_residentes_carreras1_idx` (`clave_carrera` ASC), -- VISIBLE,
-  CONSTRAINT `fk_residentes_carreras1`
-    FOREIGN KEY (`clave_carrera`)
-    REFERENCES `siger`.`carreras` (`clave`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`email` VARCHAR(64) NOT NULL,
+	`contrasena` VARCHAR(160) NOT NULL,
+	`nombre` VARCHAR(48) NOT NULL,
+	`apellido_paterno` VARCHAR(48) NOT NULL,
+	`apellido_materno` VARCHAR(48) NULL,
+	`aprobado` TINYINT NOT NULL DEFAULT 0,
+	`fecha_creacion` VARCHAR(14) NOT NULL,
+	`clave_carrera` CHAR(13) NOT NULL,
+	PRIMARY KEY (`email`),
+	INDEX `fk_residentes_carreras1_idx` (`clave_carrera` ASC), -- VISIBLE,
+	CONSTRAINT `fk_residentes_carreras1`
+		FOREIGN KEY (`clave_carrera`)
+		REFERENCES `siger`.`carreras` (`clave`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -78,12 +79,12 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`docentes` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`docentes` (
-  `email` VARCHAR(64) NOT NULL,
-  `contrasena` VARCHAR(160) NOT NULL,
-  `nombre` VARCHAR(48) NOT NULL,
-  `apellido_paterno` VARCHAR(48) NOT NULL,
-  `apellido_materno` VARCHAR(48) NOT NULL,
-  PRIMARY KEY (`email`))
+	`email` VARCHAR(64) NOT NULL,
+	`contrasena` VARCHAR(160) NOT NULL,
+	`nombre` VARCHAR(48) NOT NULL,
+	`apellido_paterno` VARCHAR(48) NOT NULL,
+	`apellido_materno` VARCHAR(48) NOT NULL,
+	PRIMARY KEY (`email`))
 ENGINE = InnoDB;
 
 
@@ -93,9 +94,9 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`materias` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`materias` (
-  `clave` CHAR(8) NOT NULL,
-  `nombre` VARCHAR(48) NOT NULL,
-  PRIMARY KEY (`clave`))
+	`clave` CHAR(8) NOT NULL,
+	`nombre` VARCHAR(48) NOT NULL,
+	PRIMARY KEY (`clave`))
 ENGINE = InnoDB;
 
 
@@ -105,21 +106,21 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`competente` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`competente` (
-  `email_docente` VARCHAR(64) NOT NULL,
-  `clave_materia` CHAR(8) NOT NULL,
-  PRIMARY KEY (`email_docente`, `clave_materia`),
-  INDEX `fk_docentes_has_materias_materias1_idx` (`clave_materia` ASC), -- VISIBLE,
-  INDEX `fk_docentes_has_materias_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
-  CONSTRAINT `fk_docentes_has_materias_docentes1`
-    FOREIGN KEY (`email_docente`)
-    REFERENCES `siger`.`docentes` (`email`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_docentes_has_materias_materias1`
-    FOREIGN KEY (`clave_materia`)
-    REFERENCES `siger`.`materias` (`clave`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`email_docente` VARCHAR(64) NOT NULL,
+	`clave_materia` CHAR(8) NOT NULL,
+	PRIMARY KEY (`email_docente`, `clave_materia`),
+	INDEX `fk_docentes_has_materias_materias1_idx` (`clave_materia` ASC), -- VISIBLE,
+	INDEX `fk_docentes_has_materias_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
+	CONSTRAINT `fk_docentes_has_materias_docentes1`
+		FOREIGN KEY (`email_docente`)
+		REFERENCES `siger`.`docentes` (`email`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT `fk_docentes_has_materias_materias1`
+		FOREIGN KEY (`clave_materia`)
+		REFERENCES `siger`.`materias` (`clave`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -129,16 +130,16 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`telefonos_residentes` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`telefonos_residentes` (
-  `telefono` CHAR(10) NOT NULL,
-  `fijo` TINYINT NOT NULL DEFAULT 0,
-  `email_residente` VARCHAR(64) NOT NULL,
-  PRIMARY KEY (`telefono`),
-  INDEX `fk_telefonos_residentes_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
-  CONSTRAINT `fk_telefonos_residentes_residentes1`
-    FOREIGN KEY (`email_residente`)
-    REFERENCES `siger`.`residentes` (`email`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`telefono` CHAR(10) NOT NULL,
+	`fijo` TINYINT NOT NULL DEFAULT 0,
+	`email_residente` VARCHAR(64) NOT NULL,
+	PRIMARY KEY (`telefono`),
+	INDEX `fk_telefonos_residentes_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
+	CONSTRAINT `fk_telefonos_residentes_residentes1`
+		FOREIGN KEY (`email_residente`)
+		REFERENCES `siger`.`residentes` (`email`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -148,16 +149,16 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`telefonos_docentes` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`telefonos_docentes` (
-  `telefono` CHAR(10) NOT NULL,
-  `fijo` TINYINT NOT NULL DEFAULT 0,
-  `email_docente` VARCHAR(64) NOT NULL,
-  PRIMARY KEY (`telefono`),
-  INDEX `fk_telefonos_docentes_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
-  CONSTRAINT `fk_telefonos_docentes_docentes1`
-    FOREIGN KEY (`email_docente`)
-    REFERENCES `siger`.`docentes` (`email`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`telefono` CHAR(10) NOT NULL,
+	`fijo` TINYINT NOT NULL DEFAULT 0,
+	`email_docente` VARCHAR(64) NOT NULL,
+	PRIMARY KEY (`telefono`),
+	INDEX `fk_telefonos_docentes_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
+	CONSTRAINT `fk_telefonos_docentes_docentes1`
+		FOREIGN KEY (`email_docente`)
+		REFERENCES `siger`.`docentes` (`email`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -167,23 +168,23 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`residencias` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`residencias` (
-  `idresidencia` INT NOT NULL AUTO_INCREMENT,
-  `nombre_proyecto` VARCHAR(128) NOT NULL,
-  `objetivo` VARCHAR(512) NOT NULL,
-  `justificacion` VARCHAR(512) NOT NULL,
-  `periodo` TINYINT NOT NULL DEFAULT 0,
-  `ano` CHAR(4) NOT NULL,
-  `descripcion_actividades` VARCHAR(1024) NOT NULL,
-  `aprobado` TINYINT NOT NULL DEFAULT 0,
-  `email_residente` VARCHAR(64) NOT NULL,
-  `fecha_elaboracion` INT NOT NULL,
-  PRIMARY KEY (`idresidencia`),
-  INDEX `fk_residencia_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
-  CONSTRAINT `fk_residencia_residentes1`
-    FOREIGN KEY (`email_residente`)
-    REFERENCES `siger`.`residentes` (`email`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`idresidencia` INT NOT NULL AUTO_INCREMENT,
+	`nombre_proyecto` VARCHAR(128) NOT NULL,
+	`objetivo` VARCHAR(512) NOT NULL,
+	`justificacion` VARCHAR(512) NOT NULL,
+	`periodo` TINYINT NOT NULL DEFAULT 0,
+	`ano` CHAR(4) NOT NULL,
+	`descripcion_actividades` VARCHAR(1024) NOT NULL,
+	`aprobado` TINYINT NOT NULL DEFAULT 0,
+	`fecha_elaboracion` VARCHAR(14) NOT NULL,
+	`email_residente` VARCHAR(64) NOT NULL,
+	PRIMARY KEY (`idresidencia`),
+	INDEX `fk_residencia_residentes1_idx` (`email_residente` ASC), -- VISIBLE,
+	CONSTRAINT `fk_residencia_residentes1`
+		FOREIGN KEY (`email_residente`)
+		REFERENCES `siger`.`residentes` (`email`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -218,20 +219,20 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`asesores_externos` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`asesores_externos` (
-  `idasesores_externos` INT NOT NULL AUTO_INCREMENT,
-  `email` VARCHAR(64) NOT NULL,
-  `nombre_completo` VARCHAR(128) NOT NULL,
-  `puesto` VARCHAR(64) NOT NULL,
-  `grado_estudios` VARCHAR(48) NOT NULL,
-  `telefono` CHAR(10) NOT NULL,
-  `id_residencia` INT NOT NULL,
-  PRIMARY KEY (`idasesores_externos`),
-  INDEX `fk_asesores_externos_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
-  CONSTRAINT `fk_asesores_externos_residencia1`
-    FOREIGN KEY (`id_residencia`)
-    REFERENCES `siger`.`residencias` (`idresidencia`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`idasesores_externos` INT NOT NULL AUTO_INCREMENT,
+	`email` VARCHAR(64) NOT NULL,
+	`nombre_completo` VARCHAR(128) NOT NULL,
+	`puesto` VARCHAR(64) NOT NULL,
+	`grado_estudios` VARCHAR(48) NOT NULL,
+	`telefono` CHAR(10) NOT NULL,
+	`id_residencia` INT NOT NULL,
+	PRIMARY KEY (`idasesores_externos`),
+	INDEX `fk_asesores_externos_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
+	CONSTRAINT `fk_asesores_externos_residencia1`
+		FOREIGN KEY (`id_residencia`)
+		REFERENCES `siger`.`residencias` (`idresidencia`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -261,22 +262,22 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`involucrados` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`involucrados` (
-  `email_docente` VARCHAR(64) NOT NULL,
-  `id_residencia` INT NOT NULL,
-  `es_asesor` TINYINT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`email_docente`, `id_residencia`),
-  INDEX `fk_docentes_has_residencia_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
-  INDEX `fk_docentes_has_residencia_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
-  CONSTRAINT `fk_docentes_has_residencia_docentes1`
-    FOREIGN KEY (`email_docente`)
-    REFERENCES `siger`.`docentes` (`email`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_docentes_has_residencia_residencia1`
-    FOREIGN KEY (`id_residencia`)
-    REFERENCES `siger`.`residencias` (`idresidencia`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`email_docente` VARCHAR(64) NOT NULL,
+	`id_residencia` INT NOT NULL,
+	`es_asesor` TINYINT NOT NULL DEFAULT 0,
+	PRIMARY KEY (`email_docente`, `id_residencia`),
+	INDEX `fk_docentes_has_residencia_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
+	INDEX `fk_docentes_has_residencia_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
+	CONSTRAINT `fk_docentes_has_residencia_docentes1`
+		FOREIGN KEY (`email_docente`)
+		REFERENCES `siger`.`docentes` (`email`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT `fk_docentes_has_residencia_residencia1`
+		FOREIGN KEY (`id_residencia`)
+		REFERENCES `siger`.`residencias` (`idresidencia`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -286,20 +287,20 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`anexo_29` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`anexo_29` (
-  `idanexo_29` INT NOT NULL AUTO_INCREMENT,
-  `fecha` INT NOT NULL,
-  `evaluacion_externa` VARCHAR(24) NOT NULL,
-  `observaciones_externas` VARCHAR(128) NOT NULL,
-  `evaluacion_interna` VARCHAR(17) NOT NULL,
-  `observaciones_internas` VARCHAR(128) NOT NULL,
-  `id_residencia` INT NOT NULL,
-  PRIMARY KEY (`idanexo_29`),
-  INDEX `fk_anexo_29_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
-  CONSTRAINT `fk_anexo_29_residencia1`
-    FOREIGN KEY (`id_residencia`)
-    REFERENCES `siger`.`residencias` (`idresidencia`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`idanexo_29` INT NOT NULL AUTO_INCREMENT,
+	`fecha` VARCHAR(14) NOT NULL,
+	`evaluacion_externa` VARCHAR(24) NOT NULL,
+	`observaciones_externas` VARCHAR(128) NOT NULL,
+	`evaluacion_interna` VARCHAR(17) NOT NULL,
+	`observaciones_internas` VARCHAR(128) NOT NULL,
+	`id_residencia` INT NOT NULL,
+	PRIMARY KEY (`idanexo_29`),
+	INDEX `fk_anexo_29_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
+	CONSTRAINT `fk_anexo_29_residencia1`
+		FOREIGN KEY (`id_residencia`)
+		REFERENCES `siger`.`residencias` (`idresidencia`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -309,20 +310,20 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `siger`.`anexo_30` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
-  `idanexo_30` INT NOT NULL AUTO_INCREMENT,
-  `fecha` INT NOT NULL,
-  `evaluacion_externa` VARCHAR(28) NOT NULL,
-  `observaciones_externas` VARCHAR(128) NOT NULL,
-  `evaluacion_interna` VARCHAR(28) NOT NULL,
-  `observaciones_internas` VARCHAR(128) NOT NULL,
-  `id_residencia` INT NOT NULL,
-  PRIMARY KEY (`idanexo_30`),
-  INDEX `fk_anexo_30_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
-  CONSTRAINT `fk_anexo_30_residencia1`
-    FOREIGN KEY (`id_residencia`)
-    REFERENCES `siger`.`residencias` (`idresidencia`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+	`idanexo_30` INT NOT NULL AUTO_INCREMENT,
+	`fecha` VARCHAR(14) NOT NULL,
+	`evaluacion_externa` VARCHAR(28) NOT NULL,
+	`observaciones_externas` VARCHAR(128) NOT NULL,
+	`evaluacion_interna` VARCHAR(28) NOT NULL,
+	`observaciones_internas` VARCHAR(128) NOT NULL,
+	`id_residencia` INT NOT NULL,
+	PRIMARY KEY (`idanexo_30`),
+	INDEX `fk_anexo_30_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
+	CONSTRAINT `fk_anexo_30_residencia1`
+		FOREIGN KEY (`id_residencia`)
+		REFERENCES `siger`.`residencias` (`idresidencia`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -332,52 +333,179 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 /* --------------------------------------------------------
 
+	FUNCTIONS.
+
+-------------------------------------------------------- */
+DELIMITER ;;
+
+/*
+	Comprueba si el adminstrador cuyo correo electrónico es
+	[v_email_admin] tiene la capacidad de validar al residente
+	con correo [v_email_residente].
+
+	Regresa 1 si dicho administrador puede validar al residente.
+	Regresa 0 si no.
+*/	
+DROP FUNCTION IF EXISTS puedeValidarResidente;;
+CREATE FUNCTION puedeValidarResidente(
+	v_email_residente VARCHAR(64),
+	v_email_admin VARCHAR(64)
+) RETURNS TINYINT DETERMINISTIC BEGIN 
+	set @realAdminEmail = (
+		select 
+			c.admin_email
+		from 
+			residentes as r join carreras as c
+				on c.clave = r.clave_carrera
+		where r.email = v_email_residente
+	);
+
+	IF v_email_admin = @realAdminEmail THEN BEGIN
+		RETURN 1;
+	END; END IF;
+
+	RETURN 0;
+END;;
+
+DELIMITER ;
+
+/* --------------------------------------------------------
+
 	STORED PROCEDURES.
 
 -------------------------------------------------------- */
 DELIMITER ;;
 
+/*
+	Muestra una lista simplificada de las carreras disponibles.
+	Esta lista solo contendrá la clave de la carrera, así como 
+	el nombre de esta.
+*/
 DROP PROCEDURE IF EXISTS SP_MostrarCarreras;;
 CREATE PROCEDURE SP_MostrarCarreras() BEGIN
 	select clave, nombre_carrera from carreras order by nombre_carrera;
 END;;
 
+
+/*
+	A partir de los datos proporcionados como parámetros,
+	crea las filas en las tablas necesarias para el 
+	registro de un nuevo residente en el sistema.
+	Este residente nuevo no estará confirmado.
+
+	[output] será 1 si todo salió bien.
+	Si ocurre alguna excepción en la transacción,
+	[output] será -1, mientras [message] indica el
+	origen de la excepción.
+*/
 DROP PROCEDURE IF EXISTS SP_RegistroResidente;;
 CREATE PROCEDURE SP_RegistroResidente(
-  v_email VARCHAR(64),
-  v_contrasena VARCHAR(160),
-  v_nombre VARCHAR(48),
-  v_apellido_paterno VARCHAR(48),
-  v_apellido_materno VARCHAR(48),
-  v_clave_carrera CHAR(13),
-  v_tel_cel CHAR(10),
-  v_tel_fijo CHAR(10)
+	v_email VARCHAR(64),
+	v_contrasena VARCHAR(160),
+	v_nombre VARCHAR(48),
+	v_apellido_paterno VARCHAR(48),
+	v_apellido_materno VARCHAR(48),
+	v_fecha_creacion VARCHAR(14),
+	v_clave_carrera CHAR(13),
+	v_tel_cel CHAR(10),
+	v_tel_fijo CHAR(10)
 ) BEGIN
-  DECLARE exit handler for SQLEXCEPTION
-  BEGIN
-    GET DIAGNOSTICS CONDITION 1
-    @p2 = MESSAGE_TEXT;
-    
-    SELECT "0" AS output, @p2 AS message;
-    
-    ROLLBACK;
-  END;
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
 
-  START TRANSACTION;
-    INSERT INTO `siger`.`residentes`
-      (email, contrasena, nombre, apellido_paterno, apellido_materno, clave_carrera)
-    VALUES
-      (v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_clave_carrera);
+	START TRANSACTION;
+		INSERT INTO `siger`.`residentes`
+			(email, contrasena, nombre, apellido_paterno, apellido_materno, fecha_creacion, clave_carrera)
+		VALUES
+			(v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_fecha_creacion, v_clave_carrera);
 
 	
-    INSERT INTO `siger`.`telefonos_residentes` 
-      (telefono, email_residente, fijo)
-    VALUES
-      (v_tel_cel, v_email, 0),
-      (v_tel_fijo, v_email, 1);
+		INSERT INTO `siger`.`telefonos_residentes` 
+			(telefono, email_residente, fijo)
+		VALUES
+			(v_tel_cel, v_email, 0),
+			(v_tel_fijo, v_email, 1);
 
-    SELECT "1" AS output, "Transaction committed successfully" AS message;
-  COMMIT;
+		SELECT "1" AS output, "Transaction committed successfully" AS message;
+	COMMIT;
+END;;
+
+
+/*
+	Muestra una lista de los residentes que actualmente están sin validar y que
+	pertenecen a alguna de las carreras administradas por el dueño del correo
+	electrónico [v_email_admin].
+*/
+DROP PROCEDURE IF EXISTS SP_ResidentesNoValidados;;
+CREATE PROCEDURE SP_ResidentesNoValidados(
+	v_email_admin VARCHAR(64)
+) BEGIN
+	select 
+		r.email, substring(r.email, 2, 8) as `noControl`, r.nombre, r.apellido_paterno, r.apellido_materno,
+		(select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 0) as `celular`,
+		(select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 1) as `tel`,
+		r.fecha_creacion, c.nombre_carrera as `carrera`
+	from 
+		residentes as r join carreras as c 
+			on c.clave = r.clave_carrera
+	where 
+		aprobado = 0 and
+	c.admin_email = v_email_admin
+	order by 
+		r.fecha_creacion, `noControl`;
+END;;
+
+
+/*
+	Valida al residente con correo [v_email_residente] 
+	solo si el administrador con el correo electrónico 
+	[v_email_admin] tiene la capacidad de hacerlo.
+
+	El [output] será 1 si se logró validar al residente.
+	Será 0 si hay algún problema, además de informarse con
+	[message].
+	En caso de ocurrir alguna excepción en la transacción,
+	[output] será -1. La razón será proporcionada a [message].
+*/
+DROP PROCEDURE IF EXISTS SP_ValidarResidente;;
+CREATE PROCEDURE SP_ValidarResidente(
+	v_email_residente VARCHAR(64),
+	v_email_admin VARCHAR(64)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+
+	START TRANSACTION;
+
+	IF (puedeValidarResidente(v_email_residente, v_email_admin)) != 1 THEN BEGIN
+		SELECT "0" AS output, "Este administrador no puede validar a este residente" AS message;
+		END; 
+	ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente) = 0 THEN BEGIN
+			SELECT "0" AS output, "No existe un residente con este email" AS message;
+		END; 
+		ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente AND r.aprobado = 0) = 0 THEN BEGIN
+			SELECT "0" AS output, "Este residente ya está validado" AS message;
+		END; ELSE BEGIN
+			UPDATE `siger`.`residentes` AS r SET r.aprobado = 1 WHERE r.email = v_email_residente;
+
+			SELECT "1" AS output, "Residente validado con éxito" AS message; 
+		END; END IF;
+	
+	COMMIT;
 END;;
 
 
@@ -497,4 +625,4 @@ VALUES
 	('imce-2010-229', 'Ingeniería Mecatrónica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('imec-2010-228', 'Ingeniería Mecánica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('isic-2010-204', 'Ingeniería en Sistemas Computacionales', 'roberto.ds@piedrasnegras.tecnm.mx'),
-	('itic-2010-225', 'Ingeniería en TIC\'s', 'roberto.ds@piedrasnegras.tecnm.mx');
+	('itic-2010-225', 'Ingeniería en TICs', 'roberto.ds@piedrasnegras.tecnm.mx');

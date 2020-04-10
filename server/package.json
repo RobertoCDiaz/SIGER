@@ -15,8 +15,8 @@
     "nodemon": "^2.0.2"
   },
   "scripts": {
-    "start": "tsc && node server.js",
-    "test": "tsc && nodemon server.js"
+    "start": "tsc && cd ../web-client/ && tsc && cd ../server/ && node server.js",
+    "test": "tsc && cd ../web-client/ && tsc && cd ../server/ && nodemon server.js"
   },
   "author": "",
   "license": "ISC"

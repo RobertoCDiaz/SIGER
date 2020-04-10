@@ -69,6 +69,67 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
     );
 });
 
+/**
+ * Regresa al cliente una lista de los residentes sin confirmar de las 
+ * carreras que el administrador actual maneja.
+ */
+server.get('/residentesNoValidados', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    con.query(
+        `call SP_ResidentesNoValidados(?);`,
+        req.session.user.info.email,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Valida la cuenta de residente registrada bajo el correo
+ * electrónico que se pase al argumento [email_residente].
+ */
+server.post('/validarResidente', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const emailResidente = req.body.email_residente;
+    if (!emailResidente) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_ValidarResidente(?, ?);`,
+        [emailResidente, req.session.user.info.email],
+        (e, rows, f) => {
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success(undefined, rows[0][0]['message']));
+        }
+    );
+
+});
+
+
+/**
+ * Con la información proporcionada desde el cliente, esta petición intentará
+ * registrar a un nuevo residente en el sistema.
+ */
 server.post('/registrarResidente', (req, res) => {
     if (
         !req.body.email ||
@@ -79,36 +140,36 @@ server.post('/registrarResidente', (req, res) => {
         !req.body.cellNumber ||
         !req.body.phoneNumber
     ) {
-        res.send("0");
+        res.send(Response.notEnoughParams());
         return;
     }
 
     con.query(
-        'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?);',
+        'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?, ?);',
         [
             req.body.email, encrypt(req.body.pass), req.body.name, req.body.patSurname,
-            (req.body.matSurname || "null"), req.body.career, req.body.cellNumber, 
+            (req.body.matSurname || "null"), new Date().getTime().toString(), req.body.career, req.body.cellNumber, 
             req.body.phoneNumber    
         ],
         (e, rows, f) => {
 
             if (e) {
                 console.log(e);
-                Response.unknownError(e.toString());
+                res.send(Response.unknownError(e.toString()));
                 return;
             }
 
             if (rows[0][0]['output'] != 1) {
-                Response.sqlError(rows[0][0]['message']);
+                res.send(Response.sqlError(rows[0][0]['message']));
                 return;
             }
 
             res.send(Response.success());
-            // res.send(rows[0][0]);
             return;
         }
     );
 });
+
 
 /**
  * Login simple
@@ -124,13 +185,34 @@ server.get('/login', (req, res) => {
     res.sendFile("login.html", { root: "../web-client/" }); 
 });
     
+
+/**
+ * Intenta autenticar una cuenta de usuario del sistema.
+ * 
+ * Dependiendo del tipo de usuario que intenta logearse (adminstradores, 
+ * docentes, o residentes) se ejecutará la lógica apropiada.
+ * 
+ * En caso de que el login tenga éxito, se registrará la información
+ * básica del usuario que podría usarse en el server en [req.session.user].
+ * Actualmente, el objeto [req.session.user] tiene esta estructura:
+ * 
+ * {
+ *      'class': Tipo de usuario identificado. Ver enum [USER_CLASSES].
+ *      'info': { Información del usuario
+ *          'email': Correo electrónico asociado a la cuenta abierta.
+ *          'nombre': Nombre almacenado en la base de datos.
+ *          'apellido_paterno': Dato almacenado en la base de datos.
+ *          'apellido_materno': Dato almacenado en la base de datos.
+ *      }
+ * }
+ */
 server.post('/auth', (req,res) =>{
     const email = req.body.email;
     const pass = req.body.pass;
     const userClass = req.body.class;
 
-    if (!email || !pass || !userClass) { // Esto es por si falta algún parámetro. Solo por si acaso.
-        res.send("0");
+    if (!email || !pass || !userClass) { 
+        res.send(Response.notEnoughParams());
         return
     }
 
@@ -138,19 +220,16 @@ server.post('/auth', (req,res) =>{
         case USER_CLASSES.RESIDENTE: {
             con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
                 if (e) {
-                    // res.send(e);
                     res.send(Response.unknownError(e.toString()));
                     return;
                 }
                 
                 if (results.length == 0) {
-                    // res.send('El correo electrónico ingresado no está registrado.'); 
                     res.send(Response.userError("El correo electrónico ingresado no está registrado."));
                     return;
                 }
         
                 if (pass != decrypt(results[0]['contrasena'])) {
-                    // res.send('La contraseña no es correcta, verifique.');
                     res.send(Response.userError("La contraseña no es correcta, verifique."));
                     return;
                 }
@@ -173,7 +252,7 @@ server.post('/auth', (req,res) =>{
         }     
 
         case USER_CLASSES.ADMIN: {
-            con.query('select * from administradores where email = ?',[email],(e,results,fi)=> {
+            con.query('select * from administradores where email = ?',[email],(e,results,fi) => {
                 if (e) {
                     res.send(Response.unknownError(e.toString()));
                     return;

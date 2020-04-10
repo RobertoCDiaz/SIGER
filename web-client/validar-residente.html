@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validación de residentes:: SIGER</title>
+    <title>Validación de residentes :: SIGER</title>
     <link rel="stylesheet" href="styles/global.css">
     <link rel="stylesheet" href="styles/forms.css">
     <style>
@@ -121,14 +121,13 @@
             <p>A continuación aparecerán los residentes cuyo registro está terminado, pero que aún no están validados. Los residentes no-validados no podrán crear un reporte preeliminar, y por lo tanto, no podrán comenzar con su Residencia Profesional.</p>
             <p>Para validar a un residente, presione el elemento deseado, lea la información del prospecto, y presione <b>VALIDAR</b>.</p>
 
-            <div class="list">
+            <div class="list" id="residentsContainerView">
                 <div class="list-header">
                     <p>No. de Control</p>
                     <p>Nombre completo</p>
                     <p>Fecha de registro</p>
                 </div>
-                <!-- TODO: Generar a partir del contenido de la BD. -->
-                <div class="list-item" onclick="openInfo();">
+                <!-- <div class="list-item" onclick="openInfo();">
                     <p class="controlNumber">17430048</p>
                     <p class="fullName">DANIEL HERNÁNDEZ SÁNCHEZ</p>
                     <p class="date">28 de marzo del 2020</p>
@@ -147,56 +146,42 @@
                     <p class="controlNumber">17430321</p>
                     <p class="fullName">NOELIA PIEDRABUENA CUÉLLAR</p>
                     <p class="date">9 de abril del 2020</p>
-                </div>
+                </div> -->
             </div>
         </form>
     </div>
 
-    <!-- TODO: Reemplazar datos por la información del residente seleccionado. -->
     <div id="residenteView" class="residente-container">
         <div class="residente">
             <div class="info-item">
                 <p class="title">Nombre completo</p>
-                <p class="value">NOELIA PIEDRABUENA CUÉLLAR</p>
+                <p id="nameView" class="value">NOELIA PIEDRABUENA CUÉLLAR</p>
             </div>
             <div class="info-item">
                 <p class="title">Número de Control</p>
-                <p class="value">17430321</p>
+                <p id="controlNumberView" class="value">17430321</p>
             </div>
             <div class="info-item">
                 <p class="title">Carrera</p>
-                <p class="value">Ingeniería en Sistemas Computacionales</p>
+                <p id="careerView" class="value">Ingeniería en Sistemas Computacionales</p>
             </div>
             <div class="info-item">
                 <p class="title">Fecha de registro</p>
-                <p class="value">9 de abril del 2020</p>
+                <p id="dateView" class="value">9 de abril del 2020</p>
             </div>
             <div class="info-item">
                 <p class="title">Contacto</p>
-                <p class="value">L17430321@piedrasnegras.tecnm.mx</p>
-                <p class="value">8787894561</p>
-                <p class="value">8781236548</p>
+                <p id="emailView" class="value">L17430321@piedrasnegras.tecnm.mx</p>
+                <p id="cellPhoneView" class="value">8787894561</p>
+                <p id="phoneView" class="value">8781236548</p>
             </div>
             <div class="options-container">
                 <button type="button" class="secondary-button" onclick="closeInfo();">CERRAR</button>
-                <!-- TODO: Validar un residente al dar click. -->
-                <button type="button" class="primary-button">VALIDAR</button>
+                <button id="validateButtonView" type="button" class="primary-button">VALIDAR</button>
             </div>
         </div>
     </div>
-
-    <script>
-        const residenteView = document.getElementById('residenteView');
-
-        const openInfo = () => {
-            // residenteView.style.opacity = 100;
-            residenteView.style.display = 'flex';
-        }
-
-        const closeInfo = () => {
-            residenteView.style.display = 'none';
-        }
-    </script>
+    <script src="scripts/validar-residente.js"></script>
 
     <footer>
         <div class="sections-container">
