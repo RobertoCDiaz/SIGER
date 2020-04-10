@@ -562,11 +562,11 @@ BEGIN
     VALUES
       (v_email_ae, v_nombre_ae, v_puesto,v_grado_estudios, v_tel_ae, @idr);
 
-    SELECT "1" AS output, "Transaction commited successfully" AS message;
+    SELECT "1" AS output, "Transaction commited successfully" AS message, @idr AS `idresidencia`;
   COMMIT;
 END;;
 
-DROP procedure IF EXISTS `SP_RegistraHorarios`;
+DROP procedure IF EXISTS `SP_RegistraHorarios`;;
 CREATE PROCEDURE `SP_RegistraHorarios`(
   v_inicio CHAR(5),
   v_fin CHAR(5),
@@ -585,13 +585,13 @@ BEGIN
 
   START TRANSACTION;
     INSERT INTO `siger`.`horarios`
-      (inicio, fin, idresidencia)
+      (inicio, fin, id_residencia)
     VALUES
       (v_inicio, v_fin, v_idresidencia);
 
     SELECT "1" AS output, "Transaction commited successfully" AS message;
   COMMIT;
-END$$
+END;;
 
 DELIMITER ;
 

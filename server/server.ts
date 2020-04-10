@@ -154,7 +154,6 @@ server.post('/registrarResidente', (req, res) => {
         (e, rows, f) => {
 
             if (e) {
-                console.log(e);
                 res.send(Response.unknownError(e.toString()));
                 return;
             }
@@ -341,16 +340,17 @@ server.post('/registro-residencia',(req,res)=>
 {
     
     if (!req.session.loggedin) {
-        console.log("Se redirige a home por no tener sesión iniciada")
         res.redirect('/home');
         return;
     }
     if (req.session.user.class != USER_CLASSES.RESIDENTE) {
         // TODO: Agregar pantalla de Acesson No Autorizado.
-        console.log("Se redirige a home porque no es residente")
         res.redirect('/home');
         return;
     }
+
+    console.log(req.body);
+
     const nombre_proyecto = req.body.nombre_proyecto;
     const objetivo = req.body.objetivo;
     const justificacion = req.body.justificacion;
@@ -387,7 +387,6 @@ server.post('/registro-residencia',(req,res)=>
         {
             if(e)
             {
-                console.log(e);
                 res.send(Response.unknownError(e.toString()));
                 return;
             }
@@ -398,30 +397,66 @@ server.post('/registro-residencia',(req,res)=>
             }
             idres=Number(rows[0][0]['idresidencia']);
 
-            for(let i = 0;i<counter;i++)
-            {
-                con.query('call SP_RegistraHorarios(?,?,?);',
-                    [
-                        entradas[i],salidas[i],idres
-                    ],
-                (er,r,fi)=>
-                {
-                    if(er)
-                    {
-                        console.log(er);
-                        return;
-                    }
-                    if(rows[0][0]['output']!=1)
-                    {
-                        console.log(rows[0][0]['message']);
-                        return;
-                    }
-                });
-            }
-            res.send(Response.success());
+            // for(let i = 0;i<counter;i++)
+            // {
+            //     con.query('call SP_RegistraHorarios(?,?,?);',
+            //         [
+            //             entradas[i],salidas[i],idres
+            //         ],
+            //     (er,r,fi)=>
+            //     {
+            //         if(er)
+            //         {
+            //             res.send(Response.unknownError(er.toString()));
+            //             return;
+            //         }
+            //         if(r[0][0]['output']!=1)
+            //         {
+            //             res.send(Response.sqlError(r[0][0]['message']));
+            //             return;
+            //         }
+            //     });
+            // }
+            // res.send(Response.success());
+
+            registrarHorarios(
+                idres, entradas, salidas, counter, 
+                () => { // onDone
+                    res.send(Response.success());
+                },
+                (error, horarioN) => { // onError
+                    res.send(Response.unknownError(error.toString()));
+                }
+            );
         }
     );
 });
+
+const registrarHorarios = (
+    idResidencia: number, entradas: string[], salidas: string[], 
+    horarios: number, onDone: () => void, onError: (error, numeroHorario) => void
+) => {
+    con.query(
+        `call SP_RegistraHorarios(?,?,?);`,
+        [entradas[horarios - 1], salidas[horarios - 1], idResidencia],
+        (err, rows, f) => {
+            
+            if (err) {
+                onError(err, horarios - 1);
+                return;
+            }
+            if (rows[0][0]['output'] != 1) {
+                onError(`SQL Error: ${rows[0][0]['message']}`, horarios - 1);
+                return;
+            }
+
+            if (horarios - 1 > 0)
+                registrarHorarios(idResidencia, entradas, salidas, horarios - 1, onDone, onError);
+            else 
+                onDone();
+        }
+    );
+}
 
 server.get('/avance-proyecto', (req, res) => {
     if (!req.session.loggedin) {
