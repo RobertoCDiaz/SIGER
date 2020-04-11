@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Detalles de Residencia Profesional :: SIGER</title>
+        <link rel="stylesheet" href="styles/global.css" />
+        <link rel="stylesheet" href="styles/forms.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            .form-input {
+                display: flex;
+                padding: 1em;
+                align-items: center;
+            }
+
+            .form-input > * {
+                flex: 3;
+            }
+
+            .form-input > label {
+                flex: 1;
+            }
+
+            .button-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 2em;
+            }
+
+            form p {
+                font-family: 'Arial';
+                color: var(--primary-text) !important; 
+            }
+
+            .page-header {
+                display: grid;
+                flex-direction: row;
+                align-items: center;
+                grid-template-columns: 1fr 3fr 1fr;
+                justify-items: center;
+                margin-bottom: 3em;
+            }
+
+            .page-header > img {
+                height: 100px;
+                -ms-grid-row-align: center;
+            }
+
+            .page-header > .text > *{
+                text-align: center;
+                color: var(--secondary-text) !important;
+            }
+
+            .page-header > .text > .title {
+                margin-top: 2em;
+            }
+
+            .section-title {
+                font-weight: bold;
+                font-size: 18px;
+                margin-top: 2em;
+            }
+
+            .page-content > p {
+                margin-bottom: .5em;
+            }
+
+            .field-bundle {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: .5em;
+            }
+
+            .field-bundle > p:not(:first-child) {
+                margin-left: 1em;
+            }
+
+            .buttons-container {
+                margin-top: 3em;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            hr {
+                margin: 5em 5vw;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <header class="header-extension">
+            <div class="bar">
+                <!-- <h1><a href="/home">SIGER</a></h1> -->
+                <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                    <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                    <h1 style="margin-left: .5em;">SIGER</h1>
+                </a>
+                <h2>Detalles de Residencia Profesional</h2>
+            </div>
+        </header>
+
+        <div class="content">
+            <form id="form">
+                <div class="page-header">
+                    <img src="assets/images/tecnm.png" alt="TECNM">
+                    <div class="text">
+                        <p>INSTITUTO TECNOLÓGICO DE PIEDRAS NEGRAS</p>
+                        <p>SUBDIRECCIÓN ACADÉMICA</p>
+                        <p>DIVISIÓN DE ESTUDIOS PROFESIONALES</p>
+                        <p class="title"><b>FORMATO DE ANTEPROYECTO DE RESIDENCIA PROFESIONAL</b></p>
+                    </div>
+                    <img src="assets/images/itpn.png" alt="ITPN">
+                </div>
+
+                <p style="text-align: end;">Fecha de Elaboración: <b>[FECHA DE ELABORACIÓN]</b></p>
+
+                <div class="page-content">
+                    <p class="section-title">Descripción General de Proyecto</p>
+                    <p>Nombre del Proyecto: <b>[NOMBRE DEL PROYECTO]</b></p>
+                    <p>Objetivo General: <b>[OBJETIVO GENERAL]</b></p>
+                    <p>Justificación (Problema a resolver): <b>[JUSTIFICACIÓN]</b></p>
+                    <p>Periodo de realización: <b>[PERIODO Y AÑO]</b></p>
+
+                    <p class="section-title">Descripción de las actividades:</p>
+                    <p>[ACTIVIDADES]</p>
+
+                    <p class="section-title">Información sobre la empresa, organismo, o dependencia donde se desarrollará el proyecto</p>
+                    <p>Nombre de la empresa: <b>[EMPRESA]</b></p>
+                    <p>Representante Legal de la empresa: <b>[REPRESENTANTE]</b></p>
+                    <div class="field-bundle">
+                        <p>Dirección: <b>[DIRECCIÓN]</b></p>
+                        <p>Teléfono: <b>[TELÉFONO]</b></p>
+                    </div>
+                    <div class="field-bundle">
+                        <p>Ciudad: <b>[CIUDAD]</b></p>
+                        <p>Correo electrónico: <b>[EMAIL]</b></p>
+                    </div>
+                    <p>Departamento o área del desarrollo del proyecto en la empresa: <b>[DEPARTAMENTO]</b></p>
+
+                    <p class="section-title">Datos del asesor externo</p>
+                    <p>Nombre completo: <b>[NOMBRE COMPLETO]</b></p>
+                    <div class="field-bundle">
+                        <p>Puesto: <b>[PUESTO]</b></p>
+                        <p>Grado de estudios: <b>[GRADO]</b></p>
+                    </div>
+                    <div class="field-bundle">
+                        <p>Teléfono: <b>[TELÉFONO]</b></p>
+                        <p>Correo electrónico: <b>[EMAIL]</b></p>
+                    </div>
+
+                    <p class="section-title">Datos del residente</p>
+                    <p>Nombre completo: <b>[NOMBRE]</b></p>
+                    <p>No. de Control: <b>[NO CONTROL]</b></p>
+                    <p>Carrera: <b>[CARRERA]</b></p>
+                    <p>Teléfono Casa: <b>[TEL. FIJO]</b></p>
+                    <p>Celular: <b>[TEL. CEL.]</b></p>
+                    <p>Correo electrónico: <b>[EMAIL]</b></p>
+                    <p>Horario(s) en la Empresa: <b>[HORARIOS, SEPARADOS POR COMA]</b></p>
+                </div>
+                <div class="buttons-container">
+                    <!-- TODO: Implementar descarga de formato. -->
+                    <button class="primary-button">DESCARGAR FORMATO</button>
+                </div>
+            </form>
+
+            <hr>
+
+            <style>
+                .assigner-container > p {
+                    margin-top: 1em;
+                    text-align: justify;
+                }
+
+                .assigner {
+                    background-color: white;
+                    border: 1px solid var(--gray-border-color);
+                    border-radius: 4px;
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: 3em;
+                    overflow: hidden;
+                }
+
+                .assigner > .searchBar {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: stretch;
+                }
+
+                .assigner > .searchBar > * {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .assigner > .searchBar > input {
+                    flex: 1;
+                    border: none;
+                    border-bottom: 1px solid var(--gray-border-color);
+                }
+
+                .assigner > .searchBar > i {
+                    background-color: var(--azul-tec);
+                    color: white;
+                    padding: .5em;
+                }
+
+                .teacher > .title {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    background-color: var(--gray-content-color);
+                }
+
+                .teacher > .title > * {
+                    color: var(--secondary-text);
+                    padding: .25em;
+                    color: white;
+                }
+
+                .teacher > .teacherName {
+                    padding: .25em 1em;
+                }
+
+                .result {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    cursor: pointer;
+                }
+
+                .result > * {
+                    padding: .25em;
+                }
+
+                .result:hover > i {
+                    background-color: green;
+                    color: white;
+                }
+            </style>
+            <div class="assigner-container">
+                <h2>Asignar asesor interno y revisores</h2>
+                <p>Con este buscador podrá encontrar docentes registrados en el SIGER y asignarlos al proyecto como asesor interno o revisores. El buscador hace consultas basadas en nombre, apellidos, o correo electrónico. Para seleccionar a un docente, simplemente haga click en el resultado deseado.</p>
+                <p>Tendrá que seleccionar exactamente tres docentes distintos. El primero que seleccione será asignado al proyecto como asesor interno, mientras que los dos restantes serán revisores de la Residencia Profesional.</p>
+                <p>Una vez asignado un docente a algún cargo, puede presionar la cruz al lado de su nombre para eliminarlo si cometió alguna equivocación.</p>
+
+                <div class="assigner">
+                    <div class="searchBar">
+                        <input type="text" placeholder="Nombre o correo del docente">
+                        <i class="material-icons">search</i>
+                    </div>
+                    <div class="resultsContainer">
+                        <p style="padding: 1em;">No hay ningún resultado que satisfaga el criterio de búsqueda actual</p>
+                        <!-- <div class="result">
+                            <i class="material-icons">person_add</i>
+                            <p>Daniel Hernández Sánchez (daniel.hs@piedrasnegras.tecnm.mx)</p>
+                        </div>
+                        <div class="result">
+                            <i class="material-icons">person_add</i>
+                            <p>Roberto Carlos Sánchez (roberto.ds@piedrasnegras.tecnm.mx)</p>
+                        </div> -->
+                    </div>
+                </div>
+
+                <div class="assigner">
+                    <div class="teacherContainer">
+                        <div class="teacher">
+                            <div class="title">
+                                <i class="material-icons">supervisor_account</i>
+                                <p>Asesor interno</p>
+                            </div>
+                            <p class="teacherName">Aún no hay un docente asignado</p>
+                        </div>
+                        <div class="teacher">
+                            <div class="title">
+                                <i class="material-icons">person</i>
+                                <p>Revisor</p>
+                            </div>
+                            <p class="teacherName">Aún no hay un docente asignado</p>
+                        </div>
+                        <div class="teacher">
+                            <div class="title">
+                                <i class="material-icons">person</i>
+                                <p>Revisor</p>
+                            </div>
+                            <p class="teacherName">Aún no hay un docente asignado</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="sections-container">
+                <section>
+                    <h2>Integrantes</h2>
+                    <div class="section-item">
+                        <p>Daniel Hernández Sánchez</p>
+                        <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+                    </div>
+                    <div class="section-item">
+                        <p>Roberto Carlos Díaz Sánchez</p>
+                        <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Materias</h2>
+                    <div class="section-item">
+                        <p>Administración de Bases de Datos</p>
+                        <p>SCB-1001</p>
+                    </div>
+                    <div class="section-item">
+                        <p>Ingeniería de Software</p>
+                        <p>SCD-1011</p>
+                    </div>
+                    <div class="section-item">
+                        <p>Programación Web</p>
+                        <p>AEB-1055</p>
+                    </div>
+                </section>
+                <section>
+                    <h2>Enlaces de interés</h2>
+                    <div class="section-item">
+                        <p>
+                            <a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a>
+                        </p>
+                        <p>
+                            <a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">
+                                Documentación y evidencias
+                            </a>
+                        </p>
+                    </div>
+                </section>
+            </div>
+            <p>Instituto Tecnológico de Piedras Negras</p>
+            <p>Ingeniería en Sistemas Computacionales</p>
+        </footer>
+    </body>
+</html>

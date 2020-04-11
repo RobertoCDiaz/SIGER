@@ -234,7 +234,7 @@ server.get('/validar-residentes', (req, res) => {
     }
 
     if (req.session.user.class != USER_CLASSES.ADMIN) {
-        // TODO: Agregar pantalla de Acesson No Autorizado.
+        // TODO: Agregar pantalla de Acceso No Autorizado.
         res.redirect('/home');
         return;
     }
@@ -249,7 +249,7 @@ server.get('/nuevo-proyecto', (req, res) => {
     }
 
     if (req.session.user.class != USER_CLASSES.RESIDENTE) {
-        // TODO: Agregar pantalla de Acesson No Autorizado.
+        // TODO: Agregar pantalla de Acceso No Autorizado.
         res.redirect('/home');
         return;
     }
@@ -383,7 +383,7 @@ server.get('/docs', (req, res) => {
     }
 
     if (req.session.user.class != USER_CLASSES.RESIDENTE) {
-        // TODO: Agregar pantalla de Acesson No Autorizado.
+        // TODO: Agregar pantalla de Acceso No Autorizado.
         res.redirect('/home');
         return;
     }
@@ -412,6 +412,36 @@ server.get('/nuevo-docente', (req, res) => {
     }
 
     res.sendFile('registro-docentes.html', { root: '../web-client/' })
+});
+
+server.get('/panel-residencias', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.ADMIN) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('panel-residencias.html', { root: '../web-client/' });
+});
+
+server.get('/residencia', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.ADMIN) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('residencia.html', { root: '../web-client/' });
 });
 
 
