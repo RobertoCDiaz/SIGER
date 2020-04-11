@@ -413,6 +413,42 @@ CREATE FUNCTION nombreCompleto(
 	RETURN '';
 END;;
 
+
+/*
+	Dado el id de una residencia, concatena todos los horarios
+	del residente en una empresa en una sola cadena de caracteres,
+	separando cada jornada con una coma.
+
+	Por ejemplo, si a una residencia le corresponden los siguientes horarios
+	----------------
+	|entrada|salida|
+	----------------
+	|09:00	|12:00 |
+	----------------
+	|16:00	|20:00 |
+	----------------
+
+	Esta función arrojará el siguiente VARCHAR:
+	"09:00 - 12:00,16:00 - 20:00"
+*/
+DROP FUNCTION IF EXISTS concatenarHorarios;;
+CREATE FUNCTION concatenarHorarios(
+	v_id_residencia INT
+) RETURNS VARCHAR(64) DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			GROUP_CONCAT(t.jornada SEPARATOR ',')
+		FROM (
+			SELECT 
+				CONCAT(h.inicio, " - ", h.fin) as 'jornada'
+			FROM 
+				horarios AS h 
+			WHERE 
+				h.id_residencia = v_id_residencia
+		) AS t
+	);
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------
@@ -674,6 +710,56 @@ CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 		);
 END;;
 
+
+/*
+	Muestra la información necesaria para generar el formato
+	preliminar de la residencia con id [v_id_residencia], siempre 
+	y cuando el correo electrónico [v_email_admin] sea
+	encargado de asignar docentes al proyecto.
+*/
+DROP PROCEDURE IF EXISTS SP_FormatoPreliminar;;
+CREATE PROCEDURE SP_FormatoPreliminar(
+	v_id_residencia INT,
+	v_email_admin VARCHAR(64)
+) BEGIN
+	SELECT 
+		DISTINCT r.idresidencia,
+		r.fecha_elaboracion AS 'fecha', r.nombre_proyecto AS 'proyecto',
+		r.objetivo AS 'objetivo', r.justificacion AS 'justificacion',
+		r.periodo AS 'periodo', r.ano AS 'ano', r.descripcion_actividades AS 'actividades',
+
+		e.nombre AS 'empresa', e.representante as 'representante_e', e.direccion AS 'direccion_e',
+		e.telefono AS 'telefono_e', e.ciudad AS 'ciudad_e', e.email AS 'email_e', e.departamento AS 'departamento_e',
+
+		ae.nombre_completo AS 'nombre_ae', ae.puesto AS 'puesto_ae', ae.grado_estudios AS 'grado_ae', 
+		ae.telefono AS 'telefono_ae', ae.email AS 'email_ae',
+
+		nombreCompleto(res.email) as 'nombre_res', SUBSTRING(res.email, 2, 9) as 'noControl_res',
+		c.nombre_carrera as 'carrera', 
+		(
+			SELECT telefono FROM telefonos_residentes WHERE email_residente = res.email AND fijo = 1
+		) as 'tel_casa',
+		(
+			SELECT telefono FROM telefonos_residentes WHERE email_residente = res.email AND fijo = 0
+		) as 'celular',
+		res.email as 'email_res',
+		concatenarHorarios(r.idresidencia) as 'horarios'
+	FROM 
+		residencias AS r LEFT JOIN empresas AS e
+			ON r.idresidencia = e.id_residencia
+		LEFT JOIN asesores_externos AS ae
+			ON r.idresidencia = ae.id_residencia
+		JOIN horarios AS h
+			ON r.idresidencia = h.id_residencia
+		LEFT JOIN residentes AS res
+			ON r.email_residente = res.email
+		LEFT JOIN carreras AS c
+			ON res.clave_carrera = c.clave
+	WHERE
+		r.idresidencia = v_id_residencia AND
+		c.admin_email = v_email_admin;
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------
@@ -734,6 +820,7 @@ call SP_RegistroResidente(
 call SP_RegistroResidencia(
 	'Volt Breaker', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 1, 2020, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 'L17430001@piedrasnegras.tecnm.mx', '1586570609000', 'Twilight Electronics', 'Amir Obrero', 'Olive Street', 'Kugate', '8781234567', 'twilightelectronics@gmail.com', 'Sistemas y Computación', 'amirobrero@gmail.com', 'Amir Obrero', 'Jefe de departamento', 'Licenciatura', '8781234568'
 );
+call SP_RegistraHorarios('01:00', '07:00', 1);
 call SP_RegistroResidencia(
 	'Alpha Entangler', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
@@ -751,6 +838,7 @@ call SP_RegistroResidencia(
 	'Oliver Linares', 
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
+call SP_RegistraHorarios('15:00', '20:00', 2);
 call SP_RegistroResidencia(
 	'Harmonic Diverter', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
@@ -769,6 +857,8 @@ call SP_RegistroResidencia(
 	'Izan Madrid', 
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
+call SP_RegistraHorarios('13:00', '16:00', 3);
+call SP_RegistraHorarios('17:30', '20:30', 3);
 call SP_RegistroResidencia(
 	'Cosmic Reactor', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
@@ -787,6 +877,9 @@ call SP_RegistroResidencia(
 	'Sergi Ferrero', 
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
+call SP_RegistraHorarios('13:00', '14:00', 4);
+call SP_RegistraHorarios('15:00', '17:00', 4);
+call SP_RegistraHorarios('20:00', '24:00', 4);
 call SP_RegistroResidencia(
 	'Particle Shaper', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
@@ -805,6 +898,8 @@ call SP_RegistroResidencia(
 	'Sergi Ferrero', 
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
+call SP_RegistraHorarios('13:30', '15:30', 5);
+call SP_RegistraHorarios('17:00', '19:00', 5);
 call SP_RegistroResidencia(
 	'Kwolek Communicator', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
@@ -823,3 +918,4 @@ call SP_RegistroResidencia(
 	'Mateo Escrivá', 
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
+call SP_RegistraHorarios('15:00', '20:00', 6);

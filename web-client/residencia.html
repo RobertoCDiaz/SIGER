@@ -8,6 +8,29 @@
         <link rel="stylesheet" href="styles/forms.css" />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <style>
+            @media only screen and (min-width: 1441px) {
+                :root {
+                    --vertical-form-margin: 20vw;
+                }
+            }
+            
+            @media only screen and (min-width: 1001px) and (max-width: 1440px) {
+                :root {
+                    --vertical-form-margin: 15vw;
+                }
+            }
+            
+            @media only screen and (max-width: 1000px) {
+                :root {
+                    --vertical-form-margin: 2vw;
+                }
+            }
+
+            .content {
+                padding-left: var(--vertical-form-margin);
+                padding-right: var(--vertical-form-margin);
+            }
+
             .form-input {
                 display: flex;
                 padding: 1em;

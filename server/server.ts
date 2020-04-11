@@ -574,7 +574,17 @@ server.get('/residencia', (req, res) => {
         return;
     }
 
-    res.sendFile('residencia.html', { root: '../web-client/' });
+    if (!req.query.id) {
+        res.send(Response.userError('Residencia no especificada'));
+        return;
+    }
+
+    res.sendFile('residencia.html', { 
+        root: '../web-client/',
+        headers: {
+            'header-personalizado': req.query.id
+        }
+    });
 });
 
 
