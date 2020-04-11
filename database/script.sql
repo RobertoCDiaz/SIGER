@@ -367,6 +367,52 @@ CREATE FUNCTION puedeValidarResidente(
 	RETURN 0;
 END;;
 
+
+/*
+	Regresa un string con el nombre completo del 
+	residente, docente, o administrador cuyo email 
+	concuerde con [v_email].
+
+	Si no encuentra un registro con email [v_email],
+	regresará una cadena vacía [''].
+*/
+DROP FUNCTION IF EXISTS nombreCompleto;;
+CREATE FUNCTION nombreCompleto(
+	v_email VARCHAR(64)
+) RETURNS VARCHAR(256) DETERMINISTIC BEGIN
+
+	IF v_email IN (SELECT email FROM residentes) THEN BEGIN
+		RETURN (
+			SELECT 
+				CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', COALESCE(t.apellido_materno, ''))
+			FROM 
+				residentes as t
+			WHERE
+				t.email = v_email
+		);
+	END; ELSEIF v_email IN (SELECT email FROM docentes) THEN BEGIN
+		RETURN (
+			SELECT 
+				CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', COALESCE(t.apellido_materno, ''))
+			FROM 
+				docentes as t
+			WHERE
+				t.email = v_email
+		);
+	END; ELSEIF v_email IN (SELECT email FROM administradores) THEN BEGIN
+		RETURN (
+			SELECT 
+				CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', COALESCE(t.apellido_materno, ''))
+			FROM 
+				administradores as t
+			WHERE
+				t.email = v_email
+		);
+	END; END IF;
+
+	RETURN '';
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------
@@ -562,7 +608,7 @@ BEGIN
     VALUES
       (v_email_ae, v_nombre_ae, v_puesto,v_grado_estudios, v_tel_ae, @idr);
 
-    SELECT "1" AS output, "Transaction commited successfully" AS message, @idr AS `idresidencia`;
+    SELECT "1" AS output, "Transaction committed successfully" AS message, @idr AS `idresidencia`;
   COMMIT;
 END;;
 
@@ -589,20 +635,29 @@ BEGIN
     VALUES
       (v_inicio, v_fin, v_idresidencia);
 
-    SELECT "1" AS output, "Transaction commited successfully" AS message;
+    SELECT "1" AS output, "Transaction committed successfully" AS message;
   COMMIT;
 END;;
 
+
+/*
+	Muestra una lista de residencias sin confirmar que administra 
+	el usuario con correo electrónico [v_admin_email].
+	[v_query] es un parámetro que servirá para filtrar las residencias
+	a mostrar. Este filtro se comparará con el nombre del proyecto,
+	nombre de la empresa, nombre completo del residente, y correo
+	electrónico del residente.
+*/
 DROP PROCEDURE IF EXISTS SP_ListaResidenciasSinDocentes;;
 CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 	v_email_admin VARCHAR(64),
 	v_query VARCHAR(128)
 ) BEGIN
-
 	SELECT 
-		r.nombre_proyecto AS 'nombre_p', e.nombre AS 'empresa', c.nombre_carrera AS 'carrera',
-		concat(res.nombre, " ", res.apellido_paterno, " ", res.apellido_materno) AS 'residente',
-		r.fecha_elaboracion AS 'fecha', r.periodo AS 'periodo', r.ano AS 'ano'
+		r.idresidencia as 'id', r.nombre_proyecto AS 'proyecto', e.nombre AS 'empresa',
+		c.nombre_carrera AS 'carrera', nombreCompleto(res.email) AS 'residente',
+		res.email AS 'email', r.fecha_elaboracion AS 'fecha', r.periodo AS 'periodo', 
+		r.ano AS 'ano'
 	FROM 
 		residencias AS r JOIN empresas AS e
 			on r.idresidencia = e.id_residencia
@@ -614,9 +669,9 @@ CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 		c.admin_email = v_email_admin AND (
 			r.nombre_proyecto LIKE v_query OR
 			e.nombre LIKE v_query OR
-			CONCAT(res.nombre, " ", res.apellido_paterno, " ", res.apellido_materno) LIKE v_query
+			res.email LIKE v_query OR
+			nombreCompleto(res.email) LIKE v_query
 		);
-	
 END;;
 
 DELIMITER ;
@@ -650,3 +705,121 @@ VALUES
 	('imec-2010-228', 'Ingeniería Mecánica', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('isic-2010-204', 'Ingeniería en Sistemas Computacionales', 'roberto.ds@piedrasnegras.tecnm.mx'),
 	('itic-2010-225', 'Ingeniería en TICs', 'roberto.ds@piedrasnegras.tecnm.mx');
+
+-- ---------------------------------------------
+-- residentes
+-- ---------------------------------------------
+call SP_RegistroResidente(
+  'L17430001@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Xavier', 'Arroyo', 'Valdéz', '1586229655325', 'isic-2010-204', '8781234567', '8787654321'
+);
+call SP_RegistroResidente(
+  'L17430002@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Francisco', 'Sáenz', null, '1586229655325', 'iind-2010-227', '8782582582', '8788528528'
+);
+call SP_RegistroResidente(
+  'L17430003@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Eva', 'Burgos', 'Herrera', '1586229655325', 'imec-2010-228', '8781597535', '8789513575'
+);
+call SP_RegistroResidente(
+  'L17430004@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Zoe', 'Lérida', 'Ramírez', '1586229655325', 'isic-2010-204', '8781111111', '8782222222'
+);
+call SP_RegistroResidente(
+  'L17430005@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Saúl', 'Baztán', 'Escudero', '1586229655325', 'ielc-2010-211', '8783333333', '8784444444'
+);
+call SP_RegistroResidente(
+  'L17430006@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Paula', 'Caballero', null, '1586229655325', 'igem-2009-201', '8785555555', '8786666666'
+);
+
+-- ---------------------------------------------
+-- residencias
+-- ---------------------------------------------
+call SP_RegistroResidencia(
+	'Volt Breaker', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 1, 2020, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 'L17430001@piedrasnegras.tecnm.mx', '1586570609000', 'Twilight Electronics', 'Amir Obrero', 'Olive Street', 'Kugate', '8781234567', 'twilightelectronics@gmail.com', 'Sistemas y Computación', 'amirobrero@gmail.com', 'Amir Obrero', 'Jefe de departamento', 'Licenciatura', '8781234568'
+);
+call SP_RegistroResidencia(
+	'Alpha Entangler', 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
+	1, 2021, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'L17430002@piedrasnegras.tecnm.mx', 
+	'1586570609000', 
+	'Butterfly Media', 
+	'Oliver Linares', 
+	'Ebon Avenue', 
+	'Gardelita', '8781234567', 
+	'butterflymedia@gmail.com', 
+	'Sistemas y Computación', 
+	'oliverlinares@gmail.com',
+	'Oliver Linares', 
+	'Jefe de departamento', 'Licenciatura', '8781234568'
+);
+call SP_RegistroResidencia(
+	'Harmonic Diverter', 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
+	2, 2021, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'L17430003@piedrasnegras.tecnm.mx', 
+	'1586570609000', 
+	'Prodigy Aviation', 
+	'Izan Madrid', 
+	'Starfall Route', 
+	'San Ancazu', 
+	'8781234567', 
+	'prodigyaviation@gmail.com', 
+	'Sistemas y Computación', 
+	'izanmadrid@gmail.com',
+	'Izan Madrid', 
+	'Jefe de departamento', 'Licenciatura', '8781234568'
+);
+call SP_RegistroResidencia(
+	'Cosmic Reactor', 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
+	2, 2020, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'L17430004@piedrasnegras.tecnm.mx', 
+	'1586570609000', 
+	'Alphacom', 
+	'Sergi Ferrero', 
+	'Windmill Avenue', 
+	'San Ancazu', 
+	'8781234567', 
+	'alphacom@gmail.com', 
+	'Sistemas y Computación', 
+	'sergiferrero@gmail.com',
+	'Sergi Ferrero', 
+	'Jefe de departamento', 'Licenciatura', '8781234568'
+);
+call SP_RegistroResidencia(
+	'Particle Shaper', 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
+	2, 2020, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'L17430005@piedrasnegras.tecnm.mx', 
+	'1586570609000', 
+	'Alphacom', 
+	'Sergi Ferrero', 
+	'Windmill Avenue', 
+	'San Ancazu', 
+	'8781234567', 
+	'alphacom@gmail.com', 
+	'Sistemas y Computación', 
+	'sergiferrero@gmail.com',
+	'Sergi Ferrero', 
+	'Jefe de departamento', 'Licenciatura', '8781234568'
+);
+call SP_RegistroResidencia(
+	'Kwolek Communicator', 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
+	2, 2021, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'L17430006@piedrasnegras.tecnm.mx', 
+	'1586570609000', 
+	'Oracleutions', 
+	'Mateo Escrivá', 
+	'Noble Route', 
+	'San Fracillo', 
+	'8781234567', 
+	'oracleutions@gmail.com', 
+	'Sistemas y Computación', 
+	'mateoescriva@gmail.com',
+	'Mateo Escrivá', 
+	'Jefe de departamento', 'Licenciatura', '8781234568'
+);

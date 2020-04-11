@@ -1,6 +1,5 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
-import { runInNewContext } from "vm";
 
 const express   = require("express");
 const session   = require("express-session");
@@ -431,6 +430,40 @@ server.post('/registro-residencia',(req,res)=>
                     res.send(Response.unknownError(error.toString()));
                 }
             );
+        }
+    );
+});
+
+
+/**
+ * Regresa al cliente una lista de residencias que aún no han sido confirmadas
+ * (No se han asignado docentes como asesores internos o revisores) de las carreras
+ * que administra el usuario actual.
+ * 
+ * Opcionalmente, se puede pasar una consulta en el parámetro [q] que se usará para 
+ * buscar residencias basándose en el nombre del proyecto, nombre de la empresa, 
+ * nombre del residente, o correo electrónico del residente (y por extensión, su
+ * número de control).
+ */
+server.get('/listaResidenciasSinDocentes', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const query = req.query.q ?? '';
+    const adminEmail = req.session.user.info.email; 
+
+    con.query(
+        `call SP_ListaResidenciasSinDocentes(?, ?);`,
+        [adminEmail, `%${query}%`],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
         }
     );
 });
