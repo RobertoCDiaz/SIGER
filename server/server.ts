@@ -575,16 +575,44 @@ server.get('/residencia', (req, res) => {
     }
 
     if (!req.query.id) {
-        res.send(Response.userError('Residencia no especificada'));
+        res.redirect('/panel-residencias');
         return;
     }
 
-    res.sendFile('residencia.html', { 
-        root: '../web-client/',
-        headers: {
-            'header-personalizado': req.query.id
+    res.sendFile('residencia.html', { root: '../web-client/' });
+});
+
+server.get('/reporte-preliminar', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const idResidencia = req.query.id;
+    const adminEmail = req.session.user.info.email;
+    if (!idResidencia) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        'call SP_FormatoPreliminar(?, ?);',
+        [idResidencia, adminEmail], 
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError(`No se encontró esta residencia`));
+                return;
+            }
+
+            res.send(Response.success(rows[0][0]));
         }
-    });
+    )
+
 });
 
 

@@ -437,7 +437,7 @@ CREATE FUNCTION concatenarHorarios(
 ) RETURNS VARCHAR(64) DETERMINISTIC BEGIN
 	RETURN (
 		SELECT 
-			GROUP_CONCAT(t.jornada SEPARATOR ',')
+			GROUP_CONCAT(t.jornada SEPARATOR ', ')
 		FROM (
 			SELECT 
 				CONCAT(h.inicio, " - ", h.fin) as 'jornada'
@@ -734,7 +734,7 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 		ae.nombre_completo AS 'nombre_ae', ae.puesto AS 'puesto_ae', ae.grado_estudios AS 'grado_ae', 
 		ae.telefono AS 'telefono_ae', ae.email AS 'email_ae',
 
-		nombreCompleto(res.email) as 'nombre_res', SUBSTRING(res.email, 2, 9) as 'noControl_res',
+		nombreCompleto(res.email) as 'nombre_res', SUBSTRING(res.email, 2, 8) as 'noControl_res',
 		c.nombre_carrera as 'carrera', 
 		(
 			SELECT telefono FROM telefonos_residentes WHERE email_residente = res.email AND fijo = 1
