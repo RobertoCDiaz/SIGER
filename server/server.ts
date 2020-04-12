@@ -1,5 +1,6 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
+import { userInfo } from "os";
 
 const express   = require("express");
 const session   = require("express-session");
@@ -359,7 +360,7 @@ server.get('/avance-proyecto', (req, res) => {
     res.sendFile('avance.html', { root: '../web-client/' });
 });
 
-server.get('/progreso',(req,res)=>
+server.get('/aprobado',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -371,9 +372,227 @@ server.get('/progreso',(req,res)=>
         res.redirect('/home');
         return;
     }
+    con.query('call SP_MostrarAprobado(?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+        {
+            if(er)
+            {
+                console.log(er);
+                return;
+            }
+            try
+            {
+                if(rows[0][0]['aprobado']==0)
+                {
+                    const message = 0;
+                    const a = String(rows[0][0]['aprobado']);
+                    const p = String(rows[0][0]['proyecto']);
+                    const n = String(req.session.user.info.nombre);
+                    const ap = String(req.session.user.info.apellido_paterno);
+                    const am = String(req.session.user.info.apellido_materno);
+                    const em = String(req.session.user.info.email);
+                    const fecha = String(rows[0][0]['fecha']);
 
-    const email = req.user.info.email;
-    //con.query('select ')
+                    res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                }
+                const message = 1;
+                const a = String(rows[0][0]['aprobado']);
+                const p = String(rows[0][0]['proyecto']);
+                const n = String(req.session.user.info.nombre);
+                const ap = String(req.session.user.info.apellido_paterno);
+                const am = String(req.session.user.info.apellido_materno);
+                const em = String(req.session.user.info.email);
+                const fecha = String(rows[0][0]['fecha']);
+
+                res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                }
+                catch(e)
+                {
+                    if(e instanceof TypeError)
+                    {
+                        const message = -3;
+                        const n = String(req.session.user.info.nombre);
+                        const ap = String(req.session.user.info.apellido_paterno);
+                        const am = String(req.session.user.info.apellido_materno);
+                        const em = String(req.session.user.info.email);
+                        res.json({message:message,n:n,ap:ap,am:am,em:em});
+                    }
+                }
+        });          
+});
+
+server.get('/asesor',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarAsesor(?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try {
+            const message = 1;
+            const nasesor = String(rows[0][0]['nombre']);
+            const apasesor = String(rows[0][0]['ap']);
+            const amasesor = String(rows[0][0]['am']);
+
+            res.json({message:message,nombre:nasesor,paternoasesor:apasesor,maternoasesor:amasesor});
+        } catch (e) {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/revisores',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acesso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarRevisores(?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try {
+            const message = 1;
+            const n1 = String(rows[0][0]['nombre']);
+            const ap1 = String(rows[0][0]['ap']);
+            const am1 = String(rows[0][0]['am']);
+            const n2 = String(rows[0][1]['nombre']);
+            const ap2 = String(rows[0][1]['ap']);
+            const am2 = String(rows[0][1]['am']);
+
+            res.json({message:message,n1:n1,ap1:ap1,am1:am1,n2:n2,ap2:ap2,am2:am2});
+        } catch (e) {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/cal1',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    con.query('call SP_MostrarAnexo29 (?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            const message = 1;
+            const ee = String(rows[0][0]['ee']);
+            const oe = String(rows[0][0]['oe']);
+            const ei = String(rows[0][0]['ei']);
+            const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/cal2',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarAnexo30 (?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            const message = 1;
+            const ee = String(rows[0][0]['ee']);
+            const oe = String(rows[0][0]['oe']);
+            const ei = String(rows[0][0]['ei']);
+            const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+        
+    });
 });
 
 server.get('/docs', (req, res) => {

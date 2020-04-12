@@ -27,64 +27,24 @@
                         <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                         <h1 style="margin-left: .5em;">SIGER</h1>
                     </a>
-                <h2>Reporte preliminar</h2>
+                <h2>Progeso actual</h2>
             </div>
         </header>
             
             <div id="main">
 
                 <div class="content" id="contenido">
-                    <form>
-                        <h2>Progreso actual</h2><br>
-                        <p>Se muestra el avance del alumno <b>DANIEL HERNÁNDEZ SÁNCHEZ</b> con número de control <b>17430048</b>, respecto a su residencia profesional.</p>
+                    <form id="maininfo">
+                        <h2>Avance</h2><br>
+                        
                     </form>
+
+                    <div class="timeline" id="timelinedef">
+
+                    </div>
         
                 <div class="timeline" id="timeline">
-                    <div class="container left">
-                    <div class="contentt">
-                        <h2>01/01/2020</h2>
-                        <p>Elección de proyecto: <b>Nombre del proyecto</b> en la empresa <b>Nombre de la empresa</b></p>
-                    </div>
-                    </div>
-                    <div class="container right">
-                    <div class="contentt">
-                        <h2>02/02/2020</h2>
-                        <p>Asesor y revisores asignados</p>
-                        <p><b>Nombre de asesor</b></p>
-                        <p><b>Nombre de revisor 1</b></p>
-                        <p><b>Nombre de revisor 2</b></p>
-                    </div>
-                    </div>
-                    <div class="container left">
-                        <div class="contentt">
-                        <h2>03/03/2020</h2>
-                        <p>Desarrollo de la Residencia profesional</p>
-                        </div>
-                    </div>
-        
-                    <div class="container right">
-                        <div class="contentt">
-                        <h2>04/04/2020</h2>
-                        <p>Evaluación 1</p>
-                        <p>Calificación: <b>100</b></p>
-                        </div>
-                    </div>
-        
-                    <div class="container left">
-                        <div class="contentt">
-                        <h2>05/05/2020</h2>
-                        <p>Evaluación 2</p>
-                        <p>Calificación: <b>100</b></p>
-                        </div>
-                    </div>
-        
-                    <div class="container right">
-                        <div class="contentt">
-                        <h2>06/06/2020</h2>
-                        <p>Residencia terminada</p>
-                        </div>
-                    </div>
-
+                    
                 </div>
             </div>
     </div>
@@ -138,5 +98,261 @@
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
     <script src="scripts/sidebar.js"></script>
+    <script>
+        let ts;
+        let proyecto;
+        let fechareporte
+        let nresidente;
+        let apresidente;
+        let amresidente;
+        let ncontrol;
+
+        const getAprobado=()=>
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.open('get',`/aprobado`,true);
+            xhr.onload=()=>
+            {
+                let response = JSON.parse(xhr.responseText);
+                nresidente=response['n'];
+                apresidente=response['ap'];
+                amresidente=response['am'];
+                
+                ncontrol=response['em'].substring(1,9);
+
+                const maininfo = document.getElementById('maininfo');
+                let h = document.createElement('p');
+                if(amresidente!='null')
+                    h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+' '+amresidente+' con número de control '+ ncontrol +' respecto a su residencia profesional.';
+                else
+                    h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+'  con número de control '+ ncontrol +' respecto a su residencia profesional.';
+                maininfo.appendChild(h);
+
+                if(response['message']==1)
+                {
+                    proyecto = response['proyecto'];
+                    ts=Number.parseInt(String(response['fecha']));
+                    fechareporte = new Date(ts);
+                    let tl = document.getElementById('timelinedef');
+                    let contleft = document.createElement('div');
+                    contleft.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Reporte preliminar enviado para aprobación';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+
+                    tl = document.getElementById('timelinedef');
+                    contleft = document.createElement('div');
+                    contleft.className='container left';
+                    cont = document.createElement('div');
+                    cont.className='contentt';
+                    title = document.createElement('h2');
+                    title.innerText='Residencia aprobada.';
+                    cont.appendChild(title);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+                }
+                else if (response['message']==0)
+                {
+                    proyecto = response['proyecto'];
+                    ts=Number.parseInt(String(response['fecha']));
+                    fechareporte = new Date(ts);
+                    let tl = document.getElementById('timelinedef');
+                    let contleft = document.createElement('div');
+                    contleft.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Reporte preliminar enviado para aprobación';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+
+                    tl = document.getElementById('timelinedef');
+                    contleft = document.createElement('div');
+                    contleft.className='container left';
+                    cont = document.createElement('div');
+                    cont.className='contentt';
+                    title = document.createElement('h2');
+                    title.innerText='Proyecto pendiente para aprobación.';
+                    cont.appendChild(title);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+                }
+                else if (response['message']==-3)
+                {
+                    let tl = document.getElementById('timelinedef');
+                    let contleft = document.createElement('div');
+                    contleft.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Aún no hay avance para mostrar.';
+                    let inf = document.createElement('p');
+                    cont.appendChild(title);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+                }
+            }
+            xhr.send();
+        }
+        getAprobado();
+
+        const getAsesor=()=>
+        {
+            let b = new XMLHttpRequest();b.open('get',`/asesor`,true);
+            b.onload=()=>
+            {
+                let response = JSON.parse(b.responseText);
+                if(response['message']==1)
+                {
+                    const na = response['nombre'];
+                    const apa = response['paternoasesor'];
+                    const ama = response['maternoasesor'];
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    cont.id='asesorevisores';
+                    let title = document.createElement('h2');
+                    title.innerText='Asesor y revisores asignados';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Asesor interno: '+ na + ' ' + apa + ' ' + ama +'.';
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+                
+            }
+            b.send();
+        }
+        getAsesor();
+
+        const getRevisores=()=>
+        {
+            let c = new XMLHttpRequest();c.open('get',`/revisores`,true);
+            c.onload=()=>
+            {
+                let response = JSON.parse(c.responseText);
+                if(response['message']==1)
+                {
+                    const n1 = response['n1'];
+                    const ap1 = response['ap1'];
+                    const am1 = response['am1'];
+                    const n2 = response['n2'];
+                    const ap2 = response['ap2'];
+                    const am2 = response['am2'];
+                    let cont = document.getElementById('asesorevisores');
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Revisores: '+ n1 + ' ' + ap1 + ' ' + am1 +' y ' + n2 + ' ' + ap2 + ' ' + am2 + '.';
+                    cont.appendChild(inf);
+                }
+                
+            }
+            c.send();
+        }
+        getRevisores();
+
+        const getCal1=()=>
+        {
+            let d = new XMLHttpRequest();d.open('get',`/cal1`,true);
+            d.onload=()=>
+            {
+                let response = JSON.parse(d.responseText);
+                if(response['message']==1)
+                {
+                    const ee = response['ee'];
+                    const oe = response['oe'];
+                    const ei = response['ei'];
+                    const oi = response['oi'];
+                    let totalee=0;
+                    let totalei=0;
+                    const aee = String(ee).split(',');
+                    for(let i=0;i<aee.length;i++)
+                    {
+                        totalee+=Number.parseInt(aee[i]);
+                    }
+                    const aei = ei.split(',');
+                    for(let i=0;i<aei.length;i++)
+                    {
+                        totalei+=Number.parseInt(aei[i]);
+                    }
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Calificaciones parciales (Anexo 29)';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            d.send();
+        }
+        getCal1();
+
+        const getCal2=()=>
+        {
+            let e = new XMLHttpRequest();e.open('get',`/cal2`,true);
+            e.onload=()=>
+            {
+                let response = JSON.parse(e.responseText);
+                if(response['message']==1)
+                {
+                    const ee = response['ee'];
+                    const oe = response['oe'];
+                    const ei = response['ei'];
+                    const oi = response['oi'];
+                    let totalee=0;
+                    let totalei=0;
+                    const aee = String(ee).split(',');
+                    for(let i=0;i<aee.length;i++)
+                    {
+                        totalee+=Number.parseInt(aee[i]);
+                    }
+                    const aei = ei.split(',');
+                    for(let i=0;i<aei.length;i++)
+                    {
+                        totalei+=Number.parseInt(aei[i]);
+                    }
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Calificaciones parciales (Anexo 30)';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            e.send();
+        }
+        getCal2();
+        
+    </script>
 </body>
 </html>
