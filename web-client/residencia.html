@@ -263,6 +263,10 @@
                     background-color: green;
                     color: white;
                 }
+
+                i {
+                    cursor: pointer;
+                }
             </style>
             <div class="assigner-container">
                 <h2>Asignar asesor interno y revisores</h2>
@@ -272,11 +276,12 @@
 
                 <div class="assigner">
                     <div class="searchBar">
-                        <input type="text" placeholder="Nombre o correo del docente">
-                        <i class="material-icons">search</i>
+                        <input id="searchInput" type="text" placeholder="Nombre o correo del docente">
+                        <i id="searchButton" class="material-icons">search</i>
                     </div>
-                    <div class="resultsContainer">
-                        <p style="padding: 1em;">No hay ningún resultado que satisfaga el criterio de búsqueda actual</p>
+                    <div id="resultsContainer" class="resultsContainer">
+                        <p style="padding: 1em;">Introduzca un criterio de búsqueda</p>
+
                         <!-- <div class="result">
                             <i class="material-icons">person_add</i>
                             <p>Daniel Hernández Sánchez (daniel.hs@piedrasnegras.tecnm.mx)</p>

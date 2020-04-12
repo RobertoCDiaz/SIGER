@@ -456,7 +456,7 @@ server.get('/listaResidenciasSinDocentes', (req, res) => {
 
     con.query(
         `call SP_ListaResidenciasSinDocentes(?, ?);`,
-        [adminEmail, `%${query}%`],
+        [adminEmail, query],
         (e, rows, f) => {
             if (e) {
                 res.send(Response.unknownError(e.toString()));
@@ -582,6 +582,12 @@ server.get('/residencia', (req, res) => {
     res.sendFile('residencia.html', { root: '../web-client/' });
 });
 
+
+/**
+ * Dado un id de residencia [id], regresa al cliente la información
+ * necesaria para llenar el formato de reporte preliminar, siempre 
+ * y cuando el adminsitrador esté a cargo de la carrera del residente.
+ */
 server.get('/reporte-preliminar', (req, res) => {
     if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
         res.send(Response.authError());
@@ -613,6 +619,43 @@ server.get('/reporte-preliminar', (req, res) => {
         }
     )
 
+});
+
+
+/**
+ * Dado un criterio de búsqueda [q], regresa al cliente una lista
+ * de docentes que cumplan con [q] en su correo electrónico o nombre completo.
+ */
+server.get('/buscarDocente', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const query = req.query.q;
+    if (!query) {
+        res.send(Response.userError("Introduzca un criterio de búsqueda"));
+        return;
+    }
+
+    con.query(
+        'call SP_BuscarDocente(?);',
+        query,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            // console.log(rows);
+            if (rows[0].length == 0) {
+                res.send(Response.userError('No se ha encontrado ningún docente con este criterio de búsqueda'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
 });
 
 

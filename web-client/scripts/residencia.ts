@@ -27,6 +27,10 @@ const celRView = document.getElementById('celRView');
 const emailRView = document.getElementById('emailRView');
 const horariosRView = document.getElementById('horariosRView');
 
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+const resultsContainer = document.getElementById('resultsContainer');
+
 
 /* ================================================================================================
 
@@ -95,3 +99,52 @@ const fillReport = () => {
 }
 
 fillReport();
+
+/* ================================================================================================
+
+    Búsqueda de docentes.
+
+================================================================================================ */
+const searchTeachersPromise: (string) => Promise<Object> = 
+    (query: string) => new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('get', `/buscarDocente?q=${query}`, true);
+        
+        xhr.onload = () => {
+            let response = JSON.parse(xhr.response);
+
+            if (response.code <= 0) {
+                reject(response.message);
+                return;
+            }
+
+            resolve(response.object);          
+        };
+        
+        xhr.send();
+    });
+
+const resultView = (result) => `
+<div class="result">
+    <i class="material-icons">person_add</i>
+    <p>${result['nombre']} (${result['email']})</p>
+</div>
+`;
+
+const searchAndPopulate = () => {
+    const query: string = searchInput['value'].trim();
+
+    searchTeachersPromise(query).then(list => {
+        resultsContainer.innerHTML = '';
+        for (const o in list) {
+            resultsContainer.innerHTML += resultView(list[o]);
+        }
+    }).catch(error => {
+        resultsContainer.innerHTML = `
+            <p style="padding: 1em;">${error}</p>
+        `;
+    });
+}
+
+searchButton.onclick = searchAndPopulate;
+searchInput.oninput = searchAndPopulate;

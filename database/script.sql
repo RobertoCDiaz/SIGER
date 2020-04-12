@@ -703,10 +703,10 @@ CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 			on c.clave = res.clave_carrera
 	WHERE 
 		c.admin_email = v_email_admin AND (
-			r.nombre_proyecto LIKE v_query OR
-			e.nombre LIKE v_query OR
-			res.email LIKE v_query OR
-			nombreCompleto(res.email) LIKE v_query
+			r.nombre_proyecto LIKE CONCAT('%', v_query, '%') OR
+			e.nombre LIKE CONCAT('%', v_query, '%') OR
+			res.email LIKE CONCAT('%', v_query, '%') OR
+			nombreCompleto(res.email) LIKE CONCAT('%', v_query, '%')
 		);
 END;;
 
@@ -758,6 +758,26 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 	WHERE
 		r.idresidencia = v_id_residencia AND
 		c.admin_email = v_email_admin;
+END;;
+
+
+/*
+	Regresa una lista de docentes cuyo correo electrónico,
+	nombre, o apellidos se asemejen al criterio de 
+	búsqueda [v_query].
+*/
+DROP PROCEDURE IF EXISTS SP_BuscarDocente;;
+CREATE PROCEDURE SP_BuscarDocente(
+	v_query VARCHAR(256)
+) BEGIN
+	SELECT 
+		d.email as 'email',
+		nombreCompleto(d.email) as 'nombre'
+	FROM 
+		docentes AS d
+	WHERE
+		d.email LIKE CONCAT('%',v_query,'%') OR
+		nombreCompleto(d.email) LIKE CONCAT('%',v_query,'%');
 END;;
 
 DELIMITER ;
@@ -919,3 +939,20 @@ call SP_RegistroResidencia(
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('15:00', '20:00', 6);
+
+-- ---------------------------------------------
+-- docentes
+-- ---------------------------------------------
+-- Las contraseñas de estos docentes fueron encriptadas usando la clave secreta [H5n7jMcgSA^&Rz%ZxyFE@&E#zSteW$jx].
+INSERT INTO docentes
+VALUES 
+	('marti.pd@piedrasnegras.tecnm.mx', '4551b7f81bb877c27da5cd4109bce58c4ae8cd51656473b191558340c23c400b99f1928ccf6e69549ec00a80f11d300b218dd2da314182fc2f7ecab7b854fd4ca041e60877725c4013613b2665bbe7aa', 'Marti', 'Peralta', 'Durán'),
+	('rafael.cc@piedrasnegras.tecnm.mx', 'afb8baa57eeed18dfe253d4ad257e8e26f00645032d0b40e53365bff42077839cdc3793a64455e429018bd1e1d1e38a053407764e8890664cbfa1748d598d03d797b9c3fa0cc4a9f3f404021f48e0338', 'Rafael', 'Contador', 'Cueva'),
+	('izan.mm@piedrasnegras.tecnm.mx', '12f3d773c7b5a99b82ef470a27c2c9995bafc695968d9783488e304a87b7710582eb7eb9ba383bf43ee45309a5481a765dce26536881b7f24fec94f9ba6a237faac087879700ecc0a4ab828a5dd43eb0', 'Izan', 'Martín', 'Malillos'),
+	('rafael.am@piedrasnegras.tecnm.mx', '5c3d248a3bca0aa3d11f656ae1f7bc2e478ae0a101e7fb66f6270292834be634b33fe2d9c8b0f9723a7036b7086579f432577afd17a0f03cf70c340cedd38e06aced19b89f306ea62115ba01e28474a2', 'Rafael', 'Alcaide', 'Mallén'),
+	('alonso.sm@piedrasnegras.tecnm.mx', '73c94b2912b5915146ba1e5258451d4262a3f05617a63ae94c05f4695cb78ab7290a37451f9597791b0a2e568deca927593a20ac30619256d5b84320694d4631cdc4a832a6614f0372ff98920c84fe25', 'Alonso', 'Sánchez', 'Montemayor'),
+	('adriana.sb@piedrasnegras.tecnm.mx', '8ec5e9bb7aea1f86f50723ba625dd326e69f1b07deaef71f936fac5b1d0f33ee8cfdd2b83e2d2e7fb7b23f3a265a71bfe765d832574a9691e83dd77e494401ec0807bd532d0efd1a7642725468c9b512', 'Adriana', 'Sevilla', 'Bolívar'),
+	('rosa.gc@piedrasnegras.tecnm.mx', 'cd406867e7428e7aeace45793637aef06c590e1b980061587caa03590b8d20d5240625e9aaaddb4003db49cffd338f88b8aa7ed3a06a9830fa938561215931a7ca774b20bc7abb5a462e3d7ea118b82f', 'Rosa', 'Gallego', 'Colina'),
+	('maria.gm@piedrasnegras.tecnm.mx', 'ac30e7658f0dfb0c66235730cf31a7976101ce88aa55ffa4350878d33df36c5c8df45d7bc37fbca71fe02bfdf0c593023e80020316079fe51061abcbecc712df22117263e3e2f25e6820e9b07d235a17', 'Maria José', 'Gutiérrez', 'Malillos'),
+	('sandra.fs@piedrasnegras.tecnm.mx', 'afdc6e60a07d7821e3ab51555bc805cc1d45453ba4d0a5141217dcb6a78342bdb62b4d256db8ef6549b9ee915720b1ddceb0f229dffac62e84f1cd0253945dc64ac2a1cc3ba543a0166ac698e6b313ff', 'Sandra', 'Fidalgo', 'Sabaté'),
+	('celia.pd@piedrasnegras.tecnm.mx', 'a0d4c93f29656492dbd4cbeca385fbaa1e0915f3c47d5cc8dd23bead85754427b33c670c061df4d080d1fb4386db4c9fc41435fbc5475189caa54f05e8988b720be20ac2a118778d55db6f3fced60b2e', 'Celia', 'Pastor', 'Domínguez');
