@@ -67,4 +67,4 @@ populate('');
     Abrir detalles de residencia.
 
 ================================================================================================ */
-const abrirResidencia = (id: number) => window.open(`/residencia?id=${id}`);
+const abrirResidencia = (id: number) => window.open(`/residencia?id=${id}`, '_self');

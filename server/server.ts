@@ -658,9 +658,43 @@ server.get('/buscarDocente', (req, res) => {
     );
 });
 
+server.post('/asignar-docentes', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
 
+    const resId: number = Number(req.body.residencia_id);
+    const ai: string    = req.body.ai;
+    const r1: string    = req.body.r1;
+    const r2: string    = req.body.r2;
+    if (!resId || !ai || !r1 || !r2) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
 
+    con.query(
+        'call SP_AsignarDocentesAProyecto(?, ?, ?, ?);',
+        [resId, ai, r1, r2],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
 
+            if (rows[0][0]['ouput'] == -1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+            }
+
+            if (rows[0][0]['ouput'] == 0) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success());
+        }
+    )
+});
 
 
 /* ================================================================================================

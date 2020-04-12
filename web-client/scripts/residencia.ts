@@ -31,6 +31,12 @@ const searchInput = document.getElementById('searchInput');
 const searchButton = document.getElementById('searchButton');
 const resultsContainer = document.getElementById('resultsContainer');
 
+const cleanButton = document.getElementById('cleanButton');
+const assignButton = document.getElementById('assignButton');
+
+const goBack = () => {
+    window.open('/panel-residencias', '_self');
+}
 
 /* ================================================================================================
 
@@ -125,7 +131,7 @@ const searchTeachersPromise: (string) => Promise<Object> =
     });
 
 const resultView = (result) => `
-<div class="result">
+<div class="result" onclick="asignar('${result['email']}', '${result['nombre']}');">
     <i class="material-icons">person_add</i>
     <p>${result['nombre']} (${result['email']})</p>
 </div>
@@ -148,3 +154,104 @@ const searchAndPopulate = () => {
 
 searchButton.onclick = searchAndPopulate;
 searchInput.oninput = searchAndPopulate;
+
+/* ================================================================================================
+
+    Asignar docentes.
+
+================================================================================================ */
+
+// "?id=123" -> "123"
+const residenciaId: number = Number(location.search.substring(4));
+
+const docentesArr: string[] = [];
+
+const asignar: (email: string, name: string) => void = 
+    (email: string, name: string) => {
+        const identifier: string = `${email},${name}`;
+
+        if (docentesArr.includes(identifier)) {
+            alert('Este docente ya ha sido elegido');
+            return;
+        }
+
+        if (docentesArr.length >= 3) {
+            alert('Ya han sido elegidos tres docentes')
+            return;
+        }
+
+        docentesArr.push(identifier);
+        updateUI();
+    }
+
+const desasignar: (index: number) => void = 
+    (idx: number) => {
+        docentesArr.splice(idx, 1);
+
+        updateUI();
+    }
+
+const updateUI = () => {
+    for (const o in docentesArr) {
+        const email = docentesArr[o].split(',')[0];
+        const name = docentesArr[o].split(',')[1];
+
+        const teacherContainer = document.getElementById(`teacher${o}`);
+        teacherContainer.innerHTML = `
+        <i class="material-icons" onclick="desasignar(${o});">close</i> ${name} (${email})
+        `;        
+    }
+
+    for (let i = 3; i > docentesArr.length; --i) {
+        const teacherContainer = document.getElementById(`teacher${i - 1}`);
+        teacherContainer.innerHTML = '-';
+    }
+}
+
+const asignarDocentesPromise: (aiEmail: string, r1Email: string, r2Email: string) => Promise<Object> =
+    (ai, r1, r2) => new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('post', '/asignar-docentes', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        
+        xhr.onload = () => {
+            let response = JSON.parse(xhr.response);
+            if (response.code <= 0) {
+                reject(response.message);
+                return;
+            }
+
+            resolve("Se han asignado los docentes");
+        };
+        
+        xhr.send(
+            `residencia_id=${residenciaId}&` +
+            `ai=${ai}&` +
+            `r1=${r1}&` +
+            `r2=${r2}`
+        );
+    });
+
+cleanButton.onclick = () => {
+    docentesArr.splice(0, docentesArr.length);
+
+    updateUI();
+}
+
+assignButton.onclick = () => {
+    if (docentesArr.length != 3) {
+        alert('Se requieren de exactamente 3 docentes elegidos para poder continuar');
+        return;
+    }
+
+    asignarDocentesPromise(
+        docentesArr[0].split(',')[0],
+        docentesArr[1].split(',')[0],
+        docentesArr[2].split(',')[0]
+    ).then(msg => {
+        alert(msg);
+        window.open('/panel-residencias', '_self');
+    }).catch(error => {
+        alert(error);
+    })
+}

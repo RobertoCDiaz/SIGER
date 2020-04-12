@@ -45,10 +45,15 @@
                 flex: 1;
             }
 
-            .button-container {
+            form > .buttons-container {
                 display: flex;
                 justify-content: center;
                 margin-top: 2em;
+                margin: 2em 10% 0;
+            }
+
+            form > .buttons-container > button:not(:first-child) {
+                margin-left: 3em;
             }
 
             form p {
@@ -185,6 +190,7 @@
                     <p><b>Horario(s) en la Empresa:</b> <span id="horariosRView"></span></p>
                 </div>
                 <div class="buttons-container">
+                    <button class="secondary-button" onclick="goBack();">VOLVER AL PANEL DE RESIDENCIAS</button>
                     <!-- TODO: Implementar descarga de formato. -->
                     <button class="primary-button">DESCARGAR FORMATO</button>
                 </div>
@@ -246,6 +252,17 @@
 
                 .teacher > .teacherName {
                     padding: .25em 1em;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                }
+
+                .teacher > .teacherName > i {
+                    margin-right: .5em;
+                }
+
+                .teacher > .teacherName > i:hover {
+                    color: red;
                 }
 
                 .result {
@@ -266,6 +283,16 @@
 
                 i {
                     cursor: pointer;
+                }
+                
+                .assigner-container > .buttons-container {
+                    display: flex;
+                    margin: 2em 10%;
+                    flex-direction: row;
+                }
+
+                .assigner-container > .buttons-container > button:not(:first-child) {
+                    margin-left: 3em;
                 }
             </style>
             <div class="assigner-container">
@@ -300,23 +327,27 @@
                                 <i class="material-icons">supervisor_account</i>
                                 <p>Asesor interno</p>
                             </div>
-                            <p class="teacherName">Aún no hay un docente asignado</p>
+                            <p id="teacher0" class="teacherName">-</p>
                         </div>
                         <div class="teacher">
                             <div class="title">
                                 <i class="material-icons">person</i>
                                 <p>Revisor</p>
                             </div>
-                            <p class="teacherName">Aún no hay un docente asignado</p>
+                            <p id="teacher1" class="teacherName">-</p>
                         </div>
                         <div class="teacher">
                             <div class="title">
                                 <i class="material-icons">person</i>
                                 <p>Revisor</p>
                             </div>
-                            <p class="teacherName">Aún no hay un docente asignado</p>
+                            <p id="teacher2" class="teacherName">-</p>
                         </div>
                     </div>
+                </div>
+                <div class="buttons-container">
+                    <button id="cleanButton" type="button" class="secondary-button">LIMPIAR ASIGNACIÓN</button>
+                    <button id="assignButton" type="button" class="primary-button">ASIGNAR DOCENTES</button>
                 </div>
             </div>
         </div>
