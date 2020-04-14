@@ -772,6 +772,12 @@ const getAdminMenu: () => Object = () => ({
     }
 });
 
+/**
+ * Consigue el menú con las opciones específicas del estado de un residente.
+ * 
+ * @param email Correo electrónico del residente del cual se quiere conocer su menú.
+ * @param onDone Qué hacer cuándo un menú sea "calculado"
+ */
 const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => void) => Object =
     async (email, onDone) => {
         con.query(
@@ -865,8 +871,38 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                 onDone(menu);
             }
         );
-    }
+    };
 
+/**
+ * Consigue de manera asíncrona el estado actual de un residente
+ * en el sistema.
+ * 
+ * Regresa un valor numérico indicando el estado, acorde a
+ * los siguientes valores:
+ * 
+ *      0: Sin confirmar.
+ * 
+ *      1: Confirmado.
+ * 
+ *      2: Con residencia aprobada.
+ * 
+ * @param email Correo electrónico del residente.
+ */
+const getResidentState: (residentEmail: string) => Promise<number>
+    = (email) => new Promise((resolve, reject) => {
+        con.query(
+            `select estadoResidente(?) as estado;`,
+            email,
+            (e, rows, f) => {
+                if (e) {
+                    reject(e.toString());
+                    return;
+                }
+
+                resolve(rows[0]['estado']);
+            }
+        )
+    });
 
 /* ================================================================================================
 

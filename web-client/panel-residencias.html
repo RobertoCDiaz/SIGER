@@ -107,10 +107,28 @@
     <div class="content">
         <div class="title">
             <h1>Panel de Residencias</h1>
-            <h3>usuario.us@piedrasnegras.tecnm.mx</h3>
+            <h3 id="adminEmailView">usuario.us@piedrasnegras.tecnm.mx</h3>
             <p>A continuación se desplegarán todos aquellos proyectos de Residencias Profesionales que aún no han sido aprobados. Presione la Residencia de la que desea conocer más información para abrirla en una nueva pestaña.</p>
             <p>Una vez abiertos los detalles de un proyecto de Residencias Profesionales, podrá ver el reporte preliminar realizado por el estudiante. Después de analizarlo detenidamente, podrá asignar a un docente como asesor interno del proyecto, así como dos revisores del proyecto. Información más concreta de este proceso se le dará al momento de asignar asesores/revisores.</p>
         </div>
+        <script>
+            const fillUserEmail = () => {
+                const adminEmailView = document.getElementById('adminEmailView');
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/user-info', true);
+                
+                xhr.onload = () => {
+                    let response = JSON.parse(xhr.response);
+
+                    adminEmailView.innerHTML = response.object.email;
+                };
+                
+                xhr.send();
+            }
+
+            fillUserEmail();
+        </script>
         <hr>
         <div id="container">
             <!-- <div class="residencia" onclick="abrirResidencia();">
