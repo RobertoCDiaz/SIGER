@@ -701,17 +701,13 @@ server.get('/getMenu', (req, res) => {
         return;
     }
 
-    // let menu: Object = {};
-
     switch (req.session.user.class) {
         case USER_CLASSES.ADMIN: {
-            // menu = getAdminMenu();
             res.send(Response.success(getAdminMenu()));
             break;
         };
 
         case USER_CLASSES.RESIDENTE: {
-            // menu = getResidentMenu(req.session.user.info.email);
             getResidentMenu(
                 req.session.user.info.email,
                 (residentMenu) =>
@@ -720,8 +716,6 @@ server.get('/getMenu', (req, res) => {
             break;
         };
     }
-
-    // res.send(Response.success(menu));
 });
 
 
@@ -786,9 +780,9 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
             (e, rows, f) => {
                 let menu: Object = {
                     'main': {
-                        'Cerrar sesión': {
-                            'href': '/logout',
-                            'icon': 'exit_to_app'
+                        'Inicio': {
+                            'href': '/home',
+                            'icon': 'home'
                         }
                     },
                     'secondary': {
@@ -803,17 +797,26 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
 
                 switch (state) {
                     case 0: menu = {
-                        'main': {},
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            }
+                        },
                         'secondary': {
                             'Cerrar sesión': {
                                 'href': '/logout',
                                 'icon': 'exit_to_app'
                             }
                         }
-                    };
+                    }; break;
 
                     case 1: menu = {
                         'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            },
                             'Nuevo proyecto': {
                                 'href': '/nuevo-proyecto',
                                 'icon': 'note_add'
@@ -829,10 +832,14 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                                 'icon': 'exit_to_app'
                             }
                         }
-                    };
+                    }; break;
 
                     case 2: menu = {
                         'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            },
                             'Progreso actual': {
                                 'href': '/avance-proyecto',
                                 'icon': 'flag'
@@ -852,11 +859,10 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                                 'icon': 'exit_to_app'
                             }
                         }
-                    };
+                    }; break;
                 }
                 
                 onDone(menu);
-                // return menu;
             }
         );
     }
