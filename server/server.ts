@@ -373,15 +373,14 @@ server.post('/registro-residencia',(req,res)=>
     const telAE = req.body.telAE;
     const emailAE = req.body.emailAE;
     const emailResidente = req.session.user.info.email;
-    const aprobado = 0;
     let idres=0;
     const entradas = JSON.parse(req.body.entradas);
     const salidas = JSON.parse(req.body.salidas);
     const counter = req.body.counter;
 
-    con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
+    con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
     [
-        nombre_proyecto,objetivo,justificacion,periodo,ano,actividades,aprobado,
+        nombre_proyecto,objetivo,justificacion,periodo,ano,actividades,
         emailResidente,fecha_elaboracion,empresa,representante,direccion,ciudad,
         telEmpresa,emailEmpresa,depto,emailAE,nombreAE,puesto,grado,telAE
     ],
@@ -426,7 +425,7 @@ server.post('/registro-residencia',(req,res)=>
                 () => { // onDone
                     res.send(Response.success());
                 },
-                (error, horarioN) => { // onError
+                (error, numeroHorario) => { // onError
                     res.send(Response.unknownError(error.toString()));
                 }
             );
@@ -696,6 +695,35 @@ server.post('/asignar-docentes', (req, res) => {
     )
 });
 
+server.get('/getMenu', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    // let menu: Object = {};
+
+    switch (req.session.user.class) {
+        case USER_CLASSES.ADMIN: {
+            // menu = getAdminMenu();
+            res.send(Response.success(getAdminMenu()));
+            break;
+        };
+
+        case USER_CLASSES.RESIDENTE: {
+            // menu = getResidentMenu(req.session.user.info.email);
+            getResidentMenu(
+                req.session.user.info.email,
+                (residentMenu) =>
+                    res.send(Response.success(residentMenu))
+            )
+            break;
+        };
+    }
+
+    // res.send(Response.success(menu));
+});
+
 
 /* ================================================================================================
 
@@ -726,6 +754,112 @@ const encrypt = (txt: string) =>
 // Toma como parámetro un string [txt], que debe ser una cadena de texto encriptada usando la clave de [Keys.ts]. Regresa el texto desencriptado.
 const decrypt = (txt: string) => 
     AES.decrypt(txt, Keys.SECRET_KEY);
+
+const getAdminMenu: () => Object = () => ({
+    'main': {
+        'Inicio': {
+            'href': '/home',
+            'icon': 'home'
+        },
+        'Validar residentes': {
+            'href': '/validar-residentes',
+            'icon': 'how_to_reg'
+        },
+        'Panel de residencias': {
+            'href': '/panel-residencias',
+            'icon': 'assignment'
+        },
+    },
+    'secondary': {
+        'Cerrar sesión': {
+            'href': '/logout',
+            'icon': 'exit_to_app'
+        }
+    }
+});
+
+const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => void) => Object =
+    async (email, onDone) => {
+        con.query(
+            `select estadoResidente(?) as estado;`,
+            email,
+            (e, rows, f) => {
+                let menu: Object = {
+                    'main': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
+                        }
+                    },
+                    'secondary': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
+                        }
+                    }
+                };
+
+                const state: number = Number(rows[0]['estado']);
+
+                switch (state) {
+                    case 0: menu = {
+                        'main': {},
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    };
+
+                    case 1: menu = {
+                        'main': {
+                            'Nuevo proyecto': {
+                                'href': '/nuevo-proyecto',
+                                'icon': 'note_add'
+                            },
+                            'Documentos': {
+                                'href': '/docs',
+                                'icon': 'description'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    };
+
+                    case 2: menu = {
+                        'main': {
+                            'Progreso actual': {
+                                'href': '/avance-proyecto',
+                                'icon': 'flag'
+                            },
+                            'Documentos': {
+                                'href': '/docs',
+                                'icon': 'description'
+                            },
+                            'Chat': {
+                                'href': '/#',
+                                'icon': 'chat'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    };
+                }
+                
+                onDone(menu);
+                // return menu;
+            }
+        );
+    }
 
 
 /* ================================================================================================

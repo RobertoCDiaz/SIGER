@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`residencias` (
 	`periodo` TINYINT NOT NULL DEFAULT 0,
 	`ano` CHAR(4) NOT NULL,
 	`descripcion_actividades` VARCHAR(1024) NOT NULL,
-	`aprobado` TINYINT NOT NULL DEFAULT 0,
+	-- `aprobado` TINYINT NOT NULL DEFAULT 0,
 	`fecha_elaboracion` VARCHAR(14) NOT NULL,
 	`email_residente` VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`idresidencia`),
@@ -478,6 +478,66 @@ END;;
 
 
 /*
+	Regresa el valor que indica si el residente con email
+	[v_email] está aprobado.
+
+	0 -> No lo está.
+	1 -> Está confirmado.
+*/
+DROP FUNCTION IF EXISTS residenteConfirmado;;
+CREATE FUNCTION residenteConfirmado(
+	v_email VARCHAR(64)
+) RETURNS TINYINT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT
+			aprobado
+		FROM 
+			residentes AS r
+		WHERE 
+			r.email = v_email
+	);
+END;;
+
+
+/*
+	Regresa un valor numérico dependiendo del estado
+	actual del residente con email [v_email].
+
+	Cada valor corresponde a un estado distinto:
+
+		0: Sin confirmar.
+			- Cerrar sesión.
+
+		1: Confirmado.
+			- Nuevo proyecto.
+			- Documentos.
+			- Cerrar sesión.
+
+		2. Con residencia aprobada.
+			- Progreso actual.
+			- Documentos.
+			- Chat.
+			- Cerrar
+*/
+DROP FUNCTION IF EXISTS estadoResidente;;
+CREATE FUNCTION estadoResidente(
+	v_email VARCHAR(64)
+) RETURNS INT DETERMINISTIC BEGIN
+	SET @estado = 0;
+
+	IF residenteConfirmado(v_email) = 1 THEN BEGIN
+		SET @estado := 1;
+	END; END IF;
+
+	IF v_email IN (SELECT email_residente FROM residencias AS r WHERE residenciaAprobada(r.idresidencia) = 1) THEN BEGIN
+		SET @estado := 2;
+	END; END IF;
+
+	RETURN @estado;	
+END;;
+
+
+/*
 	Esta función comprueba si una residencia ha sido
 	aprobada, es decir, que ya tenga docentes asignados
 	como asesor interno y revisores.
@@ -578,18 +638,18 @@ DROP PROCEDURE IF EXISTS SP_ResidentesNoValidados;;
 CREATE PROCEDURE SP_ResidentesNoValidados(
 	v_email_admin VARCHAR(64)
 ) BEGIN
-	select 
-		r.email, substring(r.email, 2, 8) as `noControl`, r.nombre, r.apellido_paterno, r.apellido_materno,
-		(select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 0) as `celular`,
-		(select t.telefono from telefonos_residentes as t where r.email = t.email_residente and fijo = 1) as `tel`,
-		r.fecha_creacion, c.nombre_carrera as `carrera`
-	from 
-		residentes as r join carreras as c 
+	SELECT 
+		r.email, substring(r.email, 2, 8) AS `noControl`, r.nombre, r.apellido_paterno, r.apellido_materno,
+		(SELECT t.telefono FROM telefonos_residentes AS t WHERE r.email = t.email_residente AND fijo = 0) AS `celular`,
+		(SELECT t.telefono FROM telefonos_residentes AS t WHERE r.email = t.email_residente AND fijo = 1) AS `tel`,
+		r.fecha_creacion, c.nombre_carrera AS `carrera`
+	FROM 
+		residentes AS r JOIN carreras AS c 
 			on c.clave = r.clave_carrera
-	where 
-		aprobado = 0 and
-	c.admin_email = v_email_admin
-	order by 
+	WHERE 
+		aprobado = 0 AND
+		c.admin_email = v_email_admin
+	ORDER BY 
 		r.fecha_creacion, `noControl`;
 END;;
 
@@ -628,7 +688,8 @@ CREATE PROCEDURE SP_ValidarResidente(
 	ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente) = 0 THEN BEGIN
 			SELECT "0" AS output, "No existe un residente con este email" AS message;
 		END; 
-		ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente AND r.aprobado = 0) = 0 THEN BEGIN
+		-- ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente AND r.aprobado = 0) = 0 THEN BEGIN
+		ELSEIF (estadoResidente(v_email_residente)) >= 1 THEN BEGIN
 			SELECT "0" AS output, "Este residente ya está validado" AS message;
 		END; ELSE BEGIN
 			UPDATE `siger`.`residentes` AS r SET r.aprobado = 1 WHERE r.email = v_email_residente;
@@ -648,7 +709,7 @@ CREATE PROCEDURE SP_RegistroResidencia(
   v_periodo TINYINT,
   v_ano CHAR(4),
   v_descripcion_actividades VARCHAR(1024),
-  v_aprobado TINYINT,
+--   v_aprobado TINYINT,
   v_email_residente VARCHAR(64),
   v_fecha_elaboracion VARCHAR(14),
   v_nombre_empresa varchar(128),
@@ -675,26 +736,34 @@ BEGIN
     ROLLBACK;
   END;
 
-  START TRANSACTION;
-    INSERT INTO `siger`.`residencias`
-      (nombre_proyecto, objetivo, justificacion, periodo, ano, descripcion_actividades,aprobado,email_residente,fecha_elaboracion)
-    VALUES
-      (v_nombre_proyecto, v_objetivo, v_justificacion, v_periodo, v_ano, v_descripcion_actividades, v_aprobado, v_email_residente, v_fecha_elaboracion);
+  IF estadoResidente(v_email_residente) < 1 THEN BEGIN
 
-	set @idr = last_insert_id();
-      
-	INSERT INTO `siger`.`empresas` 
-      (nombre, representante, direccion, ciudad, telefono, email, departamento, id_residencia)
-    VALUES
-      (v_nombre_empresa, v_representante, v_direccion,v_ciudad, v_telefono, v_email, v_departamento, @idr);
-      
-	INSERT INTO `siger`.`asesores_externos` 
-      (email, nombre_completo, puesto, grado_estudios, telefono, id_residencia)
-    VALUES
-      (v_email_ae, v_nombre_ae, v_puesto,v_grado_estudios, v_tel_ae, @idr);
+	SELECT "0" AS output, 'El residente no ha sido confirmado por un administrador' AS message;
 
-    SELECT "1" AS output, "Transaction committed successfully" AS message, @idr AS `idresidencia`;
-  COMMIT;
+  END; ELSE BEGIN 
+
+	START TRANSACTION;
+		INSERT INTO `siger`.`residencias`
+		(nombre_proyecto, objetivo, justificacion, periodo, ano, descripcion_actividades,/*aprobado,*/email_residente,fecha_elaboracion)
+		VALUES
+		(v_nombre_proyecto, v_objetivo, v_justificacion, v_periodo, v_ano, v_descripcion_actividades, /*v_aprobado,*/ v_email_residente, v_fecha_elaboracion);
+
+		set @idr = last_insert_id();
+		
+		INSERT INTO `siger`.`empresas` 
+		(nombre, representante, direccion, ciudad, telefono, email, departamento, id_residencia)
+		VALUES
+		(v_nombre_empresa, v_representante, v_direccion,v_ciudad, v_telefono, v_email, v_departamento, @idr);
+		
+		INSERT INTO `siger`.`asesores_externos` 
+		(email, nombre_completo, puesto, grado_estudios, telefono, id_residencia)
+		VALUES
+		(v_email_ae, v_nombre_ae, v_puesto,v_grado_estudios, v_tel_ae, @idr);
+
+		SELECT "1" AS output, "Transaction committed successfully" AS message, @idr AS `idresidencia`;
+	COMMIT;
+
+  END; END IF;
 END;;
 
 DROP procedure IF EXISTS `SP_RegistraHorarios`;;
@@ -751,7 +820,7 @@ CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 		JOIN carreras AS c
 			on c.clave = res.clave_carrera
 	WHERE 
-		residenciaAprobada(r.idresidencia != 1) AND
+		residenciaAprobada(r.idresidencia) != 1 AND
 		c.admin_email = v_email_admin AND (
 			r.nombre_proyecto LIKE CONCAT('%', v_query, '%') OR
 			e.nombre LIKE CONCAT('%', v_query, '%') OR
@@ -940,18 +1009,41 @@ call SP_RegistroResidente(
   'L17430006@piedrasnegras.tecnm.mx', 'f890c6ee7325af3ad3a651e2d8135d8db74cf7f6ef0cf4758dad5bf022f3ac480dbfad4ded3a2602a23a9edd99a73c9e05efac396d52b992cf1e424222f2bd9d9ec1b8e7fdbc8c5c25cf56688911d42b', 'Paula', 'Caballero', null, '1586229655325', 'igem-2009-201', '8785555555', '8786666666'
 );
 
+call SP_ValidarResidente('L17430001@piedrasnegras.tecnm.mx', 'roberto.ds@piedrasnegras.tecnm.mx');
+call SP_ValidarResidente('L17430002@piedrasnegras.tecnm.mx', 'daniel.hs@piedrasnegras.tecnm.mx');
+call SP_ValidarResidente('L17430003@piedrasnegras.tecnm.mx', 'roberto.ds@piedrasnegras.tecnm.mx');
+call SP_ValidarResidente('L17430005@piedrasnegras.tecnm.mx', 'daniel.hs@piedrasnegras.tecnm.mx');
+
+-- ---------------------------------------------
+-- docentes
+-- ---------------------------------------------
+-- Las contraseñas de estos docentes fueron encriptadas usando la clave secreta [H5n7jMcgSA^&Rz%ZxyFE@&E#zSteW$jx].
+-- Por defecto, solo los primeros 4 docentes serán confirmados.
+INSERT INTO docentes
+VALUES 
+	('marti.pd@piedrasnegras.tecnm.mx', '4551b7f81bb877c27da5cd4109bce58c4ae8cd51656473b191558340c23c400b99f1928ccf6e69549ec00a80f11d300b218dd2da314182fc2f7ecab7b854fd4ca041e60877725c4013613b2665bbe7aa', 'Marti', 'Peralta', 'Durán', 1),
+	('rafael.am@piedrasnegras.tecnm.mx', '5c3d248a3bca0aa3d11f656ae1f7bc2e478ae0a101e7fb66f6270292834be634b33fe2d9c8b0f9723a7036b7086579f432577afd17a0f03cf70c340cedd38e06aced19b89f306ea62115ba01e28474a2', 'Rafael', 'Alcaide', 'Mallén', 1),
+	('sandra.fs@piedrasnegras.tecnm.mx', 'afdc6e60a07d7821e3ab51555bc805cc1d45453ba4d0a5141217dcb6a78342bdb62b4d256db8ef6549b9ee915720b1ddceb0f229dffac62e84f1cd0253945dc64ac2a1cc3ba543a0166ac698e6b313ff', 'Sandra', 'Fidalgo', 'Sabaté', 1),
+	('adriana.sb@piedrasnegras.tecnm.mx', '8ec5e9bb7aea1f86f50723ba625dd326e69f1b07deaef71f936fac5b1d0f33ee8cfdd2b83e2d2e7fb7b23f3a265a71bfe765d832574a9691e83dd77e494401ec0807bd532d0efd1a7642725468c9b512', 'Adriana', 'Sevilla', 'Bolívar', 1),
+	('izan.mm@piedrasnegras.tecnm.mx', '12f3d773c7b5a99b82ef470a27c2c9995bafc695968d9783488e304a87b7710582eb7eb9ba383bf43ee45309a5481a765dce26536881b7f24fec94f9ba6a237faac087879700ecc0a4ab828a5dd43eb0', 'Izan', 'Martín', 'Malillos', default),
+	('alonso.sm@piedrasnegras.tecnm.mx', '73c94b2912b5915146ba1e5258451d4262a3f05617a63ae94c05f4695cb78ab7290a37451f9597791b0a2e568deca927593a20ac30619256d5b84320694d4631cdc4a832a6614f0372ff98920c84fe25', 'Alonso', 'Sánchez', 'Montemayor', default),
+	('rosa.gc@piedrasnegras.tecnm.mx', 'cd406867e7428e7aeace45793637aef06c590e1b980061587caa03590b8d20d5240625e9aaaddb4003db49cffd338f88b8aa7ed3a06a9830fa938561215931a7ca774b20bc7abb5a462e3d7ea118b82f', 'Rosa', 'Gallego', 'Colina', default),
+	('maria.gm@piedrasnegras.tecnm.mx', 'ac30e7658f0dfb0c66235730cf31a7976101ce88aa55ffa4350878d33df36c5c8df45d7bc37fbca71fe02bfdf0c593023e80020316079fe51061abcbecc712df22117263e3e2f25e6820e9b07d235a17', 'Maria José', 'Gutiérrez', 'Malillos', default),
+	('rafael.cc@piedrasnegras.tecnm.mx', 'afb8baa57eeed18dfe253d4ad257e8e26f00645032d0b40e53365bff42077839cdc3793a64455e429018bd1e1d1e38a053407764e8890664cbfa1748d598d03d797b9c3fa0cc4a9f3f404021f48e0338', 'Rafael', 'Contador', 'Cueva', default),
+	('celia.pd@piedrasnegras.tecnm.mx', 'a0d4c93f29656492dbd4cbeca385fbaa1e0915f3c47d5cc8dd23bead85754427b33c670c061df4d080d1fb4386db4c9fc41435fbc5475189caa54f05e8988b720be20ac2a118778d55db6f3fced60b2e', 'Celia', 'Pastor', 'Domínguez', default);
+
 -- ---------------------------------------------
 -- residencias
 -- ---------------------------------------------
 call SP_RegistroResidencia(
-	'Volt Breaker', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 1, 2020, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 'L17430001@piedrasnegras.tecnm.mx', '1586570609000', 'Twilight Electronics', 'Amir Obrero', 'Olive Street', 'Kugate', '8781234567', 'twilightelectronics@gmail.com', 'Sistemas y Computación', 'amirobrero@gmail.com', 'Amir Obrero', 'Jefe de departamento', 'Licenciatura', '8781234568'
+	'Volt Breaker', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 1, 2020, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0,*/ 'L17430001@piedrasnegras.tecnm.mx', '1586570609000', 'Twilight Electronics', 'Amir Obrero', 'Olive Street', 'Kugate', '8781234567', 'twilightelectronics@gmail.com', 'Sistemas y Computación', 'amirobrero@gmail.com', 'Amir Obrero', 'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('01:00', '07:00', 1);
 call SP_RegistroResidencia(
 	'Alpha Entangler', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
 	1, 2021, 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
 	'L17430002@piedrasnegras.tecnm.mx', 
 	'1586570609000', 
 	'Butterfly Media', 
@@ -969,7 +1061,7 @@ call SP_RegistroResidencia(
 	'Harmonic Diverter', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
 	2, 2021, 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
 	'L17430003@piedrasnegras.tecnm.mx', 
 	'1586570609000', 
 	'Prodigy Aviation', 
@@ -989,7 +1081,7 @@ call SP_RegistroResidencia(
 	'Cosmic Reactor', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
 	2, 2020, 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
 	'L17430004@piedrasnegras.tecnm.mx', 
 	'1586570609000', 
 	'Alphacom', 
@@ -1010,7 +1102,7 @@ call SP_RegistroResidencia(
 	'Particle Shaper', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
 	2, 2020, 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
 	'L17430005@piedrasnegras.tecnm.mx', 
 	'1586570609000', 
 	'Alphacom', 
@@ -1030,7 +1122,7 @@ call SP_RegistroResidencia(
 	'Kwolek Communicator', 
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
 	2, 2021, 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0, 
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
 	'L17430006@piedrasnegras.tecnm.mx', 
 	'1586570609000', 
 	'Oracleutions', 
@@ -1045,21 +1137,3 @@ call SP_RegistroResidencia(
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('15:00', '20:00', 6);
-
--- ---------------------------------------------
--- docentes
--- ---------------------------------------------
--- Las contraseñas de estos docentes fueron encriptadas usando la clave secreta [H5n7jMcgSA^&Rz%ZxyFE@&E#zSteW$jx].
--- Por defecto, solo los primeros 4 docentes serán confirmados.
-INSERT INTO docentes
-VALUES 
-	('marti.pd@piedrasnegras.tecnm.mx', '4551b7f81bb877c27da5cd4109bce58c4ae8cd51656473b191558340c23c400b99f1928ccf6e69549ec00a80f11d300b218dd2da314182fc2f7ecab7b854fd4ca041e60877725c4013613b2665bbe7aa', 'Marti', 'Peralta', 'Durán', 1),
-	('rafael.am@piedrasnegras.tecnm.mx', '5c3d248a3bca0aa3d11f656ae1f7bc2e478ae0a101e7fb66f6270292834be634b33fe2d9c8b0f9723a7036b7086579f432577afd17a0f03cf70c340cedd38e06aced19b89f306ea62115ba01e28474a2', 'Rafael', 'Alcaide', 'Mallén', 1),
-	('sandra.fs@piedrasnegras.tecnm.mx', 'afdc6e60a07d7821e3ab51555bc805cc1d45453ba4d0a5141217dcb6a78342bdb62b4d256db8ef6549b9ee915720b1ddceb0f229dffac62e84f1cd0253945dc64ac2a1cc3ba543a0166ac698e6b313ff', 'Sandra', 'Fidalgo', 'Sabaté', 1),
-	('adriana.sb@piedrasnegras.tecnm.mx', '8ec5e9bb7aea1f86f50723ba625dd326e69f1b07deaef71f936fac5b1d0f33ee8cfdd2b83e2d2e7fb7b23f3a265a71bfe765d832574a9691e83dd77e494401ec0807bd532d0efd1a7642725468c9b512', 'Adriana', 'Sevilla', 'Bolívar', 1),
-	('izan.mm@piedrasnegras.tecnm.mx', '12f3d773c7b5a99b82ef470a27c2c9995bafc695968d9783488e304a87b7710582eb7eb9ba383bf43ee45309a5481a765dce26536881b7f24fec94f9ba6a237faac087879700ecc0a4ab828a5dd43eb0', 'Izan', 'Martín', 'Malillos', default),
-	('alonso.sm@piedrasnegras.tecnm.mx', '73c94b2912b5915146ba1e5258451d4262a3f05617a63ae94c05f4695cb78ab7290a37451f9597791b0a2e568deca927593a20ac30619256d5b84320694d4631cdc4a832a6614f0372ff98920c84fe25', 'Alonso', 'Sánchez', 'Montemayor', default),
-	('rosa.gc@piedrasnegras.tecnm.mx', 'cd406867e7428e7aeace45793637aef06c590e1b980061587caa03590b8d20d5240625e9aaaddb4003db49cffd338f88b8aa7ed3a06a9830fa938561215931a7ca774b20bc7abb5a462e3d7ea118b82f', 'Rosa', 'Gallego', 'Colina', default),
-	('maria.gm@piedrasnegras.tecnm.mx', 'ac30e7658f0dfb0c66235730cf31a7976101ce88aa55ffa4350878d33df36c5c8df45d7bc37fbca71fe02bfdf0c593023e80020316079fe51061abcbecc712df22117263e3e2f25e6820e9b07d235a17', 'Maria José', 'Gutiérrez', 'Malillos', default),
-	('rafael.cc@piedrasnegras.tecnm.mx', 'afb8baa57eeed18dfe253d4ad257e8e26f00645032d0b40e53365bff42077839cdc3793a64455e429018bd1e1d1e38a053407764e8890664cbfa1748d598d03d797b9c3fa0cc4a9f3f404021f48e0338', 'Rafael', 'Contador', 'Cueva', default),
-	('celia.pd@piedrasnegras.tecnm.mx', 'a0d4c93f29656492dbd4cbeca385fbaa1e0915f3c47d5cc8dd23bead85754427b33c670c061df4d080d1fb4386db4c9fc41435fbc5475189caa54f05e8988b720be20ac2a118778d55db6f3fced60b2e', 'Celia', 'Pastor', 'Domínguez', default);

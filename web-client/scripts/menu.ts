@@ -1,25 +1,44 @@
-const menu = {
-    'main': {
-        'Inicio': {
-            'href': '/home',
-            'icon': 'home'
-        },
-        'Validar residentes': {
-            'href': '/validar-residentes',
-            'icon': 'how_to_reg'
-        },
-        'Panel de residencias': {
-            'href': '/panel-residencias',
-            'icon': 'assignment'
-        },
-    },
-    'secondary': {
-        'Cerrar sesión': {
-            'href': '/logout',
-            'icon': 'exit_to_app'
-        }
-    }
-}
+// const menu = {
+//     'main': {
+//         'Inicio': {
+//             'href': '/home',
+//             'icon': 'home'
+//         },
+//         'Validar residentes': {
+//             'href': '/validar-residentes',
+//             'icon': 'how_to_reg'
+//         },
+//         'Panel de residencias': {
+//             'href': '/panel-residencias',
+//             'icon': 'assignment'
+//         },
+//     },
+//     'secondary': {
+//         'Cerrar sesión': {
+//             'href': '/logout',
+//             'icon': 'exit_to_app'
+//         }
+//     }
+// }
+
+const getMenu: () => Promise<Object> = 
+    () => new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('get', '/getMenu', true);
+        
+        xhr.onload = () => {
+            let response= JSON.parse(xhr.response);
+
+            if (response.code <= 0) {
+                reject(response.message);
+                return;
+            }
+
+            resolve(response.object);
+        };
+        
+        xhr.send();
+    });
 
 const menuItem = (name, o) => `
 <a href="${o['href']}"><div class="menu-item">
@@ -136,17 +155,24 @@ const menuView = (o) => {
     `
 };
 
-document.body.innerHTML = menuView(menu) + document.body.innerHTML;
-
-const toggleMenuButton = document.getElementById('toggleMenuButton');
-const menuContainer = document.getElementById('menuContainer');
-
+let toggleMenuButton;
+let menuContainer;
 let menuActive = false;
 
-toggleMenuButton.onclick = () => {
-    menuContainer.style.transform = `translateX(${ !menuActive ? '0' : '-6em'})`;
-    menuActive = !menuActive;
+const putMenuOnDOM = async () => {
+    document.body.innerHTML = menuView((await getMenu())) + document.body.innerHTML;
 
-    (toggleMenuButton.children[0] as HTMLElement).style.transition = '150ms';
-    (toggleMenuButton.children[0] as HTMLElement).style.transform = `rotate(${ !menuActive ? '0deg' : '180deg'})`;
+    toggleMenuButton = document.getElementById('toggleMenuButton');
+    menuContainer = document.getElementById('menuContainer');
+    
+    toggleMenuButton.onclick = () => {
+        menuContainer.style.transform = `translateX(${ !menuActive ? '0' : '-6em'})`;
+        menuActive = !menuActive;
+    
+        (toggleMenuButton.children[0] as HTMLElement).style.transition = '150ms';
+        (toggleMenuButton.children[0] as HTMLElement).style.transform = `rotate(${ !menuActive ? '0deg' : '180deg'})`;
+    }
 }
+    
+putMenuOnDOM();
+
