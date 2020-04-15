@@ -766,69 +766,7 @@ BEGIN
   END; END IF;
 END;;
 
-<<<<<<< HEAD
-
-DROP PROCEDURE IF EXISTS SP_RegistroResidencia;;
-CREATE PROCEDURE SP_RegistroResidencia(
-  v_nombre_proyecto VARCHAR(128),
-  v_objetivo VARCHAR(512),
-  v_justificacion VARCHAR(512),
-  v_periodo TINYINT,
-  v_ano CHAR(4),
-  v_descripcion_actividades VARCHAR(1024),
-  v_aprobado TINYINT,
-  v_email_residente VARCHAR(64),
-  v_fecha_elaboracion VARCHAR(14),
-  v_nombre_empresa varchar(128),
-  v_representante varchar (128),
-  v_direccion varchar(128),
-  v_ciudad varchar (64),
-  v_telefono char(10),
-  v_email varchar(64),
-  v_departamento varchar(64),
-  v_email_ae varchar(64),
-  v_nombre_ae varchar(128),
-  v_puesto varchar(64),
-  v_grado_estudios varchar(48),
-  v_tel_ae char(10)
-)
-BEGIN
-  DECLARE exit handler for SQLEXCEPTION
-  BEGIN
-    GET DIAGNOSTICS CONDITION 1
-    @p2 = MESSAGE_TEXT;
-    
-    SELECT "0" AS output, @p2 AS message;
-    
-    ROLLBACK;
-  END;
-
-  START TRANSACTION;
-    INSERT INTO `siger`.`residencias`
-      (nombre_proyecto, objetivo, justificacion, periodo, ano, descripcion_actividades,aprobado,email_residente,fecha_elaboracion)
-    VALUES
-      (v_nombre_proyecto, v_objetivo, v_justificacion, v_periodo, v_ano, v_descripcion_actividades, v_aprobado, v_email_residente, v_fecha_elaboracion);
-
-	set @idr = last_insert_id();
-      
-	INSERT INTO `siger`.`empresas` 
-      (nombre, representante, direccion, ciudad, telefono, email, departamento, id_residencia)
-    VALUES
-      (v_nombre_empresa, v_representante, v_direccion,v_ciudad, v_telefono, v_email, v_departamento, @idr);
-      
-	INSERT INTO `siger`.`asesores_externos` 
-      (email, nombre_completo, puesto, grado_estudios, telefono, id_residencia)
-    VALUES
-      (v_email_ae, v_nombre_ae, v_puesto,v_grado_estudios, v_tel_ae, @idr);
-
-    SELECT "1" AS output, "Transaction commited successfully" AS message;
-  COMMIT;
-END;;
-
-DROP procedure IF EXISTS `SP_RegistraHorarios`;
-=======
 DROP procedure IF EXISTS `SP_RegistraHorarios`;;
->>>>>>> origin/asignar-docentes
 CREATE PROCEDURE `SP_RegistraHorarios`(
   v_inicio CHAR(5),
   v_fin CHAR(5),
