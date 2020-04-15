@@ -8,6 +8,29 @@
         <link rel="stylesheet" href="styles/forms.css" />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <style>
+            @media only screen and (min-width: 1441px) {
+                :root {
+                    --vertical-form-margin: 20vw;
+                }
+            }
+            
+            @media only screen and (min-width: 1001px) and (max-width: 1440px) {
+                :root {
+                    --vertical-form-margin: 15vw;
+                }
+            }
+            
+            @media only screen and (max-width: 1000px) {
+                :root {
+                    --vertical-form-margin: 2vw;
+                }
+            }
+
+            .content {
+                padding-left: var(--vertical-form-margin);
+                padding-right: var(--vertical-form-margin);
+            }
+
             .form-input {
                 display: flex;
                 padding: 1em;
@@ -22,10 +45,15 @@
                 flex: 1;
             }
 
-            .button-container {
+            form > .buttons-container {
                 display: flex;
                 justify-content: center;
                 margin-top: 2em;
+                margin: 2em 10% 0;
+            }
+
+            form > .buttons-container > button:not(:first-child) {
+                margin-left: 3em;
             }
 
             form p {
@@ -64,6 +92,7 @@
 
             .page-content > p {
                 margin-bottom: .5em;
+                text-align: justify;
             }
 
             .field-bundle {
@@ -115,52 +144,53 @@
                     <img src="assets/images/itpn.png" alt="ITPN">
                 </div>
 
-                <p style="text-align: end;">Fecha de Elaboración: <b>[FECHA DE ELABORACIÓN]</b></p>
+                <p style="text-align: end;"><b>Fecha de Elaboración:</b> <span id="fechaView"></span></p>
 
                 <div class="page-content">
                     <p class="section-title">Descripción General de Proyecto</p>
-                    <p>Nombre del Proyecto: <b>[NOMBRE DEL PROYECTO]</b></p>
-                    <p>Objetivo General: <b>[OBJETIVO GENERAL]</b></p>
-                    <p>Justificación (Problema a resolver): <b>[JUSTIFICACIÓN]</b></p>
-                    <p>Periodo de realización: <b>[PERIODO Y AÑO]</b></p>
+                    <p><b>Nombre del Proyecto:</b> <span id="proyectoView"></span></p>
+                    <p><b>Objetivo General:</b> <span id="objView"></span></p>
+                    <p><b>Justificación (Problema a resolver):</b> <span id="justView"></span></p>
+                    <p><b>Periodo de realización:</b> <span id="periodoAnoView"></span></p>
 
                     <p class="section-title">Descripción de las actividades:</p>
-                    <p>[ACTIVIDADES]</p>
+                    <p><span id="actsView"></span></p>
 
                     <p class="section-title">Información sobre la empresa, organismo, o dependencia donde se desarrollará el proyecto</p>
-                    <p>Nombre de la empresa: <b>[EMPRESA]</b></p>
-                    <p>Representante Legal de la empresa: <b>[REPRESENTANTE]</b></p>
+                    <p><b>Nombre de la empresa:</b> <span id="empresaView"></span#empresaView></p>
+                    <p><b>Representante Legal de la empresa:</b> <span id="repreView"></span></p>
                     <div class="field-bundle">
-                        <p>Dirección: <b>[DIRECCIÓN]</b></p>
-                        <p>Teléfono: <b>[TELÉFONO]</b></p>
+                        <p><b>Dirección:</b> <span id="direccionEView"></span></p>
+                        <p><b>Teléfono:</b> <span id="telefonoEView"></span></p>
                     </div>
                     <div class="field-bundle">
-                        <p>Ciudad: <b>[CIUDAD]</b></p>
-                        <p>Correo electrónico: <b>[EMAIL]</b></p>
+                        <p><b>Ciudad:</b> <span id="ciudadEView"></span></p>
+                        <p><b>Correo electrónico:</b> <span id="emailEView"></span></p>
                     </div>
-                    <p>Departamento o área del desarrollo del proyecto en la empresa: <b>[DEPARTAMENTO]</b></p>
+                    <p><b>Departamento o área del desarrollo del proyecto en la empresa:</b> <span id="departamentoView"></span></p>
 
                     <p class="section-title">Datos del asesor externo</p>
-                    <p>Nombre completo: <b>[NOMBRE COMPLETO]</b></p>
+                    <p><b>Nombre completo:</b> <span id="nombreAEView"></span></p>
                     <div class="field-bundle">
-                        <p>Puesto: <b>[PUESTO]</b></p>
-                        <p>Grado de estudios: <b>[GRADO]</b></p>
+                        <p><b>Puesto:</b> <span id="puestoAEView"></span></p>
+                        <p><b>Grado de estudios:</b> <span id="gradoAEView"></span></p>
                     </div>
                     <div class="field-bundle">
-                        <p>Teléfono: <b>[TELÉFONO]</b></p>
-                        <p>Correo electrónico: <b>[EMAIL]</b></p>
+                        <p><b>Teléfono:</b> <span id="telAEView"></span></p>
+                        <p><b>Correo electrónico:</b> <span id="emailAEView"></span></p>
                     </div>
 
                     <p class="section-title">Datos del residente</p>
-                    <p>Nombre completo: <b>[NOMBRE]</b></p>
-                    <p>No. de Control: <b>[NO CONTROL]</b></p>
-                    <p>Carrera: <b>[CARRERA]</b></p>
-                    <p>Teléfono Casa: <b>[TEL. FIJO]</b></p>
-                    <p>Celular: <b>[TEL. CEL.]</b></p>
-                    <p>Correo electrónico: <b>[EMAIL]</b></p>
-                    <p>Horario(s) en la Empresa: <b>[HORARIOS, SEPARADOS POR COMA]</b></p>
+                    <p><b>Nombre completo:</b> <span id="nombreRView"></span></p>
+                    <p><b>No. de Control:</b> <span id="noControlView"></span></p>
+                    <p><b>Carrera:</b> <span id="carreraView"></span></p>
+                    <p><b>Teléfono Casa:</b> <span id="telRView"></span></p>
+                    <p><b>Celular:</b> <span id="celRView"></span></p>
+                    <p><b>Correo electrónico:</b> <span id="emailRView"></span></p>
+                    <p><b>Horario(s) en la Empresa:</b> <span id="horariosRView"></span></p>
                 </div>
                 <div class="buttons-container">
+                    <button class="secondary-button" onclick="goBack();">VOLVER AL PANEL DE RESIDENCIAS</button>
                     <!-- TODO: Implementar descarga de formato. -->
                     <button class="primary-button">DESCARGAR FORMATO</button>
                 </div>
@@ -222,6 +252,17 @@
 
                 .teacher > .teacherName {
                     padding: .25em 1em;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                }
+
+                .teacher > .teacherName > i {
+                    margin-right: .5em;
+                }
+
+                .teacher > .teacherName > i:hover {
+                    color: red;
                 }
 
                 .result {
@@ -239,6 +280,20 @@
                     background-color: green;
                     color: white;
                 }
+
+                i {
+                    cursor: pointer;
+                }
+                
+                .assigner-container > .buttons-container {
+                    display: flex;
+                    margin: 2em 10%;
+                    flex-direction: row;
+                }
+
+                .assigner-container > .buttons-container > button:not(:first-child) {
+                    margin-left: 3em;
+                }
             </style>
             <div class="assigner-container">
                 <h2>Asignar asesor interno y revisores</h2>
@@ -248,11 +303,12 @@
 
                 <div class="assigner">
                     <div class="searchBar">
-                        <input type="text" placeholder="Nombre o correo del docente">
-                        <i class="material-icons">search</i>
+                        <input id="searchInput" type="text" placeholder="Nombre o correo del docente">
+                        <i id="searchButton" class="material-icons">search</i>
                     </div>
-                    <div class="resultsContainer">
-                        <p style="padding: 1em;">No hay ningún resultado que satisfaga el criterio de búsqueda actual</p>
+                    <div id="resultsContainer" class="resultsContainer">
+                        <p style="padding: 1em;">Introduzca un criterio de búsqueda</p>
+
                         <!-- <div class="result">
                             <i class="material-icons">person_add</i>
                             <p>Daniel Hernández Sánchez (daniel.hs@piedrasnegras.tecnm.mx)</p>
@@ -271,26 +327,33 @@
                                 <i class="material-icons">supervisor_account</i>
                                 <p>Asesor interno</p>
                             </div>
-                            <p class="teacherName">Aún no hay un docente asignado</p>
+                            <p id="teacher0" class="teacherName">-</p>
                         </div>
                         <div class="teacher">
                             <div class="title">
                                 <i class="material-icons">person</i>
                                 <p>Revisor</p>
                             </div>
-                            <p class="teacherName">Aún no hay un docente asignado</p>
+                            <p id="teacher1" class="teacherName">-</p>
                         </div>
                         <div class="teacher">
                             <div class="title">
                                 <i class="material-icons">person</i>
                                 <p>Revisor</p>
                             </div>
-                            <p class="teacherName">Aún no hay un docente asignado</p>
+                            <p id="teacher2" class="teacherName">-</p>
                         </div>
                     </div>
                 </div>
+                <div class="buttons-container">
+                    <button id="cleanButton" type="button" class="secondary-button">LIMPIAR ASIGNACIÓN</button>
+                    <button id="assignButton" type="button" class="primary-button">ASIGNAR DOCENTES</button>
+                </div>
             </div>
         </div>
+
+        <script src="scripts/menu.js"></script>
+        <script src="scripts/residencia.js"></script>
 
         <footer>
             <div class="sections-container">

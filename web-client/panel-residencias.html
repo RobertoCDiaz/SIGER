@@ -14,7 +14,6 @@
                 <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
             </a>
-            <!-- <h2>Registro de Docentes</h2> -->
         </div>
     </header>
 
@@ -108,13 +107,31 @@
     <div class="content">
         <div class="title">
             <h1>Panel de Residencias</h1>
-            <h3>usuario.us@piedrasnegras.tecnm.mx</h3>
+            <h3 id="adminEmailView">usuario.us@piedrasnegras.tecnm.mx</h3>
             <p>A continuación se desplegarán todos aquellos proyectos de Residencias Profesionales que aún no han sido aprobados. Presione la Residencia de la que desea conocer más información para abrirla en una nueva pestaña.</p>
             <p>Una vez abiertos los detalles de un proyecto de Residencias Profesionales, podrá ver el reporte preliminar realizado por el estudiante. Después de analizarlo detenidamente, podrá asignar a un docente como asesor interno del proyecto, así como dos revisores del proyecto. Información más concreta de este proceso se le dará al momento de asignar asesores/revisores.</p>
         </div>
+        <script>
+            const fillUserEmail = () => {
+                const adminEmailView = document.getElementById('adminEmailView');
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/user-info', true);
+                
+                xhr.onload = () => {
+                    let response = JSON.parse(xhr.response);
+
+                    adminEmailView.innerHTML = response.object.email;
+                };
+                
+                xhr.send();
+            }
+
+            fillUserEmail();
+        </script>
         <hr>
         <div id="container">
-            <div class="residencia" onclick="openInfo();">
+            <!-- <div class="residencia" onclick="abrirResidencia();">
                 <div class="title">
                     <div class="projectNameContainer">
                         <p class="projectName">Sistema Gestor de Residencias</p>
@@ -130,7 +147,7 @@
                 <p>Daniel Hernández Sánchez</p>   
                 <p>9 de abril del 2020</p> 
             </div>
-            <div class="residencia" onclick="openInfo();">
+            <div class="residencia" onclick="abrirResidencia();">
                 <div class="title">
                     <div class="projectNameContainer">
                         <p class="projectName">Sistema para el Control de Evidencias de Proyectos Individuales</p>
@@ -146,7 +163,7 @@
                 <p>Roberto Carlos Díaz Sánchez</p>   
                 <p>9 de abril del 2020</p> 
             </div>
-            <div class="residencia" onclick="openInfo();">
+            <div class="residencia" onclick="abrirResidencia();">
                 <div class="title">
                     <div class="projectNameContainer">
                         <p class="projectName">Sistema para la No-Gestión de Residencias</p>
@@ -161,14 +178,11 @@
                 <p>Ingeniería Electrónica</p>
                 <p>Noelia Piedrabuena Cuéllar</p>   
                 <p>9 de abril del 2020</p> 
-            </div>
+            </div> -->
         </div>
     </div>
-    <script>
-        const openInfo = () => {
-            window.open('/residencia');
-        }
-    </script>
+    <script src="scripts/menu.js"></script>
+    <script src="scripts/panel-residencias.js"></script>
 
     <footer>
         <div class="sections-container">
@@ -211,5 +225,6 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
+    
 </body>
 </html>

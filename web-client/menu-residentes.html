@@ -128,7 +128,21 @@
         <div class="content">
             <div class="black-overlay">
                 <div class="main-container">
-                    <div class="title">Bienvenido, <b>Daniel</b></div>
+                    <div class="title">Bienvenido, <span id="welcomeMessage" ></span></div>
+                    <script>
+                        const populateWelcomeMessage = () => {
+                            let xhr = new XMLHttpRequest();
+                            xhr.open('get', '/user-info', true);
+                            
+                            xhr.onload = () => {
+                                let res = JSON.parse(xhr.response)['object'];
+                                document.getElementById('welcomeMessage').innerHTML = `${res['nombre']}`;
+                            };
+                            
+                            xhr.send();
+                        }
+                        populateWelcomeMessage();
+                    </script>
                     <div class="options-container">
                         <a href="/nuevo-proyecto">
                             <div class="menu-item">

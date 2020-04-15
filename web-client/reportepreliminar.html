@@ -130,7 +130,7 @@
     </style>
 </head>
 <body>
-    <button id="fixedbutton"><img src="assets/images/menu.png" onclick="openNav()"></button>
+    <!-- <button id="fixedbutton"><img src="assets/images/menu.png" onclick="openNav()"></button>
     
         <div id="mySidenav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
@@ -138,7 +138,7 @@
             <a href="#"><img src="assets/images/progreso.png"> Progreso actual</a>
             <a href="#"><img src="assets/images/brief.png"> Documentos</a>
             <a href="#"><img src="assets/images/chat.png"> Contacto con docentes</a>
-        </div>
+        </div> -->
 
     <header class="header-extension">
         <div class="bar">
@@ -335,7 +335,7 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
-    <script src="scripts/sidebar.js"></script>
+    <!-- <script src="scripts/sidebar.js"></script> -->
     <script>
         let contadorHorarios = 0;
 
@@ -459,41 +459,33 @@
         const subm              = document.getElementById("subm");
 
         subm.onclick=()=>{
-            let pe = String(document.getElementById('e1').value);
-            let pee = pe.substring(0,5);
-            let entradas = [pee];
-            let ps = String(document.getElementById('s1').value);
-            let pss = ps.substring(0,5);
-            let salidas = [pss];
+            let entradas = [];
+            let salidas = [];
 
             let parent = document.getElementById('padre');
             let c = document.getElementById('padre').children;
 
-            for (let i = 0; i < c.length; i++) {
+            for (let i = 1; i < c.length; i++) {
                 let ch = c[i].children;
                 for (let j = 0; j < ch.length; j++) {
                     let chi = ch[j].children;
                     for (let k = 0; k < chi.length; k++) {
                         if(j%2!=0)
                         {
-                            pe = String(chi[k].value);
-                            pee = pe.substring(0,5);
+                            let pe = String(chi[k].value);
+                            let pee = pe.substring(0,5);
                             entradas.push(pee);
                             console.log('Entrada: ' + pee);
                         }
                         else
                         {
-                            ps = String(chi[k].value);
-                            pss = ps.substring(0,5);
+                            let ps = String(chi[k].value);
+                            let pss = ps.substring(0,5);
                             salidas.push(pss);
                             console.log('Salida: ' + pss);
                         }
                     }
                 }
-            }
-
-            for (let i = 0; i < entradas.length; i++) {
-                console.log('Entradas chidas: '+ entradas[i]);
             }
             
             if(!salidas[0])
@@ -556,6 +548,28 @@
                 `counter=${encodeURI(contadorHorarios)}` 
             );
         };
+
+        const fill = () => {
+            nombre_proyecto.value = 'Proyecto nuevo';;
+            objetivo.value = 'Llenar este formato.';
+            justificacion.value = 'Crear una nueva residencia.';
+            periodo.value = 1;
+            ano.value = 2020;
+            actividades.value = 'Crear una función fill() para llenar automáticamente esto.';
+            empresa.value = 'ITPN';
+            representante.value = 'Fulanito de Tal';
+            direccion.value = 'S/N #510, col. Tecnológico.';
+            telEmpresa.value = '8781265438';
+            ciudad.value = 'Piedras Negras';
+            emailEmpresa.value = 'itpn@piedrasnegras.tecnm.mx';
+            depto.value = 'Sistemas y Computación'
+            nombreAE.value = 'Fulanito de Tal'
+            puesto.value = 'Jefe de todo'
+            grado.value = 'Maestría'
+            telAE.value = '8781593625';
+            emailAE.value = 'fulanito.dt@piedrasnegras.tecnm.mx';
+        };
     </script>
+    <script src="scripts/menu.js"></script>
 </body>
 </html>

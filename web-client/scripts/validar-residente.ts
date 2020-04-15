@@ -28,7 +28,7 @@ const getResidentsList = (): Promise<Object> => new Promise((resolve, reject) =>
     xhr.send();
 });
 
-const timestampToLegibleDate = (ts) => {
+const timestampToLegibleDate = (ts: number) => {
     const monthsArr: String[] = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
     const d: Date = new Date(ts);

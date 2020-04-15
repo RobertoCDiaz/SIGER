@@ -154,7 +154,6 @@ server.post('/registrarResidente', (req, res) => {
         (e, rows, f) => {
 
             if (e) {
-                console.log(e);
                 res.send(Response.unknownError(e.toString()));
                 return;
             }
@@ -321,6 +320,15 @@ server.get('/validar-residentes', (req, res) => {
     res.sendFile('validar-residente.html', { root: '../web-client/' });
 });
 
+server.get('/user-info', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError("No hay ninguna sesión iniciada"));
+        return;
+    }
+
+    res.send(Response.success(req.session.user.info));
+});
+
 server.get('/nuevo-proyecto', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -340,17 +348,11 @@ server.get('/nuevo-proyecto', (req, res) => {
 server.post('/registro-residencia',(req,res)=>
 {
     
-    if (!req.session.loggedin) {
-        console.log("Se redirige a home por no tener sesión iniciada")
-        res.redirect('/home');
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.RESIDENTE) {
+        res.send(Response.authError());
         return;
     }
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
-        // TODO: Agregar pantalla de Acesson No Autorizado.
-        console.log("Se redirige a home porque no es residente")
-        res.redirect('/home');
-        return;
-    }
+
     const nombre_proyecto = req.body.nombre_proyecto;
     const objetivo = req.body.objetivo;
     const justificacion = req.body.justificacion;
@@ -371,15 +373,14 @@ server.post('/registro-residencia',(req,res)=>
     const telAE = req.body.telAE;
     const emailAE = req.body.emailAE;
     const emailResidente = req.session.user.info.email;
-    const aprobado = 0;
     let idres=0;
     const entradas = JSON.parse(req.body.entradas);
     const salidas = JSON.parse(req.body.salidas);
     const counter = req.body.counter;
 
-    con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
+    con.query('call SP_RegistroResidencia(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);',
     [
-        nombre_proyecto,objetivo,justificacion,periodo,ano,actividades,aprobado,
+        nombre_proyecto,objetivo,justificacion,periodo,ano,actividades,
         emailResidente,fecha_elaboracion,empresa,representante,direccion,ciudad,
         telEmpresa,emailEmpresa,depto,emailAE,nombreAE,puesto,grado,telAE
     ],
@@ -387,7 +388,6 @@ server.post('/registro-residencia',(req,res)=>
         {
             if(e)
             {
-                console.log(e);
                 res.send(Response.unknownError(e.toString()));
                 return;
             }
@@ -398,30 +398,100 @@ server.post('/registro-residencia',(req,res)=>
             }
             idres=Number(rows[0][0]['idresidencia']);
 
-            for(let i = 0;i<counter;i++)
-            {
-                con.query('call SP_RegistraHorarios(?,?,?);',
-                    [
-                        entradas[i],salidas[i],idres
-                    ],
-                (er,r,fi)=>
-                {
-                    if(er)
-                    {
-                        console.log(er);
-                        return;
-                    }
-                    if(rows[0][0]['output']!=1)
-                    {
-                        console.log(rows[0][0]['message']);
-                        return;
-                    }
-                });
-            }
-            res.send(Response.success());
+            // for(let i = 0;i<counter;i++)
+            // {
+            //     con.query('call SP_RegistraHorarios(?,?,?);',
+            //         [
+            //             entradas[i],salidas[i],idres
+            //         ],
+            //     (er,r,fi)=>
+            //     {
+            //         if(er)
+            //         {
+            //             res.send(Response.unknownError(er.toString()));
+            //             return;
+            //         }
+            //         if(r[0][0]['output']!=1)
+            //         {
+            //             res.send(Response.sqlError(r[0][0]['message']));
+            //             return;
+            //         }
+            //     });
+            // }
+            // res.send(Response.success());
+
+            registrarHorarios(
+                idres, entradas, salidas, counter, 
+                () => { // onDone
+                    res.send(Response.success());
+                },
+                (error, numeroHorario) => { // onError
+                    res.send(Response.unknownError(error.toString()));
+                }
+            );
         }
     );
 });
+
+
+/**
+ * Regresa al cliente una lista de residencias que aún no han sido confirmadas
+ * (No se han asignado docentes como asesores internos o revisores) de las carreras
+ * que administra el usuario actual.
+ * 
+ * Opcionalmente, se puede pasar una consulta en el parámetro [q] que se usará para 
+ * buscar residencias basándose en el nombre del proyecto, nombre de la empresa, 
+ * nombre del residente, o correo electrónico del residente (y por extensión, su
+ * número de control).
+ */
+server.get('/listaResidenciasSinDocentes', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const query = req.query.q ?? '';
+    const adminEmail = req.session.user.info.email; 
+
+    con.query(
+        `call SP_ListaResidenciasSinDocentes(?, ?);`,
+        [adminEmail, query],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+const registrarHorarios = (
+    idResidencia: number, entradas: string[], salidas: string[], 
+    horarios: number, onDone: () => void, onError: (error, numeroHorario) => void
+) => {
+    con.query(
+        `call SP_RegistraHorarios(?,?,?);`,
+        [entradas[horarios - 1], salidas[horarios - 1], idResidencia],
+        (err, rows, f) => {
+            
+            if (err) {
+                onError(err, horarios - 1);
+                return;
+            }
+            if (rows[0][0]['output'] != 1) {
+                onError(`SQL Error: ${rows[0][0]['message']}`, horarios - 1);
+                return;
+            }
+
+            if (horarios - 1 > 0)
+                registrarHorarios(idResidencia, entradas, salidas, horarios - 1, onDone, onError);
+            else 
+                onDone();
+        }
+    );
+}
 
 server.get('/avance-proyecto', (req, res) => {
     if (!req.session.loggedin) {
@@ -738,12 +808,150 @@ server.get('/residencia', (req, res) => {
         return;
     }
 
+    if (!req.query.id) {
+        res.redirect('/panel-residencias');
+        return;
+    }
+
     res.sendFile('residencia.html', { root: '../web-client/' });
 });
 
 
+/**
+ * Dado un id de residencia [id], regresa al cliente la información
+ * necesaria para llenar el formato de reporte preliminar, siempre 
+ * y cuando el adminsitrador esté a cargo de la carrera del residente.
+ */
+server.get('/reporte-preliminar', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const idResidencia = req.query.id;
+    const adminEmail = req.session.user.info.email;
+    if (!idResidencia) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        'call SP_FormatoPreliminar(?, ?);',
+        [idResidencia, adminEmail], 
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError(`No se encontró esta residencia`));
+                return;
+            }
+
+            res.send(Response.success(rows[0][0]));
+        }
+    )
+
+});
 
 
+/**
+ * Dado un criterio de búsqueda [q], regresa al cliente una lista
+ * de docentes que cumplan con [q] en su correo electrónico o nombre completo.
+ */
+server.get('/buscarDocente', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const query = req.query.q;
+    if (!query) {
+        res.send(Response.userError("Introduzca un criterio de búsqueda"));
+        return;
+    }
+
+    con.query(
+        'call SP_BuscarDocente(?);',
+        query,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            // console.log(rows);
+            if (rows[0].length == 0) {
+                res.send(Response.userError('No se ha encontrado ningún docente con este criterio de búsqueda'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+server.post('/asignar-docentes', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const resId: number = Number(req.body.residencia_id);
+    const ai: string    = req.body.ai;
+    const r1: string    = req.body.r1;
+    const r2: string    = req.body.r2;
+    if (!resId || !ai || !r1 || !r2) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        'call SP_AsignarDocentesAProyecto(?, ?, ?, ?);',
+        [resId, ai, r1, r2],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['ouput'] == -1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+            }
+
+            if (rows[0][0]['ouput'] == 0) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success());
+        }
+    )
+});
+
+server.get('/getMenu', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    switch (req.session.user.class) {
+        case USER_CLASSES.ADMIN: {
+            res.send(Response.success(getAdminMenu()));
+            break;
+        };
+
+        case USER_CLASSES.RESIDENTE: {
+            getResidentMenu(
+                req.session.user.info.email,
+                (residentMenu) =>
+                    res.send(Response.success(residentMenu))
+            )
+            break;
+        };
+    }
+});
 
 
 /* ================================================================================================
@@ -776,6 +984,160 @@ const encrypt = (txt: string) =>
 const decrypt = (txt: string) => 
     AES.decrypt(txt, Keys.SECRET_KEY);
 
+const getAdminMenu: () => Object = () => ({
+    'main': {
+        'Inicio': {
+            'href': '/home',
+            'icon': 'home'
+        },
+        'Validar residentes': {
+            'href': '/validar-residentes',
+            'icon': 'how_to_reg'
+        },
+        'Panel de residencias': {
+            'href': '/panel-residencias',
+            'icon': 'assignment'
+        },
+    },
+    'secondary': {
+        'Cerrar sesión': {
+            'href': '/logout',
+            'icon': 'exit_to_app'
+        }
+    }
+});
+
+/**
+ * Consigue el menú con las opciones específicas del estado de un residente.
+ * 
+ * @param email Correo electrónico del residente del cual se quiere conocer su menú.
+ * @param onDone Qué hacer cuándo un menú sea "calculado"
+ */
+const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => void) => Object =
+    async (email, onDone) => {
+        con.query(
+            `select estadoResidente(?) as estado;`,
+            email,
+            (e, rows, f) => {
+                let menu: Object = {
+                    'main': {
+                        'Inicio': {
+                            'href': '/home',
+                            'icon': 'home'
+                        }
+                    },
+                    'secondary': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
+                        }
+                    }
+                };
+
+                const state: number = Number(rows[0]['estado']);
+
+                switch (state) {
+                    case 0: menu = {
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    }; break;
+
+                    case 1: menu = {
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            },
+                            'Nuevo proyecto': {
+                                'href': '/nuevo-proyecto',
+                                'icon': 'note_add'
+                            },
+                            'Documentos': {
+                                'href': '/docs',
+                                'icon': 'description'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    }; break;
+
+                    case 2: menu = {
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            },
+                            'Progreso actual': {
+                                'href': '/avance-proyecto',
+                                'icon': 'flag'
+                            },
+                            'Documentos': {
+                                'href': '/docs',
+                                'icon': 'description'
+                            },
+                            'Chat': {
+                                'href': '/#',
+                                'icon': 'chat'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    }; break;
+                }
+                
+                onDone(menu);
+            }
+        );
+    };
+
+/**
+ * Consigue de manera asíncrona el estado actual de un residente
+ * en el sistema.
+ * 
+ * Regresa un valor numérico indicando el estado, acorde a
+ * los siguientes valores:
+ * 
+ *      0: Sin confirmar.
+ * 
+ *      1: Confirmado.
+ * 
+ *      2: Con residencia aprobada.
+ * 
+ * @param email Correo electrónico del residente.
+ */
+const getResidentState: (residentEmail: string) => Promise<number>
+    = (email) => new Promise((resolve, reject) => {
+        con.query(
+            `select estadoResidente(?) as estado;`,
+            email,
+            (e, rows, f) => {
+                if (e) {
+                    reject(e.toString());
+                    return;
+                }
+
+                resolve(rows[0]['estado']);
+            }
+        )
+    });
 
 /* ================================================================================================
 
