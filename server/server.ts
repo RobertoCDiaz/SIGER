@@ -1,6 +1,5 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
-import { userInfo } from "os";
 
 const express   = require("express");
 const session   = require("express-session");

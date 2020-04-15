@@ -566,8 +566,6 @@ BEGIN
   COMMIT;
 END;;
 
-<<<<<<< HEAD
-=======
 
 DROP PROCEDURE IF EXISTS SP_RegistroResidencia;;
 CREATE PROCEDURE SP_RegistroResidencia(
@@ -626,7 +624,6 @@ BEGIN
   COMMIT;
 END;;
 
->>>>>>> f042237432675a1995b6e505912a820190c08172
 DROP procedure IF EXISTS `SP_RegistraHorarios`;
 CREATE PROCEDURE `SP_RegistraHorarios`(
   v_inicio CHAR(5),
