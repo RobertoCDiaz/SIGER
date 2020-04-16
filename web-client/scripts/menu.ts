@@ -24,7 +24,7 @@
 const getMenu: () => Promise<Object> = 
     () => new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
-        xhr.open('get', '/getMenu', true);
+        xhr.open('get', '/getMenu', false);
         
         xhr.onload = () => {
             let response= JSON.parse(xhr.response);
@@ -160,7 +160,7 @@ let menuContainer;
 let menuActive = false;
 
 const putMenuOnDOM = async () => {
-    document.body.innerHTML = menuView((await getMenu())) + document.body.innerHTML;
+    document.body.innerHTML += menuView(await getMenu());
 
     toggleMenuButton = document.getElementById('toggleMenuButton');
     menuContainer = document.getElementById('menuContainer');
