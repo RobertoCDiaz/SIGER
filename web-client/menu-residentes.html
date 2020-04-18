@@ -129,22 +129,8 @@
             <div class="black-overlay">
                 <div class="main-container">
                     <div class="title">Bienvenido, <span id="welcomeMessage" ></span></div>
-                    <script>
-                        const populateWelcomeMessage = () => {
-                            let xhr = new XMLHttpRequest();
-                            xhr.open('get', '/user-info', true);
-                            
-                            xhr.onload = () => {
-                                let res = JSON.parse(xhr.response)['object'];
-                                document.getElementById('welcomeMessage').innerHTML = `${res['nombre']}`;
-                            };
-                            
-                            xhr.send();
-                        }
-                        populateWelcomeMessage();
-                    </script>
-                    <div class="options-container">
-                        <a href="/nuevo-proyecto">
+                    <div id="optionsContainer" class="options-container">
+                        <!-- <a href="/nuevo-proyecto">
                             <div class="menu-item">
                                 <i class="material-icons">note_add</i>
                                 <p>Nuevo proyecto</p>
@@ -173,22 +159,62 @@
                                 <i class="material-icons">exit_to_app</i>
                                 <p>Cerrar sesión</p>
                             </div>
-                        </a>
-                        <!-- <div class="menu-item">
-                            <i class="material-icons">exit_to_app</i>
-                            <p>Cerrar sesión</p>
-                        </div>
-                        <div class="menu-item">
-                            <i class="material-icons">exit_to_app</i>
-                            <p>Cerrar sesión</p>
-                        </div>
-                        <div class="menu-item">
-                            <i class="material-icons">exit_to_app</i>
-                            <p>Cerrar sesión</p>
-                        </div> -->
+                        </a> -->
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+            const populateWelcomeMessage = () => {
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/user-info', true);
+                
+                xhr.onload = () => {
+                    let res = JSON.parse(xhr.response)['object'];
+                    document.getElementById('welcomeMessage').innerHTML = `${res['nombre']}`;
+                };
+                
+                xhr.send();
+            }
+            populateWelcomeMessage();
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            const optionView = (name, object) => `
+                <a href="${object['href']}">
+                    <div class="menu-item">
+                        <i class="material-icons">${object['icon']}</i>
+                        <p>${name}</p>
+                    </div>
+                </a>
+            `;
+            const getMenu = () => {
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/getMenu', false);
+                
+                xhr.onload = () => {
+                    const response = JSON.parse(xhr.response);
+
+                    if (response.code <= 0) {
+                        alert(response.message);
+                        location.reload();
+                        return;
+                    }
+
+                    const o = response.object;
+
+                    Object.keys(o['main']).forEach(key => {
+                        if (key == 'Inicio') return;
+                        optionsContainer.innerHTML += optionView(key, o['main'][key]);
+                    });
+                    Object.keys(o['secondary']).forEach(key => {
+                        optionsContainer.innerHTML += optionView(key, o['secondary'][key]);
+                    });
+
+                };
+                
+                xhr.send();
+            }
+            getMenu();
+        </script>
     </body>
 </html>
