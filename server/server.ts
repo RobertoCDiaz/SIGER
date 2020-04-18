@@ -341,7 +341,16 @@ server.get('/nuevo-proyecto', (req, res) => {
         return;
     }
 
-    res.sendFile('reportepreliminar.html', { root: '../web-client/' });
+    getResidentState(req.session.user.info.email).then(state => {
+        if (state != 1) {
+            res.redirect('/home');
+            return;
+        }
+
+        res.sendFile('reportepreliminar.html', { root: '../web-client/' });
+    }).catch(error => {
+        res.redirect('/home');
+    });
 });
 
 //Registro de residencia
@@ -505,7 +514,16 @@ server.get('/avance-proyecto', (req, res) => {
         return;
     }
 
-    res.sendFile('avance.html', { root: '../web-client/' });
+    getResidentState(req.session.user.info.email).then(state => {
+        if (state != 2) {
+            res.redirect('/home');
+            return;
+        }
+
+        res.sendFile('avance.html', { root: '../web-client/' });
+    }).catch(error => {
+        res.redirect('/home');
+    });
 });
 
 server.get('/aprobado',(req,res)=>
@@ -755,7 +773,16 @@ server.get('/docs', (req, res) => {
         return;
     }
 
-    res.sendFile('documentos.html', { root: '../web-client/' });
+    getResidentState(req.session.user.info.email).then(state => {
+        if (state <= 0) {
+            res.redirect('/home');
+            return;
+        }
+
+        res.sendFile('documentos.html', { root: '../web-client/' });
+    }).catch(error => {
+        res.redirect('/home');
+    });
 });
 
 server.get('/logout', (req, res) => {
