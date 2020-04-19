@@ -793,6 +793,66 @@ BEGIN
   COMMIT;
 END;;
 
+/*
+	Procedimientos que envían datos relacionados al avance
+    del residente.
+*/
+DROP PROCEDURE IF EXISTS SP_MostrarAnexo29;;
+CREATE PROCEDURE `SP_MostrarAnexo29`(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    evaluacion_externa as ee, observaciones_externas as oe,
+    evaluacion_interna as ei, observaciones_internas as ie 
+    from residencias join anexo_29 on anexo_29.id_residencia=residencias.idresidencia
+	where residencias.email_residente=v_email;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_MostrarAnexo30;;
+CREATE PROCEDURE SP_MostrarAnexo30(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    evaluacion_externa as ee, observaciones_externas as oe,
+    evaluacion_interna as ei, observaciones_internas as ie 
+    from residencias join anexo_30 on anexo_30.id_residencia=residencias.idresidencia
+	where residencias.email_residente=v_email;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_MostrarAprobado;;
+CREATE PROCEDURE `SP_MostrarAprobado`(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message, aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha from residencias where residencias.email_residente=v_email;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_MostrarAsesor;;
+CREATE PROCEDURE `SP_MostrarAsesor`(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    nombre as nombre, apellido_paterno as ap, apellido_materno as am, es_asesor as asesor
+    from residencias join involucrados on residencias.idresidencia=involucrados.id_residencia
+    join docentes on docentes.email=involucrados.email_docente
+    where residencias.email_residente=v_email and es_asesor=1;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_MostrarRevisores;;
+CREATE PROCEDURE SP_MostrarRevisores(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    nombre as nombre, apellido_paterno as ap, apellido_materno as am, es_asesor as asesor
+    from residencias join involucrados on residencias.idresidencia=involucrados.id_residencia
+    join docentes on docentes.email=involucrados.email_docente
+    where residencias.email_residente=v_email and es_asesor!=1;
+END;;
+
 
 /*
 	Muestra una lista de residencias sin confirmar que administra 
