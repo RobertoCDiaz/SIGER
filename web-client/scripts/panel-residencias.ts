@@ -1,5 +1,20 @@
 const container = document.getElementById('container');
 
+const fillUserEmail = () => {
+    const adminEmailView = document.getElementById('adminEmailView');
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('get', '/user-info', true);   
+    xhr.onload = () => {
+        let response = JSON.parse(xhr.response);
+
+        adminEmailView.innerHTML = response.object.email;
+    };
+    xhr.send();
+}
+
+fillUserEmail();
+
 /* ================================================================================================
 
     Desplegar lista de residencias.

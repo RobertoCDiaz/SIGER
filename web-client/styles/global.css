@@ -37,6 +37,7 @@
 
     --page-background: #EAEAEA;
     --content-background: white;
+    --footer-background: #272727;
 
     --gray-border-color: #585858;
     --gray-content-color: #949494;
@@ -290,7 +291,7 @@ input[type="number"] {
 =============================================  */
 footer {
     padding: 2em;
-    background-color: #272727;
+    background-color: var(--footer-background);
 }
 
 footer * {
@@ -304,6 +305,7 @@ footer > p {
 footer > .sections-container {
     display: flex;
     margin-bottom: 2em;
+    flex-wrap: wrap;
 }
 
 footer > .sections-container > section {

@@ -52,7 +52,10 @@ const menuView = (o) => {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --menu-color: rgb(29, 34, 59);
+            /*--menu-color: rgb(29, 34, 59);*/
+            /*--menu-color: var(--footer-background);*/
+            --menu-color: var(--azul-tec);
+            --slide-duration: 150ms;
         }
     
         .menu-container {
@@ -62,7 +65,7 @@ const menuView = (o) => {
             transform: translateX(-6em);
             position: fixed;
             height: 100%;
-            transition-duration: 150ms;
+            transition-duration: var(--slide-duration);
             transition-timing-function: ease;
         }
     
@@ -138,7 +141,7 @@ const menuView = (o) => {
         }
     </style>
     <div id="menuContainer" class="menu-container prevent-selection">
-        <div class="menu-bar">
+        <div id="menuBar" class="menu-bar">
             <div class="main-options">
                 ${
                     Object.keys(o['main']).map(key => menuItem(key, o['main'][key])).join('')
@@ -164,12 +167,15 @@ const putMenuOnDOM = async () => {
 
     toggleMenuButton = document.getElementById('toggleMenuButton');
     menuContainer = document.getElementById('menuContainer');
+
     
     toggleMenuButton.onclick = () => {
-        menuContainer.style.transform = `translateX(${ !menuActive ? '0' : '-6em'})`;
+        const menuWidth = document.getElementById('menuBar').offsetWidth;
+        console.log(menuWidth * -1);
+        menuContainer.style.transform = `translateX(${ !menuActive ? '0' : /*'-6em'*/ (menuWidth * -1).toString()}px)`;
         menuActive = !menuActive;
     
-        (toggleMenuButton.children[0] as HTMLElement).style.transition = '150ms';
+        (toggleMenuButton.children[0] as HTMLElement).style.transition = 'var(--slide-duration)';
         (toggleMenuButton.children[0] as HTMLElement).style.transform = `rotate(${ !menuActive ? '0deg' : '180deg'})`;
     }
 }
