@@ -96,7 +96,7 @@ DROP TABLE IF EXISTS `siger`.`materias` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`materias` (
 	`clave` CHAR(8) NOT NULL,
-	`nombre` VARCHAR(48) NOT NULL,
+	`nombre` VARCHAR(96) NOT NULL,
 	PRIMARY KEY (`clave`))
 ENGINE = InnoDB;
 
