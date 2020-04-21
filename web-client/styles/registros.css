@@ -1,0 +1,69 @@
+.form-input {
+    display: flex;
+    padding: 1em;
+    align-items: center;
+}
+
+.form-input > * {
+    flex: 3;
+}
+
+.form-input > label {
+    flex: 1;
+}
+
+.subject-picker {
+    border: 1px solid var(--gray-border-color);
+    width: 60%;
+    margin: 1em auto;
+}
+
+.subject {
+    display: flex;
+    align-items: stretch;
+    align-content: center;
+    border-bottom: 1px solid var(--gray-border-color);
+}
+
+.subject > i {
+    cursor: pointer;
+    padding: 0.3em;
+}
+
+.subject > * {
+    display: flex;
+    align-items: center;
+}
+
+.subject > i:hover {
+    color: white;
+    background-color: rgb(179, 24, 24);
+}
+
+.subject > .subject-name {
+    flex: 1;
+}
+
+.subject > .subject-key {
+    font-weight: bold;
+    margin: 0 1em;
+}
+
+.picker {
+    display: flex;
+}
+
+.picker > select {
+    flex: 1;
+    border: none;
+}
+
+.picker > i {
+    padding: 0.5em;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2em;
+}

@@ -163,8 +163,11 @@ let menuContainer;
 let menuActive = false;
 
 const putMenuOnDOM = async () => {
-    document.body.innerHTML += menuView(await getMenu());
-
+    //document.body.innerHTML += menuView(await getMenu());
+    const template = document.createElement('template');
+    template.innerHTML =  menuView(await getMenu());
+    Array.from(template.content.children).forEach(n=>document.body.appendChild(n as Node));
+    
     toggleMenuButton = document.getElementById('toggleMenuButton');
     menuContainer = document.getElementById('menuContainer');
 

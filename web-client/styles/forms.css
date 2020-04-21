@@ -42,3 +42,6 @@ input[type="submit"], input[type="button"], button {
     width: var(--button-width-percentage);
     padding: 1em !important;
 }
+
+/*CSS de los formularios*/
+

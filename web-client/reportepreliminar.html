@@ -19,115 +19,7 @@
                 btnDel.onclick=eliminaHorario;
             } 
         </script>
-    <style>
-        #etiquetas
-        {
-            display: flex;
-            flex-direction: row;
-        }
-
-        #contBotones
-        {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-        }
-
-        textarea
-        {
-            resize:none;
-        }
-
-        .form-input {
-                display: flex;
-                padding: 1em;
-                align-items: center;
-            }
-
-            .form-input > * {
-                flex: 3;
-            }
-
-            .form-input > label {
-                flex: 1;
-            }
-
-            .subject-picker {
-                border: 1px solid var(--gray-border-color);
-                width: 60%;
-                margin: 1em auto;
-            }
-
-            .subject {
-                display: flex;
-                align-items: stretch;
-                align-content: center;
-                border-bottom: 1px solid var(--gray-border-color);
-            }
-
-            .subject > i {
-                cursor: pointer;
-                padding: 0.3em;
-            }
-
-            .subject > * {
-                display: flex;
-                align-items: center;
-            }
-
-            .subject > i:hover {
-                color: white;
-                background-color: rgb(179, 24, 24);
-            }
-
-            .subject > .subject-name {
-                flex: 1;
-            }
-
-            .subject > .subject-key {
-                font-weight: bold;
-                margin: 0 1em;
-            }
-            
-            .picker {
-                display: flex;
-            }
-
-            .picker > select {
-                flex: 1;
-                border: none;
-            }
-
-            .picker > i {
-                padding: 0.5em;
-            }
-
-            .button-container {
-                display: flex;
-                justify-content: center;
-                margin-top: 2em;
-            }
-
-            .button-add-del
-            {
-                display: flex;
-                justify-content: center;
-                width: 6em;
-                margin: 1em;
-                /*margin-top: 2em;*/
-            }
-            
-            .footer-iframe {
-                overflow-y: visible;
-            }
-
-            #padre
-            {
-                display: flex;
-                flex-direction: column;
-            }
-
-    </style>
+    <link rel="stylesheet" href="styles/repreliminar.css">
 </head>
 <body>
     <!-- <button id="fixedbutton"><img src="assets/images/menu.png" onclick="openNav()"></button>
@@ -335,7 +227,7 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
-    <!-- <script src="scripts/sidebar.js"></script> -->
+    
     <script>
         let contadorHorarios = 0;
 
@@ -570,6 +462,6 @@
             emailAE.value = 'fulanito.dt@piedrasnegras.tecnm.mx';
         };
     </script>
-    <script src="scripts/menu.js"></script>
+    <!--<script src="scripts/menu.js"></script>-->
 </body>
 </html>
