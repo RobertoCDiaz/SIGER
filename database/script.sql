@@ -826,7 +826,9 @@ CREATE PROCEDURE `SP_MostrarAprobado`(
 v_email VARCHAR(64)
 )
 BEGIN
-	select "1" as output, "Transaction commited successfully" AS message, aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha from residencias where residencias.email_residente=v_email;
+	select "1" as output, "Transaction commited successfully" AS message, aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha
+    from residencias join residentes on residencias.email_residente=residentes.email
+    where residencias.email_residente=v_email;
 END;;
 
 DROP PROCEDURE IF EXISTS SP_MostrarAsesor;;
