@@ -558,6 +558,39 @@ CREATE FUNCTION residenciaAprobada(
 	
 END;;
 
+
+/*
+	Regresa un valor numérico dependiendo del estado
+	actual del docente con email [v_email].
+
+	Cada valor corresponde a un estado distinto:
+
+		0: Sin confirmar.
+			- Cerrar sesión.
+
+		1: Confirmado.
+			- Lista de residentes asesorados.
+            Para cada residente habrá opción de:
+				- Documentos.
+                - Progreso.
+                - Chat.
+                
+			- Cerrar sesión.
+*/
+
+DROP FUNCTION IF EXISTS estadoDocente;;
+CREATE FUNCTION estadoDocente(
+	v_email VARCHAR(64)
+) RETURNS INT DETERMINISTIC BEGIN
+	SET @estado = 0;
+
+	IF docenteConfirmado(v_email) = 1 THEN BEGIN
+		SET @estado := 1;
+	END; END IF;
+
+	RETURN @estado;	
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------
@@ -826,7 +859,9 @@ CREATE PROCEDURE `SP_MostrarAprobado`(
 v_email VARCHAR(64)
 )
 BEGIN
-	select "1" as output, "Transaction commited successfully" AS message, aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha from residencias where residencias.email_residente=v_email;
+	select "1" as output, "Transaction commited successfully" AS message, aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha
+    from residencias join residentes on residencias.email_residente=residentes.email
+    where residencias.email_residente=v_email;
 END;;
 
 DROP PROCEDURE IF EXISTS SP_MostrarAsesor;;

@@ -79,9 +79,9 @@ INSERT INTO materias VALUES ('dwd-1403', 'Diseño e Implementación de Sitios We
 
 -- CON CLAVE DUPLICADA. TODO: Hay que ver cuál es la materia correcta, y cambiar la equivocada a mano.
 INSERT INTO materias VALUES ('scd-1027', 'Topicos Avanzados de Programación');
-INSERT INTO materias VALUES ('scd-1027', 'Sistemas Operativos');
+INSERT INTO materias VALUES ('aec-1061', 'Sistemas Operativos');
 
-INSERT INTO materias VALUES ('acc-0906', 'Taller de Administración');
+INSERT INTO materias VALUES ('sch-1024', 'Taller de Administración');
 INSERT INTO materias VALUES ('acc-0906', 'Fundamentos de Investigación');
 
 /* --------------------------------------------------------
@@ -140,7 +140,7 @@ INSERT INTO materias VALUES ('scc-1023', 'Sistemas Programables');
 INSERT INTO materias VALUES ('tef-1403', 'Inteligencia de Negocios (Especialidad)');
 
 -- CON CLAVE DUPLICADA. TODO: Hay que ver cuál es la materia correcta, y cambiar la equivocada a mano.
-INSERT INTO materias VALUES ('acc-0906', 'Taller de Administración');
+INSERT INTO materias VALUES ('sch-1024', 'Taller de Administración');
 INSERT INTO materias VALUES ('acc-0906', 'Fundamentos de Investigación');
 
 /* --------------------------------------------------------
@@ -409,11 +409,11 @@ INSERT INTO materias VALUES ('gec-0930', 'Sist. de la Inf. de la Mercadotecnia')
 INSERT INTO materias VALUES ('aeb-1045', 'Mercadotecnia Electrónica');
 
 -- CON CLAVE DUPLICADA. TODO: Hay que ver cuál es la materia correcta, y cambiar la equivocada a mano.
-INSERT INTO materias VALUES ('gec-0906', 'Desarrollo Humano ');
-INSERT INTO materias VALUES ('gec-0906', 'Fundamentos de Física');
+INSERT INTO materias VALUES ('gec-0905', 'Desarrollo Humano ');
+INSERT INTO materias VALUES ('gec-0909', 'Fundamentos de Física');
 
-INSERT INTO materias VALUES ('gec-0916', 'Gestión de la Producción I');
-INSERT INTO materias VALUES ('gec-0916', 'Gestión de la Producción II');
+INSERT INTO materias VALUES ('gec-0911', 'Gestión de la Producción I');
+INSERT INTO materias VALUES ('gec-0912', 'Gestión de la Producción II');
 
 /* --------------------------------------------------------
 
@@ -471,7 +471,7 @@ INSERT INTO materias VALUES ('tic-1029', 'Tecnologias Inalambricas');
 INSERT INTO materias VALUES ('dwd-1403', 'Diseño e Implementación de Sitios Web (Especialidad)');
 
 -- CON CLAVE DUPLICADA. TODO: Hay que ver cuál es la materia correcta, y cambiar la equivocada a mano.
-INSERT INTO materias VALUES ('tic-1023', 'Negocios Electronicos I');
+INSERT INTO materias VALUES ('tic-1022', 'Negocios Electronicos I');
 INSERT INTO materias VALUES ('tic-1023', 'Negocios Electronicos II');
 
 /* --------------------------------------------------------
@@ -530,7 +530,7 @@ INSERT INTO materias VALUES ('tic-1029', 'Tecnologias Inalambricas');
 INSERT INTO materias VALUES ('tef-1403', 'Inteligencia de Negocios (Especialidad)');
 
 -- CON CLAVE DUPLICADA. TODO: Hay que ver cuál es la materia correcta, y cambiar la equivocada a mano.
-INSERT INTO materias VALUES ('tic-1023', 'Negocios Electronicos I');
+INSERT INTO materias VALUES ('tic-1022', 'Negocios Electronicos I');
 INSERT INTO materias VALUES ('tic-1023', 'Negocios Electronicos II');
 
 /* --------------------------------------------------------
