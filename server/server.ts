@@ -1072,7 +1072,7 @@ server.get('/getMenu', (req, res) => {
 server.get('/buscarMateria', (req, res) => {
     const query = req.query.q;
     if (!query) {
-        res.send(Response.notEnoughParams());
+        res.send(Response.userError("Ingrese un criterio de búsqueda"));
         return;
     }
 

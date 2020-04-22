@@ -23,54 +23,102 @@
             }
 
             .subject-picker {
+                display: flex;
+                flex-direction: row;
                 border: 1px solid var(--gray-border-color);
-                width: 60%;
-                margin: 1em auto;
+                overflow: hidden;
+                border-radius: 4px;
+                margin: 2em 5%;
+                background-color: rgb(226, 226, 226);
+                min-height: 20em;
+                max-height: 20em;
             }
 
-            .subject {
+            .subject-picker > div {
                 display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                flex: 1;
+            }
+
+            .subject-picker > .picker-container {
+                border-left: 1px solid var(--gray-border-color);
+            }
+
+            .picker-container > .searchWidget {
+                display: flex;
+                flex-direction: row;
                 align-items: stretch;
                 align-content: center;
+            }
+
+            .picker-container > .searchWidget > input {
+                flex: 1;
+                }
+            .picker-container > .searchWidget > i {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                padding: .25em;
+                cursor: pointer;
+                background-color: var(--azul-tec);
+                color: white;
+            }
+
+            .picker-container > .resultsContainer {
+                flex: 1;
+                overflow-y: scroll;
+            }
+
+            .picker-container > .resultsContainer > .subject {
+                background-color: white;
+                display: flex;
+                flex-direction: column;
+                padding: .5em 1em;
+                cursor: pointer;
                 border-bottom: 1px solid var(--gray-border-color);
             }
 
-            .subject > i {
-                cursor: pointer;
-                padding: 0.3em;
+            .picker-container > .resultsContainer > .subject:hover { 
+                background-color: var(--azul-tec-light);
             }
 
-            .subject > * {
+            .picker-container > .resultsContainer > .subject:hover > p {
+                color: white;
+            }
+
+            .subject-container > p {
+                background-color: white;
+                padding: .5em;
+                border-bottom: 1px solid var(--gray-border-color);
+                }
+
+            .subject-container > #subjectContainer  {
+                overflow-y: scroll;
+                flex: 1;
+            }
+
+            .subject-container > #subjectContainer > .subject {
+                background-color: white;
+                padding: .5em;
+                margin: .5em;
                 display: flex;
+                flex-direction: row;
                 align-items: center;
             }
 
-            .subject > i:hover {
-                color: white;
-                background-color: rgb(179, 24, 24);
-            }
-
-            .subject > .subject-name {
+            .subject-container > #subjectContainer > .subject > .name {
                 flex: 1;
             }
 
-            .subject > .subject-key {
-                font-weight: bold;
-                margin: 0 1em;
-            }
-            
-            .picker {
-                display: flex;
+            .subject-container > #subjectContainer > .subject > i {
+                cursor: pointer;
             }
 
-            .picker > select {
-                flex: 1;
-                border: none;
+            .subject-container > #subjectContainer > .subject > i:hover {
+                color: red;
             }
 
-            .picker > i {
-                padding: 0.5em;
-            }
 
             .button-container {
                 display: flex;
@@ -160,23 +208,25 @@
                 <p>De las siguiente lista de materias, seleccione aquellas en las cuales usted se siente hábil como para ayudar a los residentes</p>
 
                 <div class="subject-picker">
-                    <div class="container">
-                        <!-- TODO: Eliminar materias de prueba. Remplazar por material reales de manera dinámica. -->
-                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas</span> <span class="subject-key">(SCD-1010)</span></div>
-                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas</span> <span class="subject-key">(SCD-1010)</span></div>
-                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas</span> <span class="subject-key">(SCD-1010)</span></div>
-                        <div class="subject"><i class="material-icons">clear</i><span class="subject-name">Matemáticas Discretas Matemáticas Discretas Matemáticas Discretas</span><span class="subject-key">(SCD-1010)</span></div>
+                    <div class="subject-container">
+                        <p>Soy competente en...</p>
+                        <div id="subjectContainer">
+                            <!-- <div class="subject"><i class="material-icons">close</i><p class="name">Matemáticas Discretas</p><p class="id">SCD-1010</p></div>
+                            <div class="subject"><i class="material-icons">close</i><p class="name">Lenguajes y Autómatas II</p><p class="id">SCD-1011</p></div>
+                            <div class="subject"><i class="material-icons">close</i><p class="name">Cálculo Vectorial</p><p class="id">SCD-1012</p></div>
+                            <div class="subject"><i class="material-icons">close</i><p class="name">Taller de Bases de Datos</p><p class="id">SCD-1013</p></div> -->
+                        </div>
                     </div>
-                    <div class="picker">
-                        <!-- TODO: Llenar usando contenido de la base de datos. -->
-                        <select name="subjectPicker" id="subjectPicker">
-                            <option value="0">Seleccione una materia en la cuál es competente...</option>
-                            <option value="1">Matemáticas Discretas</option>
-                            <option value="2">Lenguajes y Autómatas I</option>
-                            <option value="3">Cálculo Vectorial</option>
-                            <option value="4">Estructuras de Datos</option>
-                        </select>
-                        <i class="material-icons primary-button">add</i>
+                    <div class="picker-container">
+                        <div class="searchWidget">
+                            <input id="searchInput" type="text">
+                            <i id="searchButton" class="material-icons">search</i>
+                        </div>
+                        <div id="searchResultsContainer" class="resultsContainer">
+                            <p style="margin: .5em;">Ingrese un criterio de búsqueda</p>
+                            <!-- <div class="subject"><p class="name">Matemáticas Discretas</p><p class="id">SCD-1010</p></div>
+                            <div class="subject"><p class="name">Lenguajes y Autómatas II</p><p class="id">SCD-1011</p></div> -->
+                        </div>
                     </div>
                 </div>
 
@@ -234,5 +284,7 @@
             <p>Instituto Tecnológico de Piedras Negras</p>
             <p>Ingeniería en Sistemas Computacionales</p>
         </footer>
+
+        <script src="scripts/registro-docentes.js"></script>
     </body>
 </html>
