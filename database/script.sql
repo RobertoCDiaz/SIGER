@@ -1015,6 +1015,24 @@ CREATE PROCEDURE SP_AsignarDocentesAProyecto(
 	END; END IF;	
 END;;
 
+
+/**
+	Regresa una lista de materias cuya nombre o clave
+	se asemeje al criterio [v_query].
+*/
+DROP PROCEDURE IF EXISTS SP_BuscarMateria;;
+CREATE PROCEDURE SP_BuscarMateria(
+	v_query VARCHAR(256)
+) BEGIN
+	SELECT 
+		*
+	FROM
+		materias as m
+	WHERE
+		m.clave LIKE CONCAT('%', v_query, '%') OR
+		m.nombre LIKE CONCAT('%', v_query, '%');
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------

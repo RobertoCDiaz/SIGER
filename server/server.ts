@@ -919,6 +919,14 @@ server.get('/buscarDocente', (req, res) => {
     );
 });
 
+
+/**
+ * Asigna al proyecto con id [resId] los docentes de la siguiente
+ * manera:
+ *      Docente con id [ai] -> Asesor Interno.
+ *      Docente con id [r1] -> Revisor 1.
+ *      Docente con id [r2] -> Revisor 2.
+ */
 server.post('/asignar-docentes', (req, res) => {
     if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
         res.send(Response.authError());
@@ -957,6 +965,38 @@ server.post('/asignar-docentes', (req, res) => {
     )
 });
 
+
+/**
+ * Dependiendo del tipo de usuario, regresa un menú
+ * personalizado indicando las acciones que puede
+ * realizar dentro del sistema. 
+ * 
+ * Un menú, para funcionar y mostrarse de manera
+ * correcta en el sistema, deberá seguir la siguiente estructura:
+ * 
+ * {
+ *      "main": {
+ *          "opción1": {            Nombre de la opción. Este será el que se visualice.
+ *              "href": ...,        Direccionamiento acorde a la opción, p.e: "/docs"
+ *              "icon": ...         Ícono de la opción, de https://material.io/icons
+ *          },
+ *          "opción2": {...},
+ *          ...
+ *      },
+ *      "secondary": {
+ *          "opción3": {...},
+ *          "opción4": {...},
+ *          ...
+ *      }
+ * }
+ * 
+ * Donde [main] son las opciones "principales" que aparecerán en la
+ * parte superior de la barra lateral. Las opciones de [secondary]
+ * aparecerá en la parte inferior.
+ * Para el menú principal en /home, la organización en [main] y 
+ * [secondary] serán irrelevantes y aparecerán todas juntas, una después
+ * de otra.
+ */
 server.get('/getMenu', (req, res) => {
     if (!req.session.loggedin) {
         res.send(Response.authError());
@@ -978,6 +1018,32 @@ server.get('/getMenu', (req, res) => {
             break;
         };
     }
+});
+
+
+/**
+ * Regresa al cliente una lista de materias que cumplan
+ * con el criterio [q].
+ */
+server.get('/buscarMateria', (req, res) => {
+    const query = req.query.q;
+    if (!query) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_BuscarMateria(?);`,
+        query,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
 });
 
 
