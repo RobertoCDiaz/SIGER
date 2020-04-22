@@ -29,9 +29,9 @@ Pares:
     1. ISC. Desarrollo Web y Aplicaciones Móviles.
 
 -------------------------------------------------------- */
-INSERT INTO materias VALUES ('acf-0901', 'Calculo Diferencial');
-INSERT INTO materias VALUES ('acf-0902', 'Calculo Integral');
-INSERT INTO materias VALUES ('acf-0904', 'Calculo Vectorial');
+INSERT INTO materias VALUES ('acf-0901', 'Cálculo Diferencial');
+INSERT INTO materias VALUES ('acf-0902', 'Cálculo Integral');
+INSERT INTO materias VALUES ('acf-0904', 'Cálculo Vectorial');
 INSERT INTO materias VALUES ('acf-0905', 'Ecuaciones Diferenciales');
 INSERT INTO materias VALUES ('scd-1008', 'Fundamentos de Programacion');
 INSERT INTO materias VALUES ('scd-1020', 'Programación Orientada a Objetos');
@@ -44,7 +44,7 @@ INSERT INTO materias VALUES ('aef-1041', 'Matemáticas Discretas');
 INSERT INTO materias VALUES ('aec-1058', 'Química');
 INSERT INTO materias VALUES ('scc-1013', 'Investigación de Operaciones');
 INSERT INTO materias VALUES ('aef-1031', 'Fundamentos de Bases de Datos');
-INSERT INTO materias VALUES ('acf-0903', 'Algebra Lineal');
+INSERT INTO materias VALUES ('acf-0903', 'Álgebra Lineal');
 INSERT INTO materias VALUES ('sca-1026', 'Taller de Sistemas Operativos');
 INSERT INTO materias VALUES ('aef-1052', 'Probabilidad y Estadística');
 INSERT INTO materias VALUES ('scf-1006', 'Física General');
@@ -79,7 +79,7 @@ INSERT INTO materias VALUES ('dwd-1403', 'Diseño e Implementación de Sitios We
 
 -- CON CLAVE DUPLICADA. TODO: Hay que ver cuál es la materia correcta, y cambiar la equivocada a mano.
 INSERT INTO materias VALUES ('scd-1027', 'Topicos Avanzados de Programación');
-INSERT INTO materias VALUES ('aec-1061', 'Sistemas Operativos');
+INSERT INTO materias VALUES ('aec-1061', 'Sistemas Operativos I');
 
 INSERT INTO materias VALUES ('sch-1024', 'Taller de Administración');
 INSERT INTO materias VALUES ('acc-0906', 'Fundamentos de Investigación');
@@ -89,9 +89,9 @@ INSERT INTO materias VALUES ('acc-0906', 'Fundamentos de Investigación');
     2. ISC. Teconologías Emergentes.
 
 -------------------------------------------------------- */
-INSERT INTO materias VALUES ('acf-0901', 'Calculo Diferencial');
-INSERT INTO materias VALUES ('acf-0902', 'Calculo Integral');
-INSERT INTO materias VALUES ('acf-0904', 'Calculo Vectorial');
+INSERT INTO materias VALUES ('acf-0901', 'Cálculo Diferencial');
+INSERT INTO materias VALUES ('acf-0902', 'Cálculo Integral');
+INSERT INTO materias VALUES ('acf-0904', 'Cálculo Vectorial');
 INSERT INTO materias VALUES ('acf-0905', 'Ecuaciones Diferenciales');
 INSERT INTO materias VALUES ('scd-1008', 'Fundamentos de Programacion');
 INSERT INTO materias VALUES ('scd-1020', 'Programación Orientada a Objetos');
@@ -105,8 +105,8 @@ INSERT INTO materias VALUES ('aef-1041', 'Matemáticas Discretas');
 INSERT INTO materias VALUES ('aec-1058', 'Química');
 INSERT INTO materias VALUES ('scc-1013', 'Investigación de Operaciones');
 INSERT INTO materias VALUES ('aef-1031', 'Fundamentos de Bases de Datos');
-INSERT INTO materias VALUES ('acf-0903', 'Algebra Lineal');
-INSERT INTO materias VALUES ('aec-1061', 'Sistemas Operativos');
+INSERT INTO materias VALUES ('acf-0903', 'Álgebra Lineal');
+INSERT INTO materias VALUES ('aec-1061', 'Sistemas Operativos I');
 INSERT INTO materias VALUES ('sca-1026', 'Taller de Sistemas Operativos');
 INSERT INTO materias VALUES ('aef-1052', 'Probabilidad y Estadística');
 INSERT INTO materias VALUES ('scf-1006', 'Física General');
@@ -158,7 +158,7 @@ INSERT INTO materias VALUES ('aef-1020', 'Electromagnetismo');
 INSERT INTO materias VALUES ('etf-1004', 'Circuitos Eléctricos I');
 INSERT INTO materias VALUES ('aec-1058', 'Química');
 INSERT INTO materias VALUES ('acd-0908', 'Desarrollo Sustentable');
-INSERT INTO materias VALUES ('acf-0903', 'Algebra Lineal');
+INSERT INTO materias VALUES ('acf-0903', 'Álgebra Lineal');
 INSERT INTO materias VALUES ('etp-1020', 'Marco Legal de la Empresa');
 INSERT INTO materias VALUES ('aca-0907', 'Taller de Ética');
 INSERT INTO materias VALUES ('etd-1021', 'Mediciones Eléctricas');
@@ -318,7 +318,7 @@ INSERT INTO materias VALUES ('aec-1047', 'Metrología y Normalización');
 INSERT INTO materias VALUES ('inc-1023', 'Procesos de Fabricación');
 INSERT INTO materias VALUES ('aca-0907', 'Taller de Ética');
 INSERT INTO materias VALUES ('inc-1024', 'Propiedad de los Materiales');
-INSERT INTO materias VALUES ('acf-0903', 'Algebra Lineal');
+INSERT INTO materias VALUES ('acf-0903', 'Álgebra Lineal');
 INSERT INTO materias VALUES ('inc-1013', 'Física');
 INSERT INTO materias VALUES ('acf-0901', 'Cálculo Diferencial');
 INSERT INTO materias VALUES ('acf-0902', 'Cálculo Integral');
@@ -420,8 +420,8 @@ INSERT INTO materias VALUES ('gec-0912', 'Gestión de la Producción II');
     4. ITICs. Desarrollo Web y Aplicaciones Móviles.
 
 -------------------------------------------------------- */
-INSERT INTO materias VALUES ('acf-0901', 'Calculo Diferencial');
-INSERT INTO materias VALUES ('acf-0902', 'Calculo Integral');
+INSERT INTO materias VALUES ('acf-0901', 'Cálculo Diferencial');
+INSERT INTO materias VALUES ('acf-0902', 'Cálculo Integral');
 INSERT INTO materias VALUES ('tie-1018', 'Matematicas Aplicadas a la Comunicacion');
 INSERT INTO materias VALUES ('tid-1004', 'Analisis de Señal y Sistemas de Comunicacion');
 INSERT INTO materias VALUES ('scd-1008', 'Fundamentos de Programacion');
@@ -432,16 +432,16 @@ INSERT INTO materias VALUES ('tif-1019', 'Matematicas Discretas I');
 INSERT INTO materias VALUES ('tif-1020', 'Matematicas Discretas II');
 INSERT INTO materias VALUES ('tic-1002', 'Administracion Gerencial');
 INSERT INTO materias VALUES ('tif-1021', 'Matematicas Para Toma de Deciciones');
-INSERT INTO materias VALUES ('tip-1017', 'Introduccion a las TICs');
-INSERT INTO materias VALUES ('aef-1052', 'Probabilidad y estadistica');
+INSERT INTO materias VALUES ('tip-1017', 'Introducción a las TICs');
+INSERT INTO materias VALUES ('aef-1052', 'Probabilidad y Estadística');
 INSERT INTO materias VALUES ('aef-1031', 'Fundamentos de Bases de Datos');
 INSERT INTO materias VALUES ('aeh-1063', 'Taller de bases de Datos');
 INSERT INTO materias VALUES ('aca-0907', 'Taller de Ética');
 INSERT INTO materias VALUES ('tif-1009', 'Contabilidad y Costos');
-INSERT INTO materias VALUES ('tic-1011', 'Electricidad y magnetismo');
+INSERT INTO materias VALUES ('tic-1011', 'Electricidad y Magnetismo');
 INSERT INTO materias VALUES ('tid-1008', 'Circuitos Electricos y Electronicos');
 INSERT INTO materias VALUES ('acc-0906', 'Fundamentos de Investigación');
-INSERT INTO materias VALUES ('acf-0903', 'Algebra Lineal');
+INSERT INTO materias VALUES ('acf-0903', 'Álgebra Lineal');
 INSERT INTO materias VALUES ('tic-1014', 'Ingenieria de Software');
 INSERT INTO materias VALUES ('tif-1013', 'Fundamentos de Redes');
 INSERT INTO materias VALUES ('tif-1026', 'Redes de computadora');
@@ -458,8 +458,8 @@ INSERT INTO materias VALUES ('acd-0908', 'Desarrollo Sustentable');
 INSERT INTO materias VALUES ('tih-1016', 'Interaccion Humano Computadora');
 INSERT INTO materias VALUES ('dwd-1405', 'Diseño para Aplicaciones Móviles (Especialidad)');
 INSERT INTO materias VALUES ('tif-1007', 'Base de Datos Distribuidas');
-INSERT INTO materias VALUES ('aca-0909', 'Taller de Investigacion I');
-INSERT INTO materias VALUES ('aca-0910', 'Taller de Investigacion II');
+INSERT INTO materias VALUES ('aca-0909', 'Taller de Investigación I');
+INSERT INTO materias VALUES ('aca-0910', 'Taller de Investigación II');
 INSERT INTO materias VALUES ('dwb-1401', 'Programación Web II (Especialidad)');
 INSERT INTO materias VALUES ('tic-1015', 'Ingenieria del Conocimiento');
 INSERT INTO materias VALUES ('tic-1005', 'Arquitectura de computadoras');
@@ -479,8 +479,8 @@ INSERT INTO materias VALUES ('tic-1023', 'Negocios Electronicos II');
     5. ITICs. Tecnologías Emergentes.
 
 -------------------------------------------------------- */
-INSERT INTO materias VALUES ('acf-0901', 'Calculo Diferencial');
-INSERT INTO materias VALUES ('acf-0902', 'Calculo Integral');
+INSERT INTO materias VALUES ('acf-0901', 'Cálculo Diferencial');
+INSERT INTO materias VALUES ('acf-0902', 'Cálculo Integral');
 INSERT INTO materias VALUES ('tie-1018', 'Matematicas Aplicadas a la Comunicacion');
 INSERT INTO materias VALUES ('tid-1004', 'Analisis de Señal y Sistemas de Comunicacion');
 INSERT INTO materias VALUES ('scd-1008', 'Fundamentos de Programacion');
@@ -491,16 +491,16 @@ INSERT INTO materias VALUES ('tif-1019', 'Matematicas Discretas I');
 INSERT INTO materias VALUES ('tif-1020', 'Matematicas Discretas II');
 INSERT INTO materias VALUES ('tic-1002', 'Administracion Gerencial');
 INSERT INTO materias VALUES ('tif-1021', 'Matematicas Para Toma de Deciciones');
-INSERT INTO materias VALUES ('tip-1017', 'Introduccion a las TICS');
-INSERT INTO materias VALUES ('aef-1052', 'Probabilidad y estadistica');
+INSERT INTO materias VALUES ('tip-1017', 'Introducción a las TICs');
+INSERT INTO materias VALUES ('aef-1052', 'Probabilidad y Estadística');
 INSERT INTO materias VALUES ('aef-1031', 'Fundamentos de Bases de Datos');
 INSERT INTO materias VALUES ('aeh-1063', 'Taller de bases de Datos');
 INSERT INTO materias VALUES ('aca-0907', 'Taller de Ética');
 INSERT INTO materias VALUES ('tif-1009', 'Contabilidad y Costos');
-INSERT INTO materias VALUES ('tic-1011', 'Electricidad y magnetismo');
+INSERT INTO materias VALUES ('tic-1011', 'Electricidad y Magnetismo');
 INSERT INTO materias VALUES ('tid-1008', 'Circuitos Electricos y Electronicos');
 INSERT INTO materias VALUES ('acc-0906', 'Fundamentos de Investigación');
-INSERT INTO materias VALUES ('acf-0903', 'Algebra Lineal');
+INSERT INTO materias VALUES ('acf-0903', 'Álgebra Lineal');
 INSERT INTO materias VALUES ('tic-1014', 'Ingenieria de Software');
 INSERT INTO materias VALUES ('tif-1013', 'Fundamentos de Redes');
 INSERT INTO materias VALUES ('tif-1026', 'Redes de computadora');
@@ -517,8 +517,8 @@ INSERT INTO materias VALUES ('acd-0908', 'Desarrollo Sustentable');
 INSERT INTO materias VALUES ('tih-1016', 'Interaccion Humano Computadora');
 INSERT INTO materias VALUES ('ted-1405', 'Planes y Respuestas a Contingencias (Especialidad)');
 INSERT INTO materias VALUES ('tif-1007', 'Base de Datos Distribuidas');
-INSERT INTO materias VALUES ('aca-0909', 'Taller de Investigacion I');
-INSERT INTO materias VALUES ('aca-0910', 'Taller de Investigacion II');
+INSERT INTO materias VALUES ('aca-0909', 'Taller de Investigación I');
+INSERT INTO materias VALUES ('aca-0910', 'Taller de Investigación II');
 INSERT INTO materias VALUES ('teb-1401', 'Programación Web II (Especialidad)');
 INSERT INTO materias VALUES ('tic-1015', 'Ingenieria del Conocimiento');
 INSERT INTO materias VALUES ('tic-1005', 'Arquitectura de computadoras');
