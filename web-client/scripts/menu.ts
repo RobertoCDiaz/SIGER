@@ -1,30 +1,7 @@
-// const menu = {
-//     'main': {
-//         'Inicio': {
-//             'href': '/home',
-//             'icon': 'home'
-//         },
-//         'Validar residentes': {
-//             'href': '/validar-residentes',
-//             'icon': 'how_to_reg'
-//         },
-//         'Panel de residencias': {
-//             'href': '/panel-residencias',
-//             'icon': 'assignment'
-//         },
-//     },
-//     'secondary': {
-//         'Cerrar sesión': {
-//             'href': '/logout',
-//             'icon': 'exit_to_app'
-//         }
-//     }
-// }
-
 const getMenu: () => Promise<Object> = 
     () => new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
-        xhr.open('get', '/getMenu', false);
+        xhr.open('get', '/getMenu', true);
         
         xhr.onload = () => {
             let response= JSON.parse(xhr.response);
@@ -163,7 +140,10 @@ let menuContainer;
 let menuActive = false;
 
 const putMenuOnDOM = async () => {
-    document.body.innerHTML += menuView(await getMenu());
+    // document.body.innerHTML += menuView(await getMenu());
+    const template = document.createElement('template');
+    template.innerHTML = menuView(await getMenu());
+    Array.from(template.content.children).forEach(n => document.body.appendChild(n as Node));
 
     toggleMenuButton = document.getElementById('toggleMenuButton');
     menuContainer = document.getElementById('menuContainer');
