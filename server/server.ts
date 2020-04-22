@@ -212,7 +212,7 @@ server.post('/auth', (req,res) =>{
 
     if (!email || !pass || !userClass) { 
         res.send(Response.notEnoughParams());
-        return
+        return;
     }
 
     switch (parseInt(userClass)) {
@@ -283,6 +283,43 @@ server.post('/auth', (req,res) =>{
             });  
             break;  
         }
+
+        case USER_CLASSES.DOCENTE:
+        {
+            con.query('select * from docentes where email = ?',[email],
+            (e,results,fi)=>
+            {
+                if (e) {
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+                    
+                if (results.length == 0) {
+                    res.send(Response.userError("El correo electrónico ingresado no está registrado."));
+                    return;
+                }
+            
+                if (pass != decrypt(results[0]['contrasena'])) {
+                    res.send(Response.userError("La contraseña no es correcta, verifique."));
+                    return;
+                }
+
+                req.session.user = {
+                    class: USER_CLASSES.DOCENTE,
+                    info: {
+                        email: results[0]['email'],
+                        nombre: results[0]['nombre'],
+                        apellido_paterno: results[0]['apellido_paterno'],
+                        apellido_materno: results[0]['apellido_materno']
+                    }
+                };
+                    
+                req.session.loggedin = true;
+
+                res.send(Response.success());
+            });
+            break;
+        }
     }
 
 });
@@ -299,7 +336,7 @@ server.get('/home',(req,res)=> {
             return
         }
 
-        res.sendFile("registro-docentes.html", { root: "../web-client/" });
+        res.sendFile("menu-docentes.html", { root: "../web-client/" });
         return;
     }
     res.redirect('/login');    
@@ -957,6 +994,16 @@ server.post('/asignar-docentes', (req, res) => {
     )
 });
 
+server.get('/mis-residentes',(req,res)=>
+{
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.DOCENTE) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('residentesasesorados.html', { root: '../web-client/' });
+
+});
+
 server.get('/getMenu', (req, res) => {
     if (!req.session.loggedin) {
         res.send(Response.authError());
@@ -966,6 +1013,15 @@ server.get('/getMenu', (req, res) => {
     switch (req.session.user.class) {
         case USER_CLASSES.ADMIN: {
             res.send(Response.success(getAdminMenu()));
+            break;
+        };
+
+        case USER_CLASSES.DOCENTE: {
+            getTeacherMenu(
+                req.session.user.info.email,
+                (teacherMenu) =>
+                    res.send(Response.success(teacherMenu))
+            )
             break;
         };
 
@@ -1002,6 +1058,7 @@ server.get('/encrypt', (req, res) => {
 
     res.send(encrypt(text));
 });
+
 
 // Toma como parámetro un string [txt], y regresa un string conteniendo el parámetro ya encriptado usando la clave secreta de [Keys.ts].
 const encrypt = (txt: string) => 
@@ -1134,6 +1191,72 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
             }
         );
     };
+
+    const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => void) => Object =
+    async (email, onDone) => {
+        con.query(
+            `select estadoDocente(?) as estado;`,
+            email,
+            (e, rows, f) => {
+                let menu: Object = {
+                    'main': {
+                        'Inicio': {
+                            'href': '/home',
+                            'icon': 'home'
+                        }
+                    },
+                    'secondary': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
+                        }
+                    }
+                };
+
+                const state: number = Number(rows[0]['estado']);
+
+                switch (state) {
+                    case 0: menu = {
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    }; break;
+
+                    case 1: menu = {
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            },
+                            'Lista de residentes': {
+                                'href': '/mis-residentes',
+                                'icon': 'menu_open'
+                            }
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    }; break;
+
+                }
+                
+                onDone(menu);
+            }
+        );
+    };
+
 
 /**
  * Consigue de manera asíncrona el estado actual de un residente

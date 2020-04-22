@@ -133,9 +133,12 @@
                 let userClass;
                 if (new RegExp('L[0-9]{8}@piedrasnegras.tecnm.mx').test(emailView.value.trim())) {
                     userClass = 1;
-                } else /*if (new RegExp('[A-z]+.[A-z]+@piedrasnegras.tecnm.mx').test(emailView.value.trim())) */{
-                    // TODO: Autenticación para docentes.
+                }
+                else if ((new RegExp('roberto.ds@piedrasnegras.tecnm.mx').test(emailView.value.trim()))||(new RegExp('daniel.hs@piedrasnegras.tecnm.mx').test(emailView.value.trim()))){
                     userClass = 2;
+                }
+                else if (new RegExp('[A-z]+.[A-z]{2}@piedrasnegras.tecnm.mx').test(emailView.value.trim())){
+                    userClass = 3;
                 }
 
 

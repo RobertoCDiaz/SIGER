@@ -537,6 +537,8 @@ CREATE FUNCTION estadoResidente(
 END;;
 
 
+
+
 /*
 	Esta función comprueba si una residencia ha sido
 	aprobada, es decir, que ya tenga docentes asignados
@@ -556,6 +558,61 @@ CREATE FUNCTION residenciaAprobada(
 
 	RETURN 0;
 	
+END;;
+
+/**/
+/*
+	Regresa el valor que indica si el docente con email
+	[v_email] está confirmado.
+
+	0 -> No lo está.
+	1 -> Está confirmado.
+*/
+
+DROP FUNCTION IF EXISTS docenteConfirmado;;
+CREATE FUNCTION docenteConfirmado(
+	v_email VARCHAR(64)
+) RETURNS TINYINT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT
+			confirmado
+		FROM 
+			docentes AS r
+		WHERE 
+			r.email = v_email
+	);
+END;;
+
+/*
+	Regresa un valor numérico dependiendo del estado
+	actual del docente con email [v_email].
+
+	Cada valor corresponde a un estado distinto:
+
+		0: Sin confirmar.
+			- Cerrar sesión.
+
+		1: Confirmado.
+			- Lista de residentes asesorados.
+            Para cada residente habrá opción de:
+				- Documentos.
+                - Progreso.
+                - Chat.
+                
+			- Cerrar sesión.
+*/
+
+DROP FUNCTION IF EXISTS estadoDocente;;
+CREATE FUNCTION estadoDocente(
+	v_email VARCHAR(64)
+) RETURNS INT DETERMINISTIC BEGIN
+	SET @estado = 0;
+
+	IF docenteConfirmado(v_email) = 1 THEN BEGIN
+		SET @estado := 1;
+	END; END IF;
+
+	RETURN @estado;	
 END;;
 
 DELIMITER ;

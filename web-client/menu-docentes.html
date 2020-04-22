@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Docente :: SIGER</title>
+        <link rel="stylesheet" href="styles/global.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="styles/menus.css">
+        <style>
+            .content {
+                background-color: black;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                background-image: url(../assets/images/teachers-background.jpg);
+                background-size: cover;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="bar">
+                <!-- <h1>SIGER</h1> -->
+                <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                <h1 style="margin-left: .5em;">SIGER</h1>
+            </a>
+            </div>
+        </header>
+        <div class="content">
+            <div class="black-overlay">
+                <div class="main-container">
+                    <div class="title">Bienvenido, <span id="welcomeMessage" ></span></div>
+                    <div id="optionsContainer" class="options-container">
+                        <!-- <a href="/nuevo-proyecto">
+                            <div class="menu-item">
+                                <i class="material-icons">note_add</i>
+                                <p>Nuevo proyecto</p>
+                            </div>
+                        </a>
+                        <a href="/avance-proyecto">
+                            <div class="menu-item">
+                                <i class="material-icons">flag</i>
+                                <p>Progreso actual</p>
+                            </div>
+                        </a>
+                        <a href="/docs">
+                            <div class="menu-item">
+                                <i class="material-icons">description</i>
+                                <p>Documentos</p>
+                            </div>
+                        </a>
+                        <a href="#">
+                            <div class="menu-item">
+                                <i class="material-icons">chat</i>
+                                <p>Chat</p>
+                            </div>
+                        </a>
+                        <a href="/logout">
+                            <div class="menu-item">
+                                <i class="material-icons">exit_to_app</i>
+                                <p>Cerrar sesión</p>
+                            </div>
+                        </a> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            const populateWelcomeMessage = () => {
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/user-info', true);
+                
+                xhr.onload = () => {
+                    let res = JSON.parse(xhr.response)['object'];
+                    document.getElementById('welcomeMessage').innerHTML = `${res['nombre']}`;
+                };
+                
+                xhr.send();
+            }
+            populateWelcomeMessage();
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            const optionView = (name, object) => `
+                <a href="${object['href']}">
+                    <div class="menu-item">
+                        <i class="material-icons">${object['icon']}</i>
+                        <p>${name}</p>
+                    </div>
+                </a>
+            `;
+            const getMenu = () => {
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/getMenu', false);
+                
+                xhr.onload = () => {
+                    const response = JSON.parse(xhr.response);
+
+                    if (response.code <= 0) {
+                        alert(response.message);
+                        location.reload();
+                        return;
+                    }
+
+                    const o = response.object;
+
+                    Object.keys(o['main']).forEach(key => {
+                        if (key == 'Inicio') return;
+                        optionsContainer.innerHTML += optionView(key, o['main'][key]);
+                    });
+                    Object.keys(o['secondary']).forEach(key => {
+                        optionsContainer.innerHTML += optionView(key, o['secondary'][key]);
+                    });
+
+                };
+                
+                xhr.send();
+            }
+            getMenu();
+        </script>
+    </body>
+</html>
