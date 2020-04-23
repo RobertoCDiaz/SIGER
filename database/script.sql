@@ -1089,9 +1089,6 @@ END;;
 	Inserta información en las tablas necesarias para el
 	registro de un nuevo docente.
 */
-
-DELIMITER ;;
-
 DROP PROCEDURE IF EXISTS SP_RegistrarDocente;;
 CREATE PROCEDURE SP_RegistrarDocente(
 	v_email VARCHAR(64),
@@ -1130,7 +1127,6 @@ CREATE PROCEDURE SP_RegistrarDocente(
 		END; END IF;
 	COMMIT;
 END;;
-DELIMITER ;
 
 
 /*
@@ -1138,7 +1134,6 @@ DELIMITER ;
 */
 DROP PROCEDURE IF EXISTS SP_ConfirmarDocente;;
 CREATE PROCEDURE SP_ConfirmarDocente(
-	v_email VARCHAR(64),
 	v_url VARCHAR(256)
 ) BEGIN
 	DECLARE exit handler for SQLEXCEPTION
@@ -1152,14 +1147,19 @@ CREATE PROCEDURE SP_ConfirmarDocente(
 	END;
 
 	START TRANSACTION;
-		IF docenteConfirmado(v_email) = 1 THEN BEGIN
-			SELECT "0" AS output, "Este docente ya está confirmado" AS message;
+		SET @email = (SELECT docentes_email FROM confirmaciones_docentes WHERE id = v_url);
+
+		IF v_url NOT IN (SELECT id FROM confirmaciones_docentes) THEN BEGIN
+			SELECT "0" AS output, "Esta no es una dirección de confirmación válida" AS message;
+		END; ELSEIF docenteConfirmado(@email) = 1 THEN BEGIN
+			SELECT "0" AS output, "Ya ha confirmado su cuenta" AS message;
 		END; ELSE BEGIN
-			UPDATE docentes SET confirmado = 1 WHERE email = v_email;
+			UPDATE docentes SET confirmado = 1 WHERE email = @email;
 			UPDATE confirmaciones_docentes SET confirmado = 1 WHERE id = v_url;
 
-			SELECT "1" AS output, @p2 AS message;
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
 		END; END IF;
+
 	COMMIT;
 END;;
 
@@ -1227,18 +1227,22 @@ call SP_ValidarResidente('L17430005@piedrasnegras.tecnm.mx', 'daniel.hs@piedrasn
 -- ---------------------------------------------
 -- Las contraseñas de estos docentes fueron encriptadas usando la clave secreta [H5n7jMcgSA^&Rz%ZxyFE@&E#zSteW$jx].
 -- Por defecto, solo los primeros 4 docentes serán confirmados.
-INSERT INTO docentes
-VALUES 
-	('marti.pd@piedrasnegras.tecnm.mx', '4551b7f81bb877c27da5cd4109bce58c4ae8cd51656473b191558340c23c400b99f1928ccf6e69549ec00a80f11d300b218dd2da314182fc2f7ecab7b854fd4ca041e60877725c4013613b2665bbe7aa', 'Marti', 'Peralta', 'Durán', 1),
-	('rafael.am@piedrasnegras.tecnm.mx', '5c3d248a3bca0aa3d11f656ae1f7bc2e478ae0a101e7fb66f6270292834be634b33fe2d9c8b0f9723a7036b7086579f432577afd17a0f03cf70c340cedd38e06aced19b89f306ea62115ba01e28474a2', 'Rafael', 'Alcaide', 'Mallén', 1),
-	('sandra.fs@piedrasnegras.tecnm.mx', 'afdc6e60a07d7821e3ab51555bc805cc1d45453ba4d0a5141217dcb6a78342bdb62b4d256db8ef6549b9ee915720b1ddceb0f229dffac62e84f1cd0253945dc64ac2a1cc3ba543a0166ac698e6b313ff', 'Sandra', 'Fidalgo', 'Sabaté', 1),
-	('adriana.sb@piedrasnegras.tecnm.mx', '8ec5e9bb7aea1f86f50723ba625dd326e69f1b07deaef71f936fac5b1d0f33ee8cfdd2b83e2d2e7fb7b23f3a265a71bfe765d832574a9691e83dd77e494401ec0807bd532d0efd1a7642725468c9b512', 'Adriana', 'Sevilla', 'Bolívar', 1),
-	('izan.mm@piedrasnegras.tecnm.mx', '12f3d773c7b5a99b82ef470a27c2c9995bafc695968d9783488e304a87b7710582eb7eb9ba383bf43ee45309a5481a765dce26536881b7f24fec94f9ba6a237faac087879700ecc0a4ab828a5dd43eb0', 'Izan', 'Martín', 'Malillos', default),
-	('alonso.sm@piedrasnegras.tecnm.mx', '73c94b2912b5915146ba1e5258451d4262a3f05617a63ae94c05f4695cb78ab7290a37451f9597791b0a2e568deca927593a20ac30619256d5b84320694d4631cdc4a832a6614f0372ff98920c84fe25', 'Alonso', 'Sánchez', 'Montemayor', default),
-	('rosa.gc@piedrasnegras.tecnm.mx', 'cd406867e7428e7aeace45793637aef06c590e1b980061587caa03590b8d20d5240625e9aaaddb4003db49cffd338f88b8aa7ed3a06a9830fa938561215931a7ca774b20bc7abb5a462e3d7ea118b82f', 'Rosa', 'Gallego', 'Colina', default),
-	('maria.gm@piedrasnegras.tecnm.mx', 'ac30e7658f0dfb0c66235730cf31a7976101ce88aa55ffa4350878d33df36c5c8df45d7bc37fbca71fe02bfdf0c593023e80020316079fe51061abcbecc712df22117263e3e2f25e6820e9b07d235a17', 'Maria José', 'Gutiérrez', 'Malillos', default),
-	('rafael.cc@piedrasnegras.tecnm.mx', 'afb8baa57eeed18dfe253d4ad257e8e26f00645032d0b40e53365bff42077839cdc3793a64455e429018bd1e1d1e38a053407764e8890664cbfa1748d598d03d797b9c3fa0cc4a9f3f404021f48e0338', 'Rafael', 'Contador', 'Cueva', default),
-	('celia.pd@piedrasnegras.tecnm.mx', 'a0d4c93f29656492dbd4cbeca385fbaa1e0915f3c47d5cc8dd23bead85754427b33c670c061df4d080d1fb4386db4c9fc41435fbc5475189caa54f05e8988b720be20ac2a118778d55db6f3fced60b2e', 'Celia', 'Pastor', 'Domínguez', default);
+
+CALL SP_RegistrarDocente('marti.pd@piedrasnegras.tecnm.mx', '4551b7f81bb877c27da5cd4109bce58c4ae8cd51656473b191558340c23c400b99f1928ccf6e69549ec00a80f11d300b218dd2da314182fc2f7ecab7b854fd4ca041e60877725c4013613b2665bbe7aa', 'Marti', 'Peralta', 'Durán', '8781111111', '8c61d46312dd46385c5f7080e6bb416e3d9b51c9405a7801615223f80bd5933c53908a9f988806f92cc4067782479c92c5fedb90c99a59735d354cc19956c9e1b48e7a355b776b19166a10c14efd67ba');
+CALL SP_ConfirmarDocente('8c61d46312dd46385c5f7080e6bb416e3d9b51c9405a7801615223f80bd5933c53908a9f988806f92cc4067782479c92c5fedb90c99a59735d354cc19956c9e1b48e7a355b776b19166a10c14efd67ba');
+CALL SP_RegistrarDocente('rafael.am@piedrasnegras.tecnm.mx', '5c3d248a3bca0aa3d11f656ae1f7bc2e478ae0a101e7fb66f6270292834be634b33fe2d9c8b0f9723a7036b7086579f432577afd17a0f03cf70c340cedd38e06aced19b89f306ea62115ba01e28474a2', 'Rafael', 'Alcaide', 'Mallén', '8782222222', 'd656f1c3c1780e811ee05594cc9469fbf4d9b60ff718c5f2dca6162f4ef83b12d5ec2375200843f15767ca21d82920108ca97bed3299483daf65df6dc29ce25deba80718ab2e842707f8a41319e7c143');
+CALL SP_ConfirmarDocente('d656f1c3c1780e811ee05594cc9469fbf4d9b60ff718c5f2dca6162f4ef83b12d5ec2375200843f15767ca21d82920108ca97bed3299483daf65df6dc29ce25deba80718ab2e842707f8a41319e7c143');
+CALL SP_RegistrarDocente('sandra.fs@piedrasnegras.tecnm.mx', 'afdc6e60a07d7821e3ab51555bc805cc1d45453ba4d0a5141217dcb6a78342bdb62b4d256db8ef6549b9ee915720b1ddceb0f229dffac62e84f1cd0253945dc64ac2a1cc3ba543a0166ac698e6b313ff', 'Sandra', 'Fidalgo', 'Sabaté', '8783333333', '96d7333de2b8f773102e06cd5bed53a83a8b25090512d4d9ba6a676122f6bbce9ff8801f059d9a6297a3afecf5e0cfb4df9febe9f9d660af0e977513ace8ece4c73ba08f4dbe3d42f34559642e7a148e');
+CALL SP_ConfirmarDocente('96d7333de2b8f773102e06cd5bed53a83a8b25090512d4d9ba6a676122f6bbce9ff8801f059d9a6297a3afecf5e0cfb4df9febe9f9d660af0e977513ace8ece4c73ba08f4dbe3d42f34559642e7a148e');
+CALL SP_RegistrarDocente('adriana.sb@piedrasnegras.tecnm.mx', '8ec5e9bb7aea1f86f50723ba625dd326e69f1b07deaef71f936fac5b1d0f33ee8cfdd2b83e2d2e7fb7b23f3a265a71bfe765d832574a9691e83dd77e494401ec0807bd532d0efd1a7642725468c9b512', 'Adriana', 'Sevilla', 'Bolívar', '8784444444', '1d7e7b4674107a43440455dfd043f507ebfef1d3d2d2a76c5cc2195e4a1efd36ac13f4166f21c7b58688b55568f5d145a20df0ef5031ae392b7ec756599b821621efd258e38d6275f24564b20377f929');
+CALL SP_ConfirmarDocente('1d7e7b4674107a43440455dfd043f507ebfef1d3d2d2a76c5cc2195e4a1efd36ac13f4166f21c7b58688b55568f5d145a20df0ef5031ae392b7ec756599b821621efd258e38d6275f24564b20377f929');
+CALL SP_RegistrarDocente('izan.mm@piedrasnegras.tecnm.mx', '12f3d773c7b5a99b82ef470a27c2c9995bafc695968d9783488e304a87b7710582eb7eb9ba383bf43ee45309a5481a765dce26536881b7f24fec94f9ba6a237faac087879700ecc0a4ab828a5dd43eb0', 'Izan', 'Martín', 'Malillos', '8785555555 ', '12d705ba659e85d42431a18ea3f9f91bc528cdc8a6317f61a1e9171d5921715b30dcbf87e38a320b518f413debe8fc04bd13ff44dd40432907296c958f21c11d7f7b700d61ef6f4d92b11b15cf6dbc65');
+CALL SP_ConfirmarDocente('12d705ba659e85d42431a18ea3f9f91bc528cdc8a6317f61a1e9171d5921715b30dcbf87e38a320b518f413debe8fc04bd13ff44dd40432907296c958f21c11d7f7b700d61ef6f4d92b11b15cf6dbc65');
+CALL SP_RegistrarDocente('alonso.sm@piedrasnegras.tecnm.mx', '73c94b2912b5915146ba1e5258451d4262a3f05617a63ae94c05f4695cb78ab7290a37451f9597791b0a2e568deca927593a20ac30619256d5b84320694d4631cdc4a832a6614f0372ff98920c84fe25', 'Alonso', 'Sánchez', 'Montemayor', '8786666666', '325a8a4770d780f73d40f04bddb42003007fa2bd605832bddb5860782f77ea327b5afe23be1745f7a10b6ec8e863af1113d3f8aa4669a0dc3cc71825b521e7ec4973d1ec0ed35776cac8000150fd7940');
+CALL SP_RegistrarDocente('rosa.gc@piedrasnegras.tecnm.mx', 'cd406867e7428e7aeace45793637aef06c590e1b980061587caa03590b8d20d5240625e9aaaddb4003db49cffd338f88b8aa7ed3a06a9830fa938561215931a7ca774b20bc7abb5a462e3d7ea118b82f', 'Rosa', 'Gallego', 'Colina', '8787777777', '5629987dc40b58f7334850d1788b13665d0bea8ecd489697a30ebf221891da15b3a395a192eb0520b872636e017e9f5218aa4407fdafb7d364a9dc1e980f7d0cf08b153264297aeb4555c1ea7e4e7bde');
+CALL SP_RegistrarDocente('maria.gm@piedrasnegras.tecnm.mx', 'ac30e7658f0dfb0c66235730cf31a7976101ce88aa55ffa4350878d33df36c5c8df45d7bc37fbca71fe02bfdf0c593023e80020316079fe51061abcbecc712df22117263e3e2f25e6820e9b07d235a17', 'Maria José', 'Gutiérrez', 'Malillos', '8788888888', 'acde321dcf98ce192877beed7b2f30753e9f98073d2ec379fbd885ee96f1bea23314d69929fb352d235955bf39c7f91856cb9ccc65a1c8dd06a919f1b7591d67a9dda24c17344a663d8e337e9f17f9c2');
+CALL SP_RegistrarDocente('rafael.cc@piedrasnegras.tecnm.mx', 'afb8baa57eeed18dfe253d4ad257e8e26f00645032d0b40e53365bff42077839cdc3793a64455e429018bd1e1d1e38a053407764e8890664cbfa1748d598d03d797b9c3fa0cc4a9f3f404021f48e0338', 'Rafael', 'Contador', 'Cueva', '8780000000', '58c9b3fc6ef05bb20fb08e2895dc308b4b783ca41a3557ff881d54c13c390c967406d992f496dd8c471b7ef161fa84d2c17c5fffb96af4e1ada2047cecbf0036c957774127672d148e838aa5c576e308');
+CALL SP_RegistrarDocente('celia.pd@piedrasnegras.tecnm.mx', 'a0d4c93f29656492dbd4cbeca385fbaa1e0915f3c47d5cc8dd23bead85754427b33c670c061df4d080d1fb4386db4c9fc41435fbc5475189caa54f05e8988b720be20ac2a118778d55db6f3fced60b2e', 'Celia', 'Pastor', 'Domínguez', '8789999999', '1eb3cf32577c04293c1975b56d2548b1ff38b1298f20329a617942f4e12c86ddced23328206093d56179961d79533699207cc066fd1680839b287ddc0a8341909d2795f3ae62cfefe5e2a92877274c9d');
 
 -- ---------------------------------------------
 -- residencias
