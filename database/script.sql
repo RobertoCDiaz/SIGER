@@ -151,7 +151,6 @@ DROP TABLE IF EXISTS `siger`.`telefonos_docentes` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`telefonos_docentes` (
 	`telefono` CHAR(10) NOT NULL,
-	`fijo` TINYINT NOT NULL DEFAULT 0,
 	`email_docente` VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`telefono`),
 	INDEX `fk_telefonos_docentes_docentes1_idx` (`email_docente` ASC), -- VISIBLE,
@@ -176,7 +175,6 @@ CREATE TABLE IF NOT EXISTS `siger`.`residencias` (
 	`periodo` TINYINT NOT NULL DEFAULT 0,
 	`ano` CHAR(4) NOT NULL,
 	`descripcion_actividades` VARCHAR(1024) NOT NULL,
-	-- `aprobado` TINYINT NOT NULL DEFAULT 0,
 	`fecha_elaboracion` VARCHAR(14) NOT NULL,
 	`email_residente` VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`idresidencia`),
@@ -325,6 +323,25 @@ CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
 		REFERENCES `siger`.`residencias` (`idresidencia`)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `siger`.`confirmaciones_docentes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`confirmaciones_docentes` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`confirmaciones_docentes` (
+  `id` VARCHAR(256) NOT NULL,
+  `fecha_registro` VARCHAR(14) NOT NULL,
+  `confirmado` TINYINT NOT NULL DEFAULT 0,
+  `docentes_email` VARCHAR(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_confirmaciones_docentes_docentes1_idx` (`docentes_email` ASC) -- VISIBLE,
+  CONSTRAINT `fk_confirmaciones_docentes_docentes1`
+    FOREIGN KEY (`docentes_email`)
+    REFERENCES `siger`.`docentes` (`email`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
