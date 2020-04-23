@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`docentes` (
 	`contrasena` VARCHAR(160) NOT NULL,
 	`nombre` VARCHAR(48) NOT NULL,
 	`apellido_paterno` VARCHAR(48) NOT NULL,
-	`apellido_materno` VARCHAR(48) NOT NULL,
+	`apellido_materno` VARCHAR(48) NULL,
 	`confirmado` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`email`))
 ENGINE = InnoDB;
@@ -336,7 +336,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`confirmaciones_docentes` (
   `confirmado` TINYINT NOT NULL DEFAULT 0,
   `docentes_email` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_confirmaciones_docentes_docentes1_idx` (`docentes_email` ASC) -- VISIBLE,
+  INDEX `fk_confirmaciones_docentes_docentes1_idx` (`docentes_email` ASC), -- VISIBLE,
   CONSTRAINT `fk_confirmaciones_docentes_docentes1`
     FOREIGN KEY (`docentes_email`)
     REFERENCES `siger`.`docentes` (`email`)
@@ -483,14 +483,14 @@ DROP FUNCTION IF EXISTS docenteConfirmado;;
 CREATE FUNCTION docenteConfirmado(
 	v_email_docente VARCHAR(64)
 ) RETURNS TINYINT DETERMINISTIC BEGIN
-	RETURN (
-		SELECT
-			confirmado
-		FROM 
-			docentes AS d
-		WHERE 
-			d.email = v_email_docente
-	);
+	IF 
+		(SELECT confirmado FROM docentes AS d WHERE d.email = v_email_docente) = 1 AND 
+		(SELECT confirmado FROM confirmaciones_docentes AS cd WHERE cd.docentes_email = v_email_docente)
+	THEN BEGIN
+		RETURN 1;
+	END; ELSE BEGIN
+		RETURN 0;
+	END; END IF;
 END;;
 
 
@@ -1083,6 +1083,84 @@ CREATE PROCEDURE SP_BuscarMateria(
 	WHERE
 		m.clave LIKE CONCAT('%', v_query, '%') OR
 		m.nombre LIKE CONCAT('%', v_query, '%');
+END;;
+
+/*
+	Inserta información en las tablas necesarias para el
+	registro de un nuevo docente.
+*/
+
+DELIMITER ;;
+
+DROP PROCEDURE IF EXISTS SP_RegistrarDocente;;
+CREATE PROCEDURE SP_RegistrarDocente(
+	v_email VARCHAR(64),
+	v_pass VARCHAR(160),
+	v_nombre VARCHAR(48),
+	v_apellido_paterno VARCHAR(48),
+	v_apellido_materno VARCHAR(48),
+	v_telefono CHAR(10),
+	v_url VARCHAR(256)	-- ID única generada para la confirmación del registro.
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+
+	START TRANSACTION;
+		IF v_email IN (SELECT d.email FROM docentes AS d WHERE d.confirmado = 1) THEN BEGIN
+			SELECT "0" AS output, "Este email ya está registrado como docente" AS message;
+		END; ELSE BEGIN
+			IF v_email IN (SELECT d.email FROM docentes AS d WHERE d.confirmado = 0) THEN BEGIN
+				DELETE FROM docentes WHERE email = v_email;
+			END; END IF;
+
+			INSERT INTO docentes VALUES (v_email, v_pass, v_nombre, v_apellido_paterno,v_apellido_materno, default);
+
+			INSERT INTO confirmaciones_docentes VALUES (v_url, UNIX_TIMESTAMP() * 1000, default, v_email);
+
+			INSERT INTO telefonos_docentes VALUES (v_telefono, v_email);
+
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+		END; END IF;
+	COMMIT;
+END;;
+DELIMITER ;
+
+
+/*
+	Confirmar el registro de un docente.
+*/
+DROP PROCEDURE IF EXISTS SP_ConfirmarDocente;;
+CREATE PROCEDURE SP_ConfirmarDocente(
+	v_email VARCHAR(64),
+	v_url VARCHAR(256)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+
+	START TRANSACTION;
+		IF docenteConfirmado(v_email) = 1 THEN BEGIN
+			SELECT "0" AS output, "Este docente ya está confirmado" AS message;
+		END; ELSE BEGIN
+			UPDATE docentes SET confirmado = 1 WHERE email = v_email;
+			UPDATE confirmaciones_docentes SET confirmado = 1 WHERE id = v_url;
+
+			SELECT "1" AS output, @p2 AS message;
+		END; END IF;
+	COMMIT;
 END;;
 
 DELIMITER ;
