@@ -472,6 +472,7 @@ server.post('/registro-residencia',(req,res)=>
                     res.send(Response.success());
                 },
                 (error, numeroHorario) => { // onError
+                    con.query('delete from residencias where idresidencias = ?;', idres);
                     res.send(Response.unknownError(error.toString()));
                 }
             );
@@ -1218,6 +1219,10 @@ const asociarDocenteConMateria = (
 }
 
 
+/**
+ * Dirección enviada a los correos electrónicos para confirmación de docentes.
+ * Confirma el registro de un docente que tiene el id de confirmación [id].
+ */
 server.get('/confirmarDocente', (req, res) => {
     const id: string = req.query.id;
 
