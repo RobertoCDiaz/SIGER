@@ -126,6 +126,9 @@
                 margin-top: 2em;
             }
             
+            form > p {
+                margin: .5em 0;
+            }
         </style>
     </head>
     <body>
@@ -147,7 +150,7 @@
                     Información requerida para la identificación del docente
                 </p>
                 <div class="form-input">
-                    <label for="emailView">Correo electrónico</label>
+                    <label for="emailView">* Correo electrónico</label>
                     <input
                         type="text"
                         placeholder="fulanito.dt@itpiedrasnegras.tecnm.mx"
@@ -157,7 +160,7 @@
                     />
                 </div>
                 <div class="form-input">
-                    <label for="passView">Contraseña</label>
+                    <label for="passView">* Contraseña</label>
                     <input
                         type="password"
                         placeholder="********"
@@ -167,7 +170,7 @@
                     />
                 </div>
                 <div class="form-input">
-                    <label for="repeatPassView">Vuelva a introducir su contraseña</label>
+                    <label for="repeatPassView">* Vuelva a introducir su contraseña</label>
                     <input
                         type="password"
                         placeholder="********"
@@ -180,11 +183,11 @@
                 <h3>Configuración del perfil</h3>
                 <p>Información del docente</p>
                 <div class="form-input">
-                    <label for="nameView">Nombre(s)</label>
+                    <label for="nameView">* Nombre(s)</label>
                     <input type="text" name="nameView" id="nameView" />
                 </div>
                 <div class="form-input">
-                    <label for="patSurnameView">Apellido Paterno</label>
+                    <label for="patSurnameView">* Apellido Paterno</label>
                     <input
                         type="text"
                         name="patSurnameView"
@@ -200,12 +203,13 @@
                     />
                 </div>
                 <div class="form-input">
-                    <label for="phoneNumberView">Número de teléfono</label>
+                    <label for="phoneNumberView">* Número de teléfono</label>
                     <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" name="phoneNumberView" id="phoneNumberView">
                 </div>
                 <hr>
                 <h3>Competencia en materias</h3>
-                <p>De las siguiente lista de materias, seleccione aquellas en las cuales usted se siente hábil como para ayudar a los residentes</p>
+                <p>Usando el buscador de la derecha, seleccione las materias en las que usted tiene la capacidad de ofrecer asesorías a los alumnos del Instituto Tecnológico de Piedras Negras. Podrá buscar ya sea el nombre de una materia, o la clave asociada a la asignatura. Los resultados de la búsqueda se ordenarán de manera alfabética en base al nombre.</p>
+                <p>Para agregar una materia, simplemente presione el resultado deseado de la búsqueda. Si comete un error, siempre puede remover una materia haciendo click en el botón con la X.</p>
 
                 <div class="subject-picker">
                     <div class="subject-container">
@@ -231,7 +235,8 @@
                 </div>
 
                 <div class="button-container">
-                    <input class="primary-button" type="submit" value="TERMINAR" />
+                    <!-- <input class="primary-button" type="submit" value="TERMINAR" /> -->
+                    <button id="finishButton" class="primary-button" type="button">TERMINAR</button>
                 </div>
             </form>
         </div>

@@ -34,7 +34,7 @@ export class Mailer {
 		});
 	}
 
-	async sendEmail(mailOptions: Mail, onDone: (error, info) => void) {
+	async sendEmail(mailOptions: Mail, onDone: (error, info) => void = () => {}) {
 		await this.transporter.sendMail({
 			from: mailOptions.from,
 			to: mailOptions.to,

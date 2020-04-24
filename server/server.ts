@@ -1,5 +1,6 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
+import { Mailer, Mail } from "./Mailer";
 
 const express   = require("express");
 const session   = require("express-session");
@@ -9,6 +10,7 @@ const AES       = require("aes.js-wrapper");
 
 const server = express();
 const port: number = 8080;
+const website: string = `http://localhost:${port}`;
 
 /* ================================================================================================
 
@@ -477,6 +479,42 @@ server.post('/registro-residencia',(req,res)=>
     );
 });
 
+/**
+ * Función recursiva que asocia un conjunto de horarios a una residencia.
+ * 
+ * @param idResidencia ID de la residencia a la cual asociar horarios.
+ * @param entradas Arreglo de horas de entrada. La correspondencia entre horas de entrada - salida será "entradas[i] - salidas[i]".
+ * @param salidas Arreglo de horas de salida. La correspondencia entre horas de entrada - salida será "entradas[i] - salidas[i]".
+ * @param horarios Número de horarios a restantes por insertar. Al llamarse por primera vez, deberá ser [entradas.length] o [salidas.length], de ahí, en cada llamada recursiva irá disminuyendo en 1.
+ * @param onDone Qué hacer cuando todo termine y haya sido exitoso.
+ * @param onError Qué hacer si ocurre un error en alguna inserción, siendo [error] el mensaje de error, y [númeroHorario] el número del índice de horario en el cual ocurrió el error.
+ */
+const registrarHorarios = (
+    idResidencia: number, entradas: string[], salidas: string[], 
+    horarios: number, onDone: () => void, onError: (error, numeroHorario) => void
+) => {
+    con.query(
+        `call SP_RegistraHorarios(?,?,?);`,
+        [entradas[horarios - 1], salidas[horarios - 1], idResidencia],
+        (err, rows, f) => {
+            
+            if (err) {
+                onError(err, horarios - 1);
+                return;
+            }
+            if (rows[0][0]['output'] != 1) {
+                onError(`SQL Error: ${rows[0][0]['message']}`, horarios - 1);
+                return;
+            }
+
+            if (horarios - 1 > 0)
+                registrarHorarios(idResidencia, entradas, salidas, horarios - 1, onDone, onError);
+            else 
+                onDone();
+        }
+    );
+}
+
 
 /**
  * Regresa al cliente una lista de residencias que aún no han sido confirmadas
@@ -511,31 +549,6 @@ server.get('/listaResidenciasSinDocentes', (req, res) => {
     );
 });
 
-const registrarHorarios = (
-    idResidencia: number, entradas: string[], salidas: string[], 
-    horarios: number, onDone: () => void, onError: (error, numeroHorario) => void
-) => {
-    con.query(
-        `call SP_RegistraHorarios(?,?,?);`,
-        [entradas[horarios - 1], salidas[horarios - 1], idResidencia],
-        (err, rows, f) => {
-            
-            if (err) {
-                onError(err, horarios - 1);
-                return;
-            }
-            if (rows[0][0]['output'] != 1) {
-                onError(`SQL Error: ${rows[0][0]['message']}`, horarios - 1);
-                return;
-            }
-
-            if (horarios - 1 > 0)
-                registrarHorarios(idResidencia, entradas, salidas, horarios - 1, onDone, onError);
-            else 
-                onDone();
-        }
-    );
-}
 
 server.get('/avance-proyecto', (req, res) => {
     if (!req.session.loggedin) {
@@ -1090,6 +1103,146 @@ server.get('/buscarMateria', (req, res) => {
     );
 });
 
+server.post('/registrarDocente', (req, res) => {
+    if (req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const email: string = req.body.email;
+    const pass: string = req.body.pass;
+    const nombre: string = req.body.nombre;
+    const apPat: string = req.body.apPat;
+    const apMat: string = req.body.apMat;
+    const tel: string = req.body.tel;
+    const claves: Array<string> = JSON.parse(req.body.clavesArr) ?? [];
+
+    if (!email || !pass || !nombre || !apPat || !tel) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    const encryptedPass = encrypt(pass);
+    const randomUrl = encrypt(new Date().getTime().toString());
+
+    con.query(
+        `call SP_RegistrarDocente(?, ?, ?, ?, ?, ?, ?);`,
+        [email, encryptedPass, nombre, apPat, apMat ?? "null", tel, randomUrl],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] == -1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0][0]['output'] == 0) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            if (claves.length > 0) {
+                asociarDocenteConMateria(
+                    email, 
+                    claves, 
+                    claves.length,
+                    () => {
+                        console.log(`El proceso de asociación de materias ha terminado para [${email}]`);
+                    },
+                    (error, clave) => {
+                        console.log(`(${clave}): ${error}`);
+                    }
+                );
+            }
+            
+            sendEmail(
+                email, 
+                'Registro como docente', 
+                `
+                <p>Usted ha recibido este correo porque su dirección de correo electrónico ha sido registrada como docente en el Sistema Gestor de Residencias (SIGER) del Instituto Tecnológico de Piedras Negras.</p>
+
+                <p>Actualmente la cuenta se encuentra inactiva. Podrá iniciar sesión y acceder al sitio web, pero no será capaz de realizar ninguna operación relevante. Para activar su cuenta de usuario, presione siguiente botón.</p>
+
+                <a href="${website}/confirmarDocente?id=${randomUrl}">ACTIVAR CUENTA DE USUARIO</a>
+
+                <p><i>Si usted no se ha registrado en el SIGER, ignore este correo.</i></p>
+                `,
+                (error, info) => {
+                    if (error) {
+                        res.send(Response.unknownError(`Ha ocurrido un error, el registro se revertirá. Error: ${error}`));
+                        con.query('delete from docentes where email = ?;', email);
+                        return;
+                    }
+                    res.send(Response.success(info, "El registro ha sido un éxito. Busque en su correo electrónico un email de confirmación y siga las instrucciones ahí descritas."));
+                }
+            );            
+        }
+    )
+});
+
+
+/**
+ * Procedimiento recursivo que define a un docente como competente en un conjunto de asignaturas.
+ * 
+ * @param email Correo electrónico del docente.
+ * @param claves Arreglo con las claves a asociar.
+ * @param materiasRestantes Número restante de materias a asociar. En la primer llamada de la rutina tiene que ser [claves.length].
+ * @param onDone Qué hacer al terminar de asociar todas las materias.
+ * @param ifError Qué hacer si ocurre un error, siendo [error] el mensaje de error y [clave] la clave de la materia donde ocurrió el error. NOTA: Si ocurre un error, el procedimiento no se detendrá y seguirá asociando el resto de materias.
+ */
+const asociarDocenteConMateria = (
+    email: string, claves: Array<string>, materiasRestantes: number, 
+    onDone: () => void, ifError: (error: string, clave: string) => void
+) => {
+    con.query(
+        `call SP_AsociarDocenteMateria(?, ?);`,
+        [email, claves[materiasRestantes - 1]],
+        (e, rows, f) => {
+            if (e) {
+                ifError(e.toString(), claves[materiasRestantes - 1]);
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                ifError(rows[0][0]['message'], claves[materiasRestantes - 1]);
+            }
+
+            if (materiasRestantes > 1)
+                asociarDocenteConMateria(email, claves, materiasRestantes - 1, onDone, ifError);
+            else 
+                onDone();
+        }
+    );
+}
+
+
+server.get('/confirmarDocente', (req, res) => {
+    const id: string = req.query.id;
+
+    if (!id) {
+        res.redirect('/');
+    }
+
+    con.query(
+        `call SP_ConfirmarDocente(?);`,
+        id,
+        (e, rows, f) => {
+            if (e) {
+                res.redirect('/nuevo-docente');
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.redirect('/');
+                return;
+            }
+
+            res.redirect('/login');
+        }
+    )
+});
 
 /* ================================================================================================
 
@@ -1348,6 +1501,28 @@ const getResidentState: (residentEmail: string) => Promise<number>
             }
         )
     });
+
+
+/**
+ * Envía un email usando la cuenta de correo definida en el archivo [Keys.ts].
+ * Se usará como plantilla para el contenido el archivo HTML [plantilla_correo.html].
+ * 
+ * @param to Correo electrónico del destinatario.
+ * @param subject Asunto del correo.
+ * @param content Contenido del correo electrónico. Puede ser en HTML.
+ * @param onDone Qué hacer cuando el proceso haya terminado. Para más información, consultar la estructura de una función callback en https://nodemailer.com/usage/#sending-mail.
+ */
+const sendEmail: (to: string, subject: string, content: string, onDone?: (error: string, info: string) => void) => void = 
+(to, subject, content, onDone) => {
+    const mailer: Mailer = new Mailer(Keys.GMAIL_EMAIL, Keys.GMAIL_PASSWORD);
+            
+    mailer.sendEmail({
+        "to": to,
+        "from": "SIGER",
+        "subject": subject,
+        "content": content.trim()
+    }, onDone);
+}
 
 /* ================================================================================================
 

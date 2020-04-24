@@ -1070,7 +1070,8 @@ END;;
 
 /**
 	Regresa una lista de materias cuya nombre o clave
-	se asemeje al criterio [v_query].
+	se asemeje al criterio [v_query] ordenadas
+	de manera alfabética con base en el nombre.
 */
 DROP PROCEDURE IF EXISTS SP_BuscarMateria;;
 CREATE PROCEDURE SP_BuscarMateria(
@@ -1082,7 +1083,9 @@ CREATE PROCEDURE SP_BuscarMateria(
 		materias as m
 	WHERE
 		m.clave LIKE CONCAT('%', v_query, '%') OR
-		m.nombre LIKE CONCAT('%', v_query, '%');
+		m.nombre LIKE CONCAT('%', v_query, '%')
+	ORDER BY 
+		m.nombre;
 END;;
 
 /*
@@ -1160,6 +1163,41 @@ CREATE PROCEDURE SP_ConfirmarDocente(
 			SELECT "1" AS output, "Transaction committed successfully" AS message;
 		END; END IF;
 
+	COMMIT;
+END;;
+
+
+/*
+	Define al docente con email [v_email_docente] como competente
+	en la asignatura con clave [v_clave_materia].
+*/
+DROP PROCEDURE IF EXISTS SP_AsociarDocenteMateria;;
+CREATE PROCEDURE SP_AsociarDocenteMateria(
+	v_email_docente VARCHAR(64),
+	v_clave_materia CHAR(8)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+
+	START TRANSACTION;
+		IF (SELECT COUNT(*) FROM competente AS c WHERE c.email_docente = v_email_docente AND c.clave_materia = v_clave_materia) = 1 THEN BEGIN
+
+			SELECT "0" AS output, "Este docente ya es competente en esta materia" AS message;
+
+		END; ELSE BEGIN
+
+			INSERT INTO competente VALUES (v_email_docente, v_clave_materia);
+
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		END; END IF;
 	COMMIT;
 END;;
 

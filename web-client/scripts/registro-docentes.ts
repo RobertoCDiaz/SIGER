@@ -3,6 +3,15 @@ const searchResultsContainer = document.getElementById('searchResultsContainer')
 const searchInputView: HTMLInputElement = document.getElementById('searchInput') as HTMLInputElement;
 const searchButtonView: HTMLElement = document.getElementById('searchButton');
 
+const emailDView: HTMLInputElement = document.getElementById('emailView') as HTMLInputElement;
+const passView: HTMLInputElement = document.getElementById('passView') as HTMLInputElement;
+const repeatPassView: HTMLInputElement = document.getElementById('repeatPassView') as HTMLInputElement;
+const nameDView: HTMLInputElement = document.getElementById('nameView') as HTMLInputElement;
+const patSurnameView: HTMLInputElement = document.getElementById('patSurnameView') as HTMLInputElement;
+const matSurnameView: HTMLInputElement = document.getElementById('matSurnameView') as HTMLInputElement;
+const phoneNumberView: HTMLInputElement = document.getElementById('phoneNumberView') as HTMLInputElement;
+const finishButton = document.getElementById('finishButton');
+
 interface Materia {
     clave: string,
     nombre: string
@@ -52,7 +61,11 @@ const search = () => {
     })
 }
 
-searchInputView.oninput = search;
+// searchInputView.oninput = search;
+searchInputView.onkeypress = e => {
+    if (e.charCode == 13)
+        search();
+}
 searchButtonView.onclick = search;
 
 const addSubject = (clave: string, nombre: string) => {
@@ -95,3 +108,58 @@ const updateSubjectUI = () => {
             subjectContainer.innerHTML += subjectView(s);
         });
 }
+
+/* ================================================================================================
+
+    Registro de docentes.
+
+================================================================================================ */
+const register = () => {
+    if (
+        emailDView.value.trim() == "" ||
+        passView.value == "" ||
+        repeatPassView.value == "" ||
+        nameDView.value.trim() == "" ||
+        patSurnameView.value.trim() == "" ||
+        phoneNumberView.value.trim() == ""
+    ) {
+        alert("Por favor, llene todos los campos marcados con un asterísco");
+        return;
+    }
+
+    if (passView.value != repeatPassView.value) {
+        alert("Las contraseñas no coinciden");
+        return;
+    }
+
+    if (new RegExp(`[A-z]+\.[A-z]{2}@piedrasnegras\.tecnm\.mx`).test(emailDView.value.trim())) {
+        alert('El correo electrónico dado no cumple con la estructura de un correo electrónico institucional de un docente.')
+        return;
+    }
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('post', '/registrarDocente', true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    
+    xhr.onload = () => {
+        const response = JSON.parse(xhr.response);
+
+        alert(response.message);
+
+        if (response.code == 1) {
+            window.open('/home', '_self');
+        }
+    };
+    
+    xhr.send(
+        `email=${encodeURI(emailDView.value.trim())}&` +
+        `pass=${encodeURI(passView.value)}&` +
+        `nombre=${encodeURI(nameDView.value.trim())}&` +
+        `apPat=${encodeURI(patSurnameView.value.trim())}&` +
+        `apMat=${encodeURI(matSurnameView.value.trim())}&` +
+        `tel=${encodeURI(phoneNumberView.value.trim())}&` +
+        `clavesArr=${encodeURI(JSON.stringify(subjects.map(s => s.clave)))}`
+    );
+}
+
+finishButton.onclick = register;
