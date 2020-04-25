@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación :: SIGER</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+
+    .primary-button {
+        color: white;
+        border: 1px solid var(--azul-tec);
+        background-color: var(--azul-tec);
+        padding: 0.5em 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition-duration: var(--animation-duration);
+        box-sizing: content-box;
+    }
+
+        .primary-button:hover {
+            background-color: var(--azul-tec-light);
+            color: white;
+        }
+        @font-face {
+            font-family: "GMX";
+            src: url(../assets/fonts/GMX.otf);
+        }
+
+        @font-face {
+            font-family: "Open Sans";
+            src: url(../assets/fonts/Open_Sans/OpenSans-Regular.ttf);
+        }
+
+        @font-face {
+            font-family: "Montserrat";
+            src: url(../assets/fonts/Montserrat/Montserrat-Regular.ttf);
+        }
+
+        @font-face {
+            font-family: "Montserrat";
+            src: url(../assets/fonts/Montserrat/Montserrat-Bold.ttf);
+            font-weight: bold;
+        }
+
+        @font-face {
+            font-family: "Roboto";
+            src: url(../assets/fonts/Roboto/Roboto-Regular.ttf);
+        }
+
+        :root {
+            /* --azul-tec: #002B7F; */
+            --azul-tec: #1B396A;
+            --azul-tec-light: #184286;
+            --amarillo-tec: #FFED38;
+
+            --page-background: #EAEAEA;
+            --content-background: white;
+            --footer-background: #272727;
+
+            --gray-border-color: #585858;
+            --gray-content-color: #949494;
+
+            --primary-text: #212121;
+            --secondary-text: #616161;
+
+            --animation-duration: 150ms;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Open Sans";
+            color: var(--primary-text);
+        }
+
+        html,
+        body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            background-color: var(--page-background);
+        }
+
+        header > .bar {
+            padding: 1em 3em;
+            background-color: var(--azul-tec);
+        }
+
+        header * {
+            color: white;
+        }
+
+        header h1 {
+            font-family: "GMX";
+        }
+
+        header h2 {
+            margin-top: .5em;
+            font-family: "Montserrat";
+            font-weight: 400;
+        }
+        .header-extension::after {
+            content: "\A";
+            position: absolute;
+            width: 100%;
+            height: 10em;
+            background-color: var(--azul-tec);
+            border-bottom-left-radius: 30%;
+            border-bottom-right-radius: 30%;
+            z-index: -5;
+        }
+
+        header a {
+            font-family: inherit;
+            text-decoration: none;
+        }
+        @media only screen and (min-width: 1441px) {
+            :root {
+                --content-vertical-padding: 20vw;
+                --button-width-percentage: 25%;
+            }
+        }
+
+        @media only screen and (min-width: 1100px) and (max-width: 1440px) {
+            :root {
+                --content-vertical-padding: 15vw;
+                --button-width-percentage: 50%;
+            }
+        }
+
+        @media only screen and (max-width: 1099px) {
+            :root {
+                --content-vertical-padding: 10vw;
+                --button-width-percentage: 75%;
+            }
+        }
+
+        .content {
+            padding: 1em var(--content-vertical-padding) 5em;
+        }
+
+        form {
+            background-color: var(--content-background);
+            padding: 2.5em 2em;
+            box-shadow: 0.5em 0.5em 0.5em rgba(0, 0, 0, 0.25);
+        }
+
+        form > p {
+            color: var(--secondary-text);
+            text-align: justify;
+        }
+
+        hr {
+            margin: 1em 0 3em;
+        }
+
+        input[type="submit"], input[type="button"], button {
+            width: var(--button-width-percentage);
+            padding: 1em !important;
+        }
+
+        footer {
+            padding: 2em;
+            background-color: var(--footer-background);
+        }
+
+        footer * {
+            color: white;
+        }
+
+        footer > p {
+            text-align: center;
+        }
+
+        .page-header {
+            display: grid;
+            flex-direction: row;
+            align-items: center;
+            grid-template-columns: 1fr 3fr 1fr;
+            justify-items: center;
+            margin-bottom: 3em;
+        }
+
+        .page-header > img {
+            height: 100px;
+            -ms-grid-row-align: center;
+        }
+
+        .page-header > .text > *{
+            text-align: center;
+            color: var(--secondary-text) !important;
+        }
+
+        .page-header > .text > .title {
+            margin-top: 2em;
+        }
+
+        .page-content > p {
+            margin-bottom: .5em;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <header class="header-extension">
+        <div class="bar">
+            <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                <h1 style="margin-left: .5em;">SIGER</h1>
+            </a>
+        </div>
+    </header>
+
+    <div >
+        <form id="form">
+            <div class="page-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Logo-TecNM-2017.png" alt="TECNM">
+                <div class="text">
+                    <h1>SISTEMA DE GESTIÓN DE RESIDENCIAS</h1>
+                </div>
+                <img src="https://geracoder.com/img/ITPNLogo.png" alt="ITPN">
+            </div>
+            <div class="page-content">
+                <h2 style="text-align: center;">Bienvenido al <b>SIGER</b></h2>
+                <h4 style="text-align: end;">Fecha: 24/04/2020</h4>
+                <h3 class="section-title">Confirmación</h3>
+                <p>
+                    Este correo electrónico automático ha sido enviado con el fin de informarle que su dirección de correo electronico: <b><i>docente.do@piedrasnegras.tecnm.mx</i></b>
+                    ha sido registrado correctamente en el sistema.
+                </p>
+                <br>
+                <p>
+                    Continuando con el proceso, le hacemos llegar su <b>contraseña provisional</b>:
+                </p>
+                <p style="text-align: center;"><i>Contraseña provisional</i></p>
+                <p>
+                    Sólo usted tiene conocimiento de ésta, pero se le pide de la manera más atenta y por su seguridad, <b>acceda al SIGER y la cambie lo antes posible</b>.
+                </p>
+                <p>
+                    Para terminar con su proceso de registro, por favor ingrese con sus credenciales al <b>SIGER</b>.
+                </p>
+            </div>
+            <div class="button-container" style="display: flex; align-self: center;">
+                <input id="subm" class="primary-button" type="button" value="IR AL SIGER">
+            </div>
+            <br><br><br>
+            <div>
+                <p>
+                    <b>Si usted no se registró en el sistema, no se preocupe, sólo ignore este correo.</b>
+                </p>
+            </div>
+        </form>
+    </div>
+    <footer>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Departamento de Sistemas y Computación</p>
+    </footer>
+</body>
+</html>
