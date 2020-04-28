@@ -1,0 +1,45 @@
+@media only screen and (min-width: 1441px) {
+    :root {
+        --main-vertical-padding: 15vw;
+    }
+}
+
+@media only screen and (min-width: 1100px) and (max-width: 1440px) {
+    :root {
+        --main-vertical-padding: 7.5vw;
+    }
+}
+
+@media only screen and (max-width: 1099px) {
+    :root {
+        --main-vertical-padding: 5vw;
+    }
+}
+
+.content {
+    padding: 0 var(--main-vertical-padding);
+}
+
+.content > .title {
+    padding: 5vh 0;
+}
+
+h3 {
+    font-weight: normal;
+}
+
+.content > .title  * {
+    font-family: 'Montserrat';
+}
+
+.content > .title > p {
+    font-family: 'Open Sans';
+    margin-top: 1em;
+    text-align: justify;
+    color: var(--secondary-text);
+}
+
+.content > hr {
+    margin: 0 25vw;
+    border-color: var(--azul-tec);
+}

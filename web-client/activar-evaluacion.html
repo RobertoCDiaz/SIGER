@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Residencias :: SIGER</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/no-header-page.css">
+    <link rel="stylesheet" href="styles/activar-evaluacion.css">
+</head>
+<body>
+    <header>
+        <div class="bar">
+            <!-- <h1><a href="/home">SIGER</a></h1> -->
+            <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                <h1 style="margin-left: .5em;">SIGER</h1>
+            </a>
+        </div>
+    </header>
+    <div class="content">
+        <div class="title">
+            <h1>Activar evaluaciones</h1>
+            <h3 id="adminEmailView">usuario.us@piedrasnegras.tecnm.mx</h3>
+            <p>Como administrador, usted es la persona responsable de activar el periodo de evaluación de una residencia. Una vez iniciado, un correo electrónico automático será enviado a los asesores del proyecto con las instrucciones para llevar a cabo la evaluación del avance hecho hasta la fecha del proyecto. Una vez que la evaluación, tanto del asesor interno como externo, estén registradas, el periodo de evaluación de la residencia habrá terminado.</p>
+            <p>El <b>anexo 29</b> es una evaluación intermedia, realizada durante el desarrollo del proyecto de Residencias Profesionales. Una vez que una evaluación con el anexo 29 de una Residencia esté registrado por completo, la Residencia podrá volver a ser evaluada.</p>
+            <p>El <b>anexo 30</b> es el formato utilizado para la evaluación final del proyecto. Después de que haya sido activado y registrado un anexo 30, la residencia se considerará como terminada y no volverá a aparecer en este sitio.</p>
+            <p>A continuación, podrá ver una lista de las residencias que están disponibles para ser evaluadas, así como aquellas que estén en estado de evaluación. Para poner en marcha el periodo de evaluación de alguna residencia, simplemente presione sobre <i>Anexo 29</i> o <i>Anexo 30</i>, según sea el caso.
+            </p>
+        </div>
+        <hr>
+
+        <h2>Residencias disponibles</h2>
+
+        <div class="list">
+            <div class="list-row list-header">
+                <p>Selección</p>
+                <p>Proyecto</p>
+                <p>Residente</p>
+                <p>Empresa</p>
+                <p>Anexos 29</p>
+            </div>
+            <div id="residenciasContainerView">
+                <!-- 
+                <div class="residencia list-row">
+                    <input type="checkbox">
+                    <p>Sistema Gestor de Residencias</p>
+                    <p>Daniel Hernández Sánchez</p>
+                    <p>Rassini Inc.</p>
+                    <p>2</p>
+                </div>
+                -->
+                <p>No hay ninguna residencia apta para iniciar una evaluación</p>
+            </div>
+        </div>
+        <div class="buttons-container">
+            <button class="secondary-button">Anexo 29</button>
+            <button class="secondary-button">Anexo 30</button>
+        </div>
+    </div>
+    <script src="scripts/menu.js"></script>
+    <script src="scripts/activar-evaluacion.js"></script>
+
+    <footer>
+        <div class="sections-container">
+        <section>
+            <h2>Integrantes</h2>
+            <div class="section-item">
+                <p>Daniel Hernández Sánchez</p>
+                <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+            </div>
+            <div class="section-item">
+                <p>Roberto Carlos Díaz Sánchez</p>
+                <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+            </div>
+        </section>
+        <section>
+            <h2>Materias</h2>
+            <div class="section-item">
+                <p>Administración de Bases de Datos</p>
+                <p>SCB-1001</p>
+            </div>
+            <div class="section-item">
+                <p>Ingeniería de Software</p>
+                <p>SCD-1011</p>
+            </div>
+            <div class="section-item">
+                <p>Programación Web</p>
+                <p>AEB-1055</p>
+            </div>
+        </section>
+        <section>
+            <h2>Enlaces de interés</h2>
+            <div class="section-item">
+                <p><a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a></p>
+                <p><a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">
+                    Documentación y evidencias
+                </a></p>
+            </div>
+        </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+    
+</body>
+</html>

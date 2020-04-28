@@ -883,13 +883,27 @@ server.get('/residencia', (req, res) => {
     res.sendFile('residencia.html', { root: '../web-client/' });
 });
 
+server.get('/activar-evaluacion', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.ADMIN) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('activar-evaluacion.html', { root: '../web-client/' });
+});
+
 
 /**
  * Dado un id de residencia [id], regresa al cliente la información
  * necesaria para llenar el formato de reporte preliminar, siempre 
  * y cuando el adminsitrador esté a cargo de la carrera del residente.
  */
-server.get('/reporte-preliminar', (req, res) => {
+server.get('/getInformacionReportePreliminar', (req, res) => {
     if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
         res.send(Response.authError());
         return;
@@ -1249,6 +1263,41 @@ server.get('/confirmarDocente', (req, res) => {
     )
 });
 
+
+/**
+ * Regresa al cliente una lista de todas las residencias aptas para iniciar
+ * un periodo de evaluación.
+ * 
+ * El criterio utilizado para determinar si una residencia es apta o no es que 
+ * la residencia debe estar aprobada, NO estar terminada, y NO contar con
+ * ninguna evaluación pendiente (Anexo 29 o 30).
+ */
+server.get('/residenciasAptasParaEvaluacion', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const adminEmail = req.session.user.info.email;
+    con.query(
+        'call SP_ResidenciasDisponiblesEvaluacion(?);',
+        adminEmail,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('No hay ninguna residencia apta para iniciar una evaluación'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
 /* ================================================================================================
 
     Misc.
@@ -1291,8 +1340,12 @@ const getAdminMenu: () => Object = () => ({
         },
         'Panel de residencias': {
             'href': '/panel-residencias',
-            'icon': 'assignment'
+            'icon': 'ballot'
         },
+        'Activar evaluaciones': {
+            'href': '/activar-evaluacion',
+            'icon': 'assignment_turned_in'
+        }
     },
     'secondary': {
         'Cerrar sesión': {
