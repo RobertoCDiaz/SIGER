@@ -1478,6 +1478,87 @@ CREATE PROCEDURE SP_ResidenciasDisponiblesEvaluacion(
 END;;
 
 
+/*
+	Regresa una lista de las residencia que actualmente están siendo
+	evaluadas.
+
+	La información que incluirá cada fila será el ID de la residencia,
+	el nombre del proyecto, nombre completo del residente, anexo pendiente,
+	email y nombre del A.I y A.E, además de si indicar cuál de los asesores 
+	aún está pendiente de evaluación.
+*/
+DROP PROCEDURE IF EXISTS SP_ResidenciasEnEvaluacion;;
+CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
+	v_admin_email VARCHAR(64)
+) BEGIN
+	SELECT 
+		r.idresidencia as 'id', r.nombre_proyecto AS 'proyecto', 
+		nombreCompleto(r.email_residente) AS 'residente',
+		e.nombre AS 'empresa',
+		ae.email AS 'ae_email',
+		ae.nombre_completo AS 'ae_nombre',
+		IF(
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_29
+				WHERE
+					fecha_externa IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1 OR 
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_30
+				WHERE
+					fecha_externa IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1
+		, 1, 0) AS 'ae_pendiente',
+		d.email AS 'ai_email',
+		nombreCompleto(d.email) AS 'ai_nombre',
+		IF(
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_29
+				WHERE
+					fecha_interna IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1 OR 
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_30
+				WHERE
+					fecha_interna IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1
+		, 1, 0) AS 'ai_pendiente',
+		IF (
+			tieneAnexo29Pendiente(r.idresidencia) = 1
+		, 29, 30) AS 'anexo_pendiente'
+	FROM
+		residencias AS r JOIN empresas AS e
+			ON r.idresidencia = e.id_residencia
+		JOIN asesores_externos AS ae
+			ON r.idresidencia = ae.id_residencia
+		JOIN involucrados AS i
+			ON r.idresidencia = i.id_residencia
+		JOIN docentes AS d
+			ON i.email_docente = d.email
+	WHERE
+		i.es_asesor = 1 AND 
+		residenciaAprobada(r.idresidencia) = 1 AND
+		residenciaTerminada(r.idresidencia) = 0 AND
+		residenciaAptaParaEvaluacion(r.idresidencia) = 0 AND
+		puedeValidarResidente(r.email_residente, v_admin_email) = 1;
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------

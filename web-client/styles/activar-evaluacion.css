@@ -1,32 +1,46 @@
-.list {
+.list, .list2 {
     background-color: white;
     border-radius: 4px;
     border: 1px solid var(--gray-border-color);
     margin: 2vh 0;
 }
 
+.list2 {
+    margin-bottom: 5vh;
+}
+
 .list-row {
     display: grid;
+    border-bottom: 1px solid var(--gray-border-color);
+}
+
+.list2 .list-row:last-child{
+    border-bottom: none;
+}
+
+.list  .list-row {
     grid-template-areas: "state text text text number buttons";
     grid-template-columns: 1fr 4fr 3fr 3fr 1fr;
+}
+.list2  .list-row {
+    grid-template-areas: "text text text text text text";
+    grid-template-columns: 3fr 3fr 3fr 5fr 5fr 2fr;
 }
 
 .list-row > * {
     display: flex;
     flex-direction: row;
+    text-align: center;
     align-items: center;
     justify-content: center;
     padding: .5em;
     overflow-wrap: anywhere;
 }
 
-.list > .list-header > * {
+.list > .list-header > *,
+.list2 > .list-header > * {
     background-color: var(--azul-tec-light);
     color: white;
-}
-
-.list-row:not(:first-child) {
-    border-top: 1px solid var(--gray-border-color);
 }
 
 .list-row > *:not(:first-child) {
@@ -50,6 +64,33 @@
     margin: 0 2.5em;
 }
 
-#residenciasContainerView > p {
+#residenciasContainerView > p,
+#residenciasEvaluacionContainer > p {
     padding: .5em;
+}
+
+.residencia.selected {
+    background-color: steelblue;
+}
+
+.residencia.selected * {
+    color: white;
+}
+
+.residencia > input[type='checkbox'] {
+    cursor: pointer;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: .5em 30%;
+}
+
+.options-container > p {
+    color: var(--azul-tec);
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
 }

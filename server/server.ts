@@ -545,6 +545,10 @@ server.get('/listaResidenciasSinDocentes', (req, res) => {
                 return;
             }
 
+            if (rows[0].length == 0) {
+                res.send(Response.userError('No hay ninguna residencia disponible'))
+            }
+
             res.send(Response.success(rows[0]));
         }
     );
@@ -1297,6 +1301,188 @@ server.get('/residenciasAptasParaEvaluacion', (req, res) => {
         }
     );
 });
+
+
+/**
+ * Regresa al cliente una lista de las residencia que actualmente están siendo
+ * evaluadas.
+ * 
+ * La información que incluirá cada fila será el ID de la residencia,
+ * el nombre del proyecto, nombre completo del residente, anexo pendiente,
+ * email y nombre del A.I y A.E, además de si indicar cuál de los asesores 
+ * aún está pendiente de evaluación.
+ */
+server.get('/residenciasEnEvaluacion', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const adminEmail = req.session.user.info.email;
+    con.query(
+        'call SP_ResidenciasEnEvaluacion(?);',
+        adminEmail,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('Por el momento no hay ninguna residencia en periodo de evaluación'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Activa el periodo de evaluación con el anexo 29 para todas las residencias
+ * con IDs incluidos en el arreglo [resArr].
+ */
+server.get('/activarAnexo29', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const residences: Object[] = JSON.parse(req.query.resArr);
+    if (!residences || residences.length == 0) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    let errors: string[];
+    activarA29Residencias(req.session.user.info.email, residences, residences.length, () => {
+        res.send(Response.success(errors));
+    }, (errorMsg, idx) => {
+        errors.push(`Ha ocurrido un error en la residencia con índice [${idx.toString()}]: "${errorMsg}"`);
+    });
+});
+
+
+/**
+ * Activa una evaluación con anexo 29 para un conjunto de 
+ * residencias.
+ * 
+ * @param arr       Arreglo de IDs de residencias a activar. 
+ * 
+ * @param count     Número de residencias a activar. Al principio de la 
+ *                  recursión debe ser [arr.length].
+ * 
+ * @param onDone    Qué hacer cuándo haya terminado el proceso.
+ * 
+ * @param onError   Qué hacer en caso de error. [msg] será el mensaje de 
+ *                  error, y [n] será el número de residencia con error.
+ * 
+ * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una 
+ * residencia no se le activará su evaluación, pero el procedimiento 
+ * intenrtará seguir con las demás.
+ */
+const activarA29Residencias = (
+    adminEmail:string, arr: Object[], count: number, 
+    onDone: () => void, 
+    onError: (msg: string, n: number) => void
+) => {
+    const currIdx: number = count - 1;
+    con.query(
+        `call SP_ActivarAnexo29(?, ?);`,
+        [arr[currIdx], adminEmail],
+        (e, rows, f) => {
+            if (e) {
+                onError(e.toString(), currIdx);
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                onError(rows[0][0]['message'], currIdx);
+                return;
+            }
+
+            if (currIdx == 0) {
+                onDone();
+            } else {
+                activarA29Residencias(adminEmail, arr, count - 1, onDone, onError);
+            }
+        }
+    );
+}
+
+
+/**
+ * Activa el periodo de evaluación con el anexo 30 para todas las residencias
+ * con IDs incluidos en el arreglo [resArr].
+ */
+server.get('/activarAnexo30', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const residences: Object[] = JSON.parse(req.query.resArr);
+    if (!residences || residences.length == 0) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    let errors: string[];
+    activarA30Residencias(req.session.user.info.email, residences, residences.length, () => {
+        res.send(Response.success(errors));
+    }, (errorMsg, idx) => {
+        errors.push(`Ha ocurrido un error en la residencia con índice [${idx.toString()}]: "${errorMsg}"`);
+    });
+});
+
+
+/**
+ * Activa una evaluación con anexo 30 para un conjunto de 
+ * residencias.
+ * 
+ * @param arr       Arreglo de IDs de residencias a activar. 
+ * 
+ * @param count     Número de residencias a activar. Al principio de la 
+ *                  recursión debe ser [arr.length].
+ * 
+ * @param onDone    Qué hacer cuándo haya terminado el proceso.
+ * 
+ * @param onError   Qué hacer en caso de error. [msg] será el mensaje de 
+ *                  error, y [n] será el número de residencia con error.
+ * 
+ * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una 
+ * residencia no se le activará su evaluación, pero el procedimiento 
+ * intenrtará seguir con las demás.
+ */
+const activarA30Residencias = (
+    adminEmail:string, arr: Object[], count: number, 
+    onDone: () => void, 
+    onError: (msg: string, n: number) => void
+) => {
+    const currIdx: number = count - 1;
+    con.query(
+        `call SP_ActivarAnexo30(?, ?);`,
+        [arr[currIdx], adminEmail],
+        (e, rows, f) => {
+            if (e) {
+                onError(e.toString(), currIdx);
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                onError(rows[0][0]['message'], currIdx);
+                return;
+            }
+
+            if (currIdx == 0) {
+                onDone();
+            } else {
+                activarA29Residencias(adminEmail, arr, count - 1, onDone, onError);
+            }
+        }
+    );
+}
 
 /* ================================================================================================
 

@@ -52,11 +52,47 @@
                 -->
                 <p>No hay ninguna residencia apta para iniciar una evaluación</p>
             </div>
+            <div class="options-container">
+                <p onclick="selectAll();">Seleccionar todas</p>
+                <p onclick="unselectAll();">Deseleccionar todas</p>
+                <p onclick="toggleSelected();">Alternar selección actual</p>
+            </div>
         </div>
         <div class="buttons-container">
-            <button class="secondary-button">Anexo 29</button>
-            <button class="secondary-button">Anexo 30</button>
+            <button id="anexo29Button" class="secondary-button">Anexo 29</button>
+            <button id="anexo30Button" class="secondary-button">Anexo 30</button>
         </div>
+
+        <hr>
+
+        <h2>Residencias en periodo de evaluación</h2>
+
+        <div class="list2">
+            <div class="list-row list-header">
+                <p>Proyecto</p>
+                <p>Residente</p>
+                <p>Empresa</p>
+                <p>Asesor externo</p>
+                <p>Asesor interno</p>
+                <p>Tipo de evaluación</p>
+            </div>
+            <div id="residenciasEvaluacionContainer">
+                
+                <!-- 
+                <div class="residencia list-row">
+                    <p>Sistema Gestor de Residencias</p>
+                    <p>Daniel Hernández Sánchez</p>
+                    <p>Rassini Inc.</p>
+                    <p>Izán Martín Malillos (izan.mm@piedrasnegras.tecnm.mx)</p>
+                    <p>Izán Martín Malillos (izan.mm@piedrasnegras.tecnm.mx)</p>
+                    <p>Anexo 30</p>
+                </div> 
+                -->
+               
+                <p>Por el momento no hay ninguna residencia en periodo de evaluación</p>
+            </div>
+        </div>
+
     </div>
     <script src="scripts/menu.js"></script>
     <script src="scripts/activar-evaluacion.js"></script>
