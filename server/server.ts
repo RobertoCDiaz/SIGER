@@ -1355,7 +1355,7 @@ server.get('/activarAnexo29', (req, res) => {
         return;
     }
 
-    let errors: string[];
+    let errors: string[] = [];
     activarA29Residencias(req.session.user.info.email, residences, residences.length, () => {
         res.send(Response.success(errors));
     }, (errorMsg, idx) => {
@@ -1388,21 +1388,57 @@ const activarA29Residencias = (
     onError: (msg: string, n: number) => void
 ) => {
     const currIdx: number = count - 1;
+    const aiUrl: string = encrypt(new Date().getTime().toString());
+    const aeUrl: string = encrypt((new Date().getTime() + 1000).toString());
+
     con.query(
-        `call SP_ActivarAnexo29(?, ?);`,
-        [arr[currIdx], adminEmail],
+        `call SP_ActivarAnexo29(?, ?, ?, ?);`,
+        [arr[currIdx], adminEmail, aiUrl, aeUrl],
         (e, rows, f) => {
             if (e) {
                 onError(e.toString(), currIdx);
-                return;
             }
 
             if (rows[0][0]['output'] != 1) {
                 onError(rows[0][0]['message'], currIdx);
-                return;
             }
 
+            const aiEmail: string       = rows[0][0]['ai_email'];
+            const aeEmail: string       = rows[0][0]['ae_email'];
+            const projectName: string   = rows[0][0]['proyecto'];
+            const resident: string      = rows[0][0]['residente'];
+
             if (currIdx == 0) {
+                const template = (url) => `
+                    <style>
+                    p {
+                        text-align: justify;
+                    }
+                    .signature {
+                        text-align: center;
+                        margin: 3em;
+                    }
+                    </style>
+                    <p>Hola,</p>
+                    <p>Usted ha recibido este correo automático porque es asesor del proyecto ${projectName.toUpperCase()}, del residente ${resident}.</p>
+                    <p>Al momento de recibir este email dió inicio el periodo de evaluación del avance del proyecto, por lo que le pedimos que, cuando tenga tiempo, entre al siguiente enlace y califique el progreso de la residencia profesional. Le recordamos que su evaluación es de vital importancia para certificar el avance de la Residencia Profesional, por lo que es fundamental que no ignore este correo electrónico.</p>
+                    <p><a href="${website}/${url}">ACCEDER AL FORMULARIO DE EVALUACIÓN</a></p>
+                    <p>Sin más que añadir, deseamos que tenga un buen día.</p>
+                    <p class="signature">SIGER, ITPN.</p>
+                `;
+
+                sendEmail(
+                    aiEmail,
+                    `Evaluación de Residencia Profesional :: SIGER`,
+                    template(aiUrl)
+                );
+                    
+                sendEmail(
+                    aeEmail,
+                    `Evaluación de Residencia Profesional :: SIGER`,
+                    template(aeUrl)
+                );
+
                 onDone();
             } else {
                 activarA29Residencias(adminEmail, arr, count - 1, onDone, onError);
@@ -1428,7 +1464,7 @@ server.get('/activarAnexo30', (req, res) => {
         return;
     }
 
-    let errors: string[];
+    let errors: string[] = [];
     activarA30Residencias(req.session.user.info.email, residences, residences.length, () => {
         res.send(Response.success(errors));
     }, (errorMsg, idx) => {
@@ -1461,21 +1497,57 @@ const activarA30Residencias = (
     onError: (msg: string, n: number) => void
 ) => {
     const currIdx: number = count - 1;
+    const aiUrl: string = encrypt(new Date().getTime().toString());
+    const aeUrl: string = encrypt((new Date().getTime() + 1000).toString());
+
     con.query(
-        `call SP_ActivarAnexo30(?, ?);`,
-        [arr[currIdx], adminEmail],
+        `call SP_ActivarAnexo30(?, ?, ?, ?);`,
+        [arr[currIdx], adminEmail, aiUrl, aeUrl],
         (e, rows, f) => {
             if (e) {
                 onError(e.toString(), currIdx);
-                return;
             }
 
             if (rows[0][0]['output'] != 1) {
                 onError(rows[0][0]['message'], currIdx);
-                return;
             }
 
+            const aiEmail: string       = rows[0][0]['ai_email'];
+            const aeEmail: string       = rows[0][0]['ae_email'];
+            const projectName: string   = rows[0][0]['proyecto'];
+            const resident: string      = rows[0][0]['residente'];
+
             if (currIdx == 0) {
+                const template = (url) => `
+                    <style>
+                    p {
+                        text-align: justify;
+                    }
+                    .signature {
+                        text-align: center;
+                        margin: 3em;
+                    }
+                    </style>
+                    <p>Hola,</p>
+                    <p>Usted ha recibido este correo automático porque es asesor del proyecto ${projectName.toUpperCase()}, del residente ${resident}.</p>
+                    <p>Al momento de recibir este email dió inicio el último periodo de evaluación del avance del proyecto, por lo que le pedimos que, cuando tenga tiempo, entre al siguiente enlace y califique el progreso de la residencia profesional. Le recordamos que su evaluación es de vital importancia para finalizar la Residencia Profesional, por lo que es fundamental que no ignore este correo electrónico.</p>
+                    <p><a href="${website}/${url}">ACCEDER AL FORMULARIO DE EVALUACIÓN</a></p>
+                    <p>Sin más que añadir, deseamos que tenga un buen día.</p>
+                    <p class="signature">SIGER, ITPN.</p>
+                `;
+
+                sendEmail(
+                    aiEmail,
+                    `Última evaluación de Residencia Profesional :: SIGER`,
+                    template(aiUrl)
+                );
+                    
+                sendEmail(
+                    aeEmail,
+                    `Última evaluación de Residencia Profesional :: SIGER`,
+                    template(aeUrl)
+                );
+
                 onDone();
             } else {
                 activarA29Residencias(adminEmail, arr, count - 1, onDone, onError);

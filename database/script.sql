@@ -329,6 +329,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
 		ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
 -- -----------------------------------------------------
 -- Table `siger`.`confirmaciones_docentes`
 -- -----------------------------------------------------
@@ -344,6 +345,46 @@ CREATE TABLE IF NOT EXISTS `siger`.`confirmaciones_docentes` (
   CONSTRAINT `fk_confirmaciones_docentes_docentes1`
     FOREIGN KEY (`docentes_email`)
     REFERENCES `siger`.`docentes` (`email`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `siger`.`enlaces_anexo29`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`enlaces_anexo29` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`enlaces_anexo29` (
+  `id` VARCHAR(256) NOT NULL,
+  `es_asesor_externo` TINYINT NOT NULL DEFAULT 0,
+  `evaluado` TINYINT NOT NULL DEFAULT 0,
+  `id_anexo29` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_enlaces_anexo29_anexo_291_idx` (`id_anexo29` ASC), -- VISIBLE,
+  CONSTRAINT `fk_enlaces_anexo29_anexo_291`
+    FOREIGN KEY (`id_anexo29`)
+    REFERENCES `siger`.`anexo_29` (`idanexo_29`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `siger`.`enlaces_anexo30`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`enlaces_anexo30` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`enlaces_anexo30` (
+  `id` VARCHAR(256) NOT NULL,
+  `es_asesor_externo` TINYINT NOT NULL DEFAULT 0,
+  `evaluado` TINYINT NOT NULL DEFAULT 0,
+  `id_anexo30` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_enlaces_anexo30_anexo_301_idx` (`id_anexo30` ASC), -- VISIBLE,
+  CONSTRAINT `fk_enlaces_anexo30_anexo_301`
+    FOREIGN KEY (`id_anexo30`)
+    REFERENCES `siger`.`anexo_30` (`idanexo_30`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -1368,7 +1409,9 @@ END;;
 DROP PROCEDURE IF EXISTS SP_ActivarAnexo29;;
 CREATE PROCEDURE SP_ActivarAnexo29(
 	v_id_residencia INT,
-	v_admin_email VARCHAR(64)
+	v_admin_email VARCHAR(64),
+	urlAI VARCHAR(256),
+	urlAE VARCHAR(256)
 ) BEGIN
 	DECLARE exit handler for SQLEXCEPTION
 	BEGIN
@@ -1394,12 +1437,39 @@ CREATE PROCEDURE SP_ActivarAnexo29(
 
 		END; ELSE BEGIN 
 
+			-- Crear el anexo 29.
 			INSERT INTO 
 				anexo_29 (fecha_activacion, id_residencia)
 			VALUES 
 				(UNIX_TIMESTAMP() * 1000, v_id_residencia);
 
-			SELECT "1" AS output, "Transaction committed successfully" AS message;
+			SET @id = LAST_INSERT_ID();
+
+			-- Crear enlaces únicos para evaluación.
+			INSERT INTO 
+				enlaces_anexo29
+			VALUES 
+				(urlAI, 0, default, @id), -- Asesor interno.
+				(urlAE, 1, default, @id); -- Asesor externo.
+
+			SELECT 
+				"1" AS output, 
+				"Transaction committed successfully" AS message,
+
+				-- Información necesaria en el cliente.
+				ae.email AS 'ae_email',
+				i.email_docente AS 'ai_email',
+				r.nombre_proyecto as 'proyecto',
+				nombreCompleto(r.email_residente) AS 'residente'
+			FROM 
+				residencias AS r JOIN involucrados AS i
+					ON r.idresidencia = i.id_residencia
+				JOIN asesores_externos AS ae
+					ON r.idresidencia = ae.id_residencia
+			WHERE
+				r.idresidencia = v_id_residencia AND
+				i.es_asesor = 1;
+
 
 		END; END IF;
 
@@ -1415,7 +1485,9 @@ END;;
 DROP PROCEDURE IF EXISTS SP_ActivarAnexo30;;
 CREATE PROCEDURE SP_ActivarAnexo30(
 	v_id_residencia INT,
-	v_admin_email VARCHAR(64)
+	v_admin_email VARCHAR(64),
+	urlAI VARCHAR(256),
+	urlAE VARCHAR(256)
 ) BEGIN
 	DECLARE exit handler for SQLEXCEPTION
 	BEGIN
@@ -1441,12 +1513,38 @@ CREATE PROCEDURE SP_ActivarAnexo30(
 
 		END; ELSE BEGIN 
 
+			-- Crear el anexo 30.
 			INSERT INTO 
 				anexo_30 (fecha_activacion, id_residencia)
 			VALUES 
 				(UNIX_TIMESTAMP() * 1000, v_id_residencia);
 
-			SELECT "1" AS output, "Transaction committed successfully" AS message;
+			SET @id = LAST_INSERT_ID();
+
+			-- Crear enlaces únicos para evaluación.
+			INSERT INTO 
+				enlaces_anexo30
+			VALUES 
+				(urlAI, 0, default, @id), -- Asesor interno.
+				(urlAE, 1, default, @id); -- Asesor externo.
+
+			SELECT 
+				"1" AS output, 
+				"Transaction committed successfully" AS message,
+
+				-- Información necesaria en el cliente.
+				ae.email AS 'ae_email',
+				i.email_docente AS 'ai_email',
+				r.nombre_proyecto as 'proyecto',
+				nombreCompleto(r.email_residente) AS 'residente'
+			FROM 
+				residencias AS r JOIN involucrados AS i
+					ON r.idresidencia = i.id_residencia
+				JOIN asesores_externos AS ae
+					ON r.idresidencia = ae.id_residencia
+			WHERE
+				r.idresidencia = v_id_residencia AND
+				i.es_asesor = 1;
 
 		END; END IF;
 
