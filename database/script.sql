@@ -1683,15 +1683,24 @@ DROP PROCEDURE IF EXISTS SP_InformacionResidenciaParaAnexo29;;
 CREATE PROCEDURE SP_InformacionResidenciaParaAnexo29(
 	v_url VARCHAR(256)
 ) BEGIN
-	SELECT 
-		r.nombre_proyecto AS 'proyecto',
-		nombreCompleto(r.email_residente) AS 'residente',
-		r.email_residente AS 'correo_residente'
-	FROM
-		residencias AS r JOIN anexo_29 AS a
-			ON r.idresidencia = a.id_residencia
-	WHERE
-		a.idanexo_29 = idAnexo29DeURL(v_url);
+
+	IF v_url NOT IN (SELECT id FROM enlaces_anexo29 WHERE evaluado = 0) THEN BEGIN
+
+		SELECT "0" AS output, "URL inválido." AS message;
+
+	END; ELSE BEGIN
+		SELECT 
+			"1" AS output, "Success" AS message,
+			r.nombre_proyecto AS 'proyecto',
+			nombreCompleto(r.email_residente) AS 'residente',
+			r.email_residente AS 'correo_residente'
+		FROM
+			residencias AS r JOIN anexo_29 AS a
+				ON r.idresidencia = a.id_residencia
+		WHERE
+			a.idanexo_29 = idAnexo29DeURL(v_url);
+	END; END IF;
+
 END;;
 
 

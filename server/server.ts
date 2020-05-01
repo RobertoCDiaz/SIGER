@@ -1577,6 +1577,11 @@ server.get('/infoAnexo29DesdeURL', (req, res) => {
                 return;
             }
 
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
             if (rows[0].length == 0) {
                 res.send(Response.userError('URL inválido. Vuelva a entrar con el mismo enlace. Si el problema persiste, comuníquese con algún administrador del sistema, un desarrollador, o a scepisoftware@gmail.com'));
                 return;
