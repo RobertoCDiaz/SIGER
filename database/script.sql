@@ -809,13 +809,31 @@ CREATE FUNCTION residenciaAptaParaEvaluacion(
 
 END;;
 
+/*
+	Regresa el ID del registro en la tabla [anexo_29] que 
+	corresponde a un url único, ya sea de un A.I. o A.E.
+*/
+DROP FUNCTION IF EXISTS idAnexo29DeURL;;
+CREATE FUNCTION idAnexo29DeURL(
+	v_url VARCHAR(256)
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			e.id_anexo29
+		FROM 
+			enlaces_anexo29 AS e
+		WHERE
+			e.id = v_url
+	);
+END;;
+
+
 
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
 
 -------------------------------------------------------- */
-DELIMITER ;;
 
 /*
 	Muestra una lista simplificada de las carreras disponibles.
@@ -1656,6 +1674,133 @@ CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
 		residenciaAptaParaEvaluacion(r.idresidencia) = 0 AND
 		puedeValidarResidente(r.email_residente, v_admin_email) = 1;
 END;;
+
+
+/*
+	Recupera información destacable para mostrar en un anexo 29 durante
+	una evaluación.
+*/
+DROP PROCEDURE IF EXISTS SP_InformacionResidenciaParaAnexo29;;
+CREATE PROCEDURE SP_InformacionResidenciaParaAnexo29(
+	v_url VARCHAR(256)
+) BEGIN
+	SELECT 
+		r.nombre_proyecto AS 'proyecto',
+		nombreCompleto(r.email_residente) AS 'residente',
+		r.email_residente AS 'correo_residente'
+	FROM
+		residencias AS r JOIN anexo_29 AS a
+			ON r.idresidencia = a.id_residencia
+	WHERE
+		a.idanexo_29 = idAnexo29DeURL(v_url);
+END;;
+
+
+/*
+	Registra la evaluación de un asesor interno sobre una residencia
+	profesional.
+
+	[v_url] es el ID único que se le asignó a la evaluación en curso.
+	[v_evaluación] es una cadena de texto que contiene la calificación
+	asignada por el asesor en cada rubro, separada por una coma [,].
+*/
+-- DROP PROCEDURE IF EXISTS SP_EvaluacionAIA29;;
+-- CREATE PROCEDURE SP_EvaluacionAIA29(
+-- 	v_url VARCHAR(256),
+-- 	v_evaluacion VARCHAR(17),
+-- 	v_observaciones VARCHAR(128)
+-- ) BEGIN
+-- 	DECLARE exit handler for SQLEXCEPTION
+-- 	BEGIN
+-- 		GET DIAGNOSTICS CONDITION 1
+-- 		@p2 = MESSAGE_TEXT;
+		
+-- 		SELECT "-1" AS output, @p2 AS message;
+		
+-- 		ROLLBACK;
+-- 	END;
+-- 	START TRANSACTION;
+-- 		IF v_url NOT IN (SELECT id FROM enlaces_anexo29 WHERE evaluado = 0) THEN BEGIN
+
+-- 			SELECT "0" AS output, "URL inválido." AS message;
+
+-- 		END; ELSE BEGIN
+
+-- 			UPDATE anexo_29 SET 
+-- 				fecha_interna = UNIX_TIMESTAMP() * 1000, evaluacion_interna = v_evaluacion, observaciones_internas = v_observaciones
+-- 			WHERE
+-- 				idanexo_29 = idAnexo29DeURL(v_url);
+
+-- 			UPDATE enlaces_anexo29 SET
+-- 				evaluado = 1
+-- 			WHERE
+-- 				id = v_url;
+
+-- 			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+-- 		END; END IF;
+-- 	COMMIT;
+-- END;;
+
+/*
+	Registra la evaluación de un asesor externo sobre una residencia
+	profesional.
+
+	[v_url] es el ID único que se le asignó a la evaluación en curso.
+	[v_evaluación] es una cadena de texto que contiene la calificación
+	asignada por el asesor en cada rubro, separada por una coma [,].
+*/
+DROP PROCEDURE IF EXISTS SP_EvaluacionA29;;
+CREATE PROCEDURE SP_EvaluacionA29(
+	v_url VARCHAR(256),
+	v_evaluacion VARCHAR(24),
+	v_observaciones VARCHAR(128)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	START TRANSACTION;
+		IF v_url NOT IN (SELECT id FROM enlaces_anexo29 WHERE evaluado = 0) THEN BEGIN
+
+			SELECT "0" AS output, "URL inválido." AS message;
+
+		END; ELSE BEGIN
+
+			IF (SELECT e.es_asesor_externo FROM enlaces_anexo29 AS e WHERE id = v_url) = 0 THEN BEGIN
+				-- Es asesor interno.
+				UPDATE anexo_29 SET 
+					fecha_interna = UNIX_TIMESTAMP() * 1000, 
+					evaluacion_interna = v_evaluacion, 
+					observaciones_internas = v_observaciones
+				WHERE
+					idanexo_29 = idAnexo29DeURL(v_url);
+			END; ELSE BEGIN
+				-- Es asesor externo.
+				UPDATE anexo_29 SET 
+					fecha_externa = UNIX_TIMESTAMP() * 1000, 
+					evaluacion_externa = v_evaluacion, 
+					observaciones_externas = v_observaciones
+				WHERE
+					idanexo_29 = idAnexo29DeURL(v_url);
+			END; END IF;
+
+			UPDATE enlaces_anexo29 SET
+				evaluado = 1
+			WHERE
+				id = v_url;
+
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		END; END IF;
+	COMMIT;
+END;;
+
 
 DELIMITER ;
 
