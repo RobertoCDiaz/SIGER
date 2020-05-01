@@ -1589,46 +1589,17 @@ server.get('/infoAnexo29DesdeURL', (req, res) => {
 
 
 /**
- * Registra en la base de datos la evaluación del asesor interno
- * usando el anexo 29.
- */
-// server.get('/registrarEvaluacionAIA29', (req, res) => {
-//     const id: string = req.query.id;
-//     const evaluacionString: string = req.query.evaluacion;
-//     const observaciones: string = req.query.observaciones;
-
-//     if (!id || !evaluacionString || !observaciones) {
-//         res.send(Response.notEnoughParams());
-//         return;
-//     }
-
-//     con.query(
-//         `call SP_EvaluacionAIA29(?, ?, ?);`,
-//         [id, evaluacionString, observaciones],
-//         (e, rows, f) => {
-//             if (e) {
-//                 res.send(Response.unknownError(e.toString()));
-//                 return;
-//             }
-
-//             if (rows[0][0]['output'] == -1) {
-//                 res.send(Response.sqlError(rows[0][0]['message']));
-//                 return;
-//             }
-
-//             if (rows[0][0]['output'] != 1) {
-//                 res.send(Response.userError(rows[0][0]['message']));
-//                 return;
-//             }
-
-//             res.send(Response.success());
-//         }
-//     );
-// });
-
-/**
- * Registra en la base de datos la evaluación del asesor externo
- * usando el anexo 29.
+ * Registra en la base de datos la evaluación de un 
+ * asesor (Ya sea interno o externo) sobre una residencia
+ * profesional, usando el anexo 29.
+ * 
+ * @param id            ID único de la evaluación.
+ * 
+ * @param evaluacion    Cadena de texto que contiene la evaluacion
+ *                      en cada rubro, separadas por coma.
+ *                      Por ejemplo, "4,2,6,10,15,4".
+ * 
+ * @param observaciones Observaciones personales del asesor.
  */
 server.post('/registrarEvaluacionA29', (req, res) => {
     const id: string = req.body.id;
