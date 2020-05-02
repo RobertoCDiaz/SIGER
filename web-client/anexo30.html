@@ -102,7 +102,7 @@
             <h2>Anexo XXX</h2>
                 <hr>
                 <!-- <p>El objetivo de este formulario es el de evaluar el reporte de la Residencia Profesional del estudiante <b>[NOMBRE DEL ESTUDIANTE]</b>, con número de control <b>[NO.CONTROL]</b>.</p> -->
-                <p>El objetivo de este formulario es el de evaluar el reporte de la Residencia Profesional del estudiante <b>DANIEL HERNÁNDEZ SÁNCHEZ</b>, con número de control <b>17430048</b>.</p>
+                <p>El objetivo de este formulario es el de evaluar el proyecto <b id="proyectoPlaceholderView">PROYECTO</b> del estudiante <b id="residentePlaceholderView">RESIDENTE</b>, con número de control <b id="numCPlaceholderView">NUM. CONTROL</b>.</p>
                 <p>A continuación, evalúe cada uno de los rubros que se indican con un valor numérico dentro del rango especificado, siendo 0 la calificación más baja. Después, podrá escribir sus observaciones personales.</p>
             <h3 style="font-style: italic;">En la medida que el residente cumple con lo siguiente.</h3>
             
@@ -115,74 +115,67 @@
                 <div class="rubric-entry">
                     <p class="entry-text">Portada</p>
                     <p class="entry-range">0-2</p>
-                    <input type="number" min="0" max="2">
+                    <input class="evaluation-input" type="number" min="0" max="2">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Agradecimientos</p>
                     <p class="entry-range">0-2</p>
-                    <input type="number" min="0" max="2">
+                    <input class="evaluation-input" type="number" min="0" max="2">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Resumen</p>
                     <p class="entry-range">0-2</p>
-                    <input type="number" min="0" max="2">
+                    <input class="evaluation-input" type="number" min="0" max="2">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Índice</p>
                     <p class="entry-range">0-2</p>
-                    <input type="number" min="0" max="2">
+                    <input class="evaluation-input" type="number" min="0" max="2">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Introducción</p>
                     <p class="entry-range">0-2</p>
-                    <input type="number" min="0" max="2">
+                    <input class="evaluation-input" type="number" min="0" max="2">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Problemas a resolver, priorizándolos</p>
                     <p class="entry-range">0-5</p>
-                    <input type="number" min="0" max="5">
+                    <input class="evaluation-input" type="number" min="0" max="5">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Objetivos</p>
                     <p class="entry-range">0-5</p>
-                    <input type="number" min="0" max="5">
-                </div>
-                <div class="rubric-entry">
-                    <p class="entry-text">Justificación</p>
-                    <p class="entry-range">No aplica</p>
+                    <input class="evaluation-input" type="number" min="0" max="5">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Marco teórico (fundamentos teóricos)</p>
                     <p class="entry-range">0-10</p>
-                    <input type="number" min="0" max="10">
+                    <input class="evaluation-input" type="number" min="0" max="10">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Procedimiento y descripción de las actividades realizadas</p>
                     <p class="entry-range">0-5</p>
-                    <input type="number" min="0" max="5">
+                    <input class="evaluation-input" type="number" min="0" max="5">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Resultados, planos, gráficas, prototipos, manuales, programas, análisis estadísticos, modelos matemáticos, simulaciones, normativas, regulaciones y restricciones, entre otros. Solo para proyectos que por su naturaleza lo requieran: estudio de mercado, estudio técnico y estudio económico</p>
                     <p class="entry-range">0-45</p>
-                    <input type="number" min="0" max="45">
+                    <input class="evaluation-input" type="number" min="0" max="45">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Conclusiones, recomendaciones y experiencia profesional adquirida</p>
                     <p class="entry-range">0-15</p>
-                    <input type="number" min="0" max="15">
+                    <input class="evaluation-input" type="number" min="0" max="15">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Competencias desarrolladas y/o aplicadas</p>
                     <p class="entry-range">0-3</p>
-                    <input type="number" min="0" max="3">
+                    <input class="evaluation-input" type="number" min="0" max="3">
                 </div>
                 <div class="rubric-entry">
                     <p class="entry-text">Fuentes de información</p>
                     <p class="entry-range">0-2</p>
-                    <input type="number" min="0" max="2">
-                </div>
-                <div class="rubric-entry">
-                    <p class="entry-text"><b>Calificación total</b></p>
+                    <input class="evaluation-input" type="number" min="0" max="2">
                 </div>
             </div>
             <!--
@@ -252,10 +245,10 @@
             <br>
             <h3>Observaciones</h3>
                 <div style="display: flex;">
-                    <textarea placeholder="Escriba aquí sus observaciones personales (limitado a 128 caracteres)..." rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
+                    <textarea id="obsView" placeholder="Escriba aquí sus observaciones personales (limitado a 128 caracteres)..." rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
                 </div>
                 <div class="button-container">
-                    <button class="primary-button">TERMINAR</button>
+                    <button id="finishButton" type="button" class="primary-button">TERMINAR</button>
                 </div>
         </form>
     </div>
@@ -307,5 +300,6 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
+    <script src="scripts/a30-evaluacion.js"></script>
 </body>
 </html>

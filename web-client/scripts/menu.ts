@@ -29,9 +29,9 @@ const menuView = (o) => {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            /*--menu-color: rgb(29, 34, 59);*/
+            --menu-color: rgb(29, 34, 59);
             /*--menu-color: var(--footer-background);*/
-            --menu-color: var(--azul-tec);
+            /*--menu-color: var(--azul-tec);*/
             --slide-duration: 150ms;
         }
     

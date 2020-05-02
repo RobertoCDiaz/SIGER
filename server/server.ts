@@ -966,7 +966,6 @@ server.get('/buscarDocente', (req, res) => {
                 return;
             }
 
-            // console.log(rows);
             if (rows[0].length == 0) {
                 res.send(Response.userError('No se ha encontrado ningún docente con este criterio de búsqueda'));
                 return;
@@ -1539,18 +1538,18 @@ const activarA30Residencias = (
                 sendEmail(
                     aiEmail,
                     `Última evaluación de Residencia Profesional :: SIGER`,
-                    template(`evaluacion-a30-ai?id=${encodeURI(aiID)}`)
+                    template(`evaluacion-a30?id=${encodeURI(aiID)}`)
                 );
                     
                 sendEmail(
                     aeEmail,
                     `Última evaluación de Residencia Profesional :: SIGER`,
-                    template(`evaluacion-a30-ae?id=${encodeURI(aeID)}`)
+                    template(`evaluacion-a30?id=${encodeURI(aeID)}`)
                 );
 
                 onDone();
             } else {
-                activarA29Residencias(adminEmail, arr, count - 1, onDone, onError);
+                activarA30Residencias(adminEmail, arr, count - 1, onDone, onError);
             }
         }
     );
@@ -1560,6 +1559,8 @@ const activarA30Residencias = (
 /**
  * Regresa al cliente la información destacable de una residencia
  * que puede ser mostrada durante la evaluación usando el Anexo 29.
+ * 
+ * @param id ID único del enlace de evaluación del asesor.
  */
 server.get('/infoAnexo29DesdeURL', (req, res) => {
     const id: string = req.query.id;
@@ -1570,6 +1571,44 @@ server.get('/infoAnexo29DesdeURL', (req, res) => {
 
     con.query(
         'call SP_InformacionResidenciaParaAnexo29(?);',
+        id,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('URL inválido. Vuelva a entrar con el mismo enlace. Si el problema persiste, comuníquese con algún administrador del sistema, un desarrollador, o a scepisoftware@gmail.com'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Regresa al cliente la información destacable de una residencia
+ * que puede ser mostrada durante la evaluación usando el Anexo 30.
+ * 
+ * @param id ID único del enlace de evaluación del asesor.
+ */
+server.get('/infoAnexo30DesdeURL', (req, res) => {
+    const id: string = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        'call SP_InformacionResidenciaParaAnexo30(?);',
         id,
         (e, rows, f) => {
             if (e) {
@@ -1639,6 +1678,56 @@ server.post('/registrarEvaluacionA29', (req, res) => {
         }
     );
 });
+
+
+/**
+ * Registra en la base de datos la evaluación de un 
+ * asesor (Ya sea interno o externo) sobre una residencia
+ * profesional, usando el anexo 30.
+ * 
+ * @param id            ID único de la evaluación.
+ * 
+ * @param evaluacion    Cadena de texto que contiene la evaluacion
+ *                      en cada rubro, separadas por coma.
+ *                      Por ejemplo, "4,2,6,10,15,4".
+ * 
+ * @param observaciones Observaciones personales del asesor.
+ */
+server.post('/registrarEvaluacionA30', (req, res) => {
+    const id: string = req.body.id;
+    const evaluacionString: string = req.body.evaluacion;
+    const observaciones: string = req.body.observaciones;
+
+    if (!id || !evaluacionString || !observaciones) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_EvaluacionA30(?, ?, ?);`,
+        [id, evaluacionString, observaciones],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] == -1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success());
+        }
+    );
+});
+
+
 /* ================================================================================================
 
     Endpoints.
@@ -1671,6 +1760,24 @@ server.get('/evaluacion-a29-ae', (req, res) => {
     }
 
     res.sendFile('anexo-29-1-ae.html', { root: '../web-client/'});
+});
+
+
+/**
+ * Direcciones para las evaluaciones correspondientes a un anexo 30.
+ * Estas no requieren de autenticación por dos principales motivos:
+ *      1. Las personas que entren a este tipo de enlaces, son los únicos
+ *         con el ID único para acceder y evaluar.
+ *      2. Los asesores externos no tienen una cuenta para autenticar.
+ */
+server.get('/evaluacion-a30', (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    res.sendFile('anexo30.html', { root: '../web-client/'});
 });
 
 /* ================================================================================================
