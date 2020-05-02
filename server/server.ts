@@ -545,6 +545,10 @@ server.get('/listaResidenciasSinDocentes', (req, res) => {
                 return;
             }
 
+            if (rows[0].length == 0) {
+                res.send(Response.userError('No hay ninguna residencia disponible'))
+            }
+
             res.send(Response.success(rows[0]));
         }
     );
@@ -883,13 +887,27 @@ server.get('/residencia', (req, res) => {
     res.sendFile('residencia.html', { root: '../web-client/' });
 });
 
+server.get('/activar-evaluacion', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.ADMIN) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('activar-evaluacion.html', { root: '../web-client/' });
+});
+
 
 /**
  * Dado un id de residencia [id], regresa al cliente la información
  * necesaria para llenar el formato de reporte preliminar, siempre 
  * y cuando el adminsitrador esté a cargo de la carrera del residente.
  */
-server.get('/reporte-preliminar', (req, res) => {
+server.get('/getInformacionReportePreliminar', (req, res) => {
     if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
         res.send(Response.authError());
         return;
@@ -948,7 +966,6 @@ server.get('/buscarDocente', (req, res) => {
                 return;
             }
 
-            // console.log(rows);
             if (rows[0].length == 0) {
                 res.send(Response.userError('No se ha encontrado ningún docente con este criterio de búsqueda'));
                 return;
@@ -1536,6 +1553,520 @@ server.get('/confirmarDocente', (req, res) => {
     )
 });
 
+
+/**
+ * Regresa al cliente una lista de todas las residencias aptas para iniciar
+ * un periodo de evaluación.
+ * 
+ * El criterio utilizado para determinar si una residencia es apta o no es que 
+ * la residencia debe estar aprobada, NO estar terminada, y NO contar con
+ * ninguna evaluación pendiente (Anexo 29 o 30).
+ */
+server.get('/residenciasAptasParaEvaluacion', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const adminEmail = req.session.user.info.email;
+    con.query(
+        'call SP_ResidenciasDisponiblesEvaluacion(?);',
+        adminEmail,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('No hay ninguna residencia apta para iniciar una evaluación'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Regresa al cliente una lista de las residencia que actualmente están siendo
+ * evaluadas.
+ * 
+ * La información que incluirá cada fila será el ID de la residencia,
+ * el nombre del proyecto, nombre completo del residente, anexo pendiente,
+ * email y nombre del A.I y A.E, además de si indicar cuál de los asesores 
+ * aún está pendiente de evaluación.
+ */
+server.get('/residenciasEnEvaluacion', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const adminEmail = req.session.user.info.email;
+    con.query(
+        'call SP_ResidenciasEnEvaluacion(?);',
+        adminEmail,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('Por el momento no hay ninguna residencia en periodo de evaluación'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Activa el periodo de evaluación con el anexo 29 para todas las residencias
+ * con IDs incluidos en el arreglo [resArr].
+ */
+server.get('/activarAnexo29', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const residences: Object[] = JSON.parse(req.query.resArr);
+    if (!residences || residences.length == 0) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    let errors: string[] = [];
+    activarA29Residencias(req.session.user.info.email, residences, residences.length, () => {
+        res.send(Response.success(errors));
+    }, (errorMsg, idx) => {
+        errors.push(`Ha ocurrido un error en la residencia con índice [${idx.toString()}]: "${errorMsg}"`);
+    });
+});
+
+
+/**
+ * Activa una evaluación con anexo 29 para un conjunto de 
+ * residencias.
+ * 
+ * @param arr       Arreglo de IDs de residencias a activar. 
+ * 
+ * @param count     Número de residencias a activar. Al principio de la 
+ *                  recursión debe ser [arr.length].
+ * 
+ * @param onDone    Qué hacer cuándo haya terminado el proceso.
+ * 
+ * @param onError   Qué hacer en caso de error. [msg] será el mensaje de 
+ *                  error, y [n] será el número de residencia con error.
+ * 
+ * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una 
+ * residencia no se le activará su evaluación, pero el procedimiento 
+ * intenrtará seguir con las demás.
+ */
+const activarA29Residencias = (
+    adminEmail:string, arr: Object[], count: number, 
+    onDone: () => void, 
+    onError: (msg: string, n: number) => void
+) => {
+    const currIdx: number = count - 1;
+    const aiID: string = encrypt(new Date().getTime().toString());
+    const aeID: string = encrypt((new Date().getTime() + 1000).toString());
+
+    con.query(
+        `call SP_ActivarAnexo29(?, ?, ?, ?);`,
+        [arr[currIdx], adminEmail, aiID, aeID],
+        (e, rows, f) => {
+            if (e) {
+                onError(e.toString(), currIdx);
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                onError(rows[0][0]['message'], currIdx);
+            }
+
+            const aiEmail: string       = rows[0][0]['ai_email'];
+            const aeEmail: string       = rows[0][0]['ae_email'];
+            const projectName: string   = rows[0][0]['proyecto'];
+            const resident: string      = rows[0][0]['residente'];
+
+            if (currIdx == 0) {
+                const template = (url) => `
+                    <style>
+                    p {
+                        text-align: justify;
+                    }
+                    .signature {
+                        text-align: center;
+                        margin: 3em;
+                    }
+                    </style>
+                    <p>Hola,</p>
+                    <p>Usted ha recibido este correo automático porque es asesor del proyecto ${projectName.toUpperCase()}, del residente ${resident}.</p>
+                    <p>Al momento de recibir este email dió inicio el periodo de evaluación del avance del proyecto, por lo que le pedimos que, cuando tenga tiempo, entre al siguiente enlace y califique el progreso de la residencia profesional. Le recordamos que su evaluación es de vital importancia para certificar el avance de la Residencia Profesional, por lo que es fundamental que no ignore este correo electrónico.</p>
+                    <p><a href="${website}/${url}">ACCEDER AL FORMULARIO DE EVALUACIÓN</a></p>
+                    <p>Sin más que añadir, deseamos que tenga un buen día.</p>
+                    <p class="signature">SIGER, ITPN.</p>
+                `;
+
+                sendEmail(
+                    aiEmail,
+                    `Evaluación de Residencia Profesional :: SIGER`,
+                    template(`evaluacion-a29-ai?id=${encodeURI(aiID)}`)
+                );
+                    
+                sendEmail(
+                    aeEmail,
+                    `Evaluación de Residencia Profesional :: SIGER`,
+                    template(`evaluacion-a29-ae?id=${encodeURI(aeID)}`)
+                );
+
+                onDone();
+            } else {
+                activarA29Residencias(adminEmail, arr, count - 1, onDone, onError);
+            }
+        }
+    );
+}
+
+
+/**
+ * Activa el periodo de evaluación con el anexo 30 para todas las residencias
+ * con IDs incluidos en el arreglo [resArr].
+ */
+server.get('/activarAnexo30', (req, res) => {
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const residences: Object[] = JSON.parse(req.query.resArr);
+    if (!residences || residences.length == 0) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    let errors: string[] = [];
+    activarA30Residencias(req.session.user.info.email, residences, residences.length, () => {
+        res.send(Response.success(errors));
+    }, (errorMsg, idx) => {
+        errors.push(`Ha ocurrido un error en la residencia con índice [${idx.toString()}]: "${errorMsg}"`);
+    });
+});
+
+
+/**
+ * Activa una evaluación con anexo 30 para un conjunto de 
+ * residencias.
+ * 
+ * @param arr       Arreglo de IDs de residencias a activar. 
+ * 
+ * @param count     Número de residencias a activar. Al principio de la 
+ *                  recursión debe ser [arr.length].
+ * 
+ * @param onDone    Qué hacer cuándo haya terminado el proceso.
+ * 
+ * @param onError   Qué hacer en caso de error. [msg] será el mensaje de 
+ *                  error, y [n] será el número de residencia con error.
+ * 
+ * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una 
+ * residencia no se le activará su evaluación, pero el procedimiento 
+ * intenrtará seguir con las demás.
+ */
+const activarA30Residencias = (
+    adminEmail:string, arr: Object[], count: number, 
+    onDone: () => void, 
+    onError: (msg: string, n: number) => void
+) => {
+    const currIdx: number = count - 1;
+    const aiID: string = encrypt(new Date().getTime().toString());
+    const aeID: string = encrypt((new Date().getTime() + 1000).toString());
+
+    con.query(
+        `call SP_ActivarAnexo30(?, ?, ?, ?);`,
+        [arr[currIdx], adminEmail, aiID, aeID],
+        (e, rows, f) => {
+            if (e) {
+                onError(e.toString(), currIdx);
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                onError(rows[0][0]['message'], currIdx);
+            }
+
+            const aiEmail: string       = rows[0][0]['ai_email'];
+            const aeEmail: string       = rows[0][0]['ae_email'];
+            const projectName: string   = rows[0][0]['proyecto'];
+            const resident: string      = rows[0][0]['residente'];
+
+            if (currIdx == 0) {
+                const template = (url) => `
+                    <style>
+                    p {
+                        text-align: justify;
+                    }
+                    .signature {
+                        text-align: center;
+                        margin: 3em;
+                    }
+                    </style>
+                    <p>Hola,</p>
+                    <p>Usted ha recibido este correo automático porque es asesor del proyecto ${projectName.toUpperCase()}, del residente ${resident}.</p>
+                    <p>Al momento de recibir este email dió inicio el último periodo de evaluación del avance del proyecto, por lo que le pedimos que, cuando tenga tiempo, entre al siguiente enlace y califique el progreso de la residencia profesional. Le recordamos que su evaluación es de vital importancia para finalizar la Residencia Profesional, por lo que es fundamental que no ignore este correo electrónico.</p>
+                    <p><a href="${website}/${url}">ACCEDER AL FORMULARIO DE EVALUACIÓN</a></p>
+                    <p>Sin más que añadir, deseamos que tenga un buen día.</p>
+                    <p class="signature">SIGER, ITPN.</p>
+                `;
+
+                sendEmail(
+                    aiEmail,
+                    `Última evaluación de Residencia Profesional :: SIGER`,
+                    template(`evaluacion-a30?id=${encodeURI(aiID)}`)
+                );
+                    
+                sendEmail(
+                    aeEmail,
+                    `Última evaluación de Residencia Profesional :: SIGER`,
+                    template(`evaluacion-a30?id=${encodeURI(aeID)}`)
+                );
+
+                onDone();
+            } else {
+                activarA30Residencias(adminEmail, arr, count - 1, onDone, onError);
+            }
+        }
+    );
+}
+
+
+/**
+ * Regresa al cliente la información destacable de una residencia
+ * que puede ser mostrada durante la evaluación usando el Anexo 29.
+ * 
+ * @param id ID único del enlace de evaluación del asesor.
+ */
+server.get('/infoAnexo29DesdeURL', (req, res) => {
+    const id: string = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        'call SP_InformacionResidenciaParaAnexo29(?);',
+        id,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('URL inválido. Vuelva a entrar con el mismo enlace. Si el problema persiste, comuníquese con algún administrador del sistema, un desarrollador, o a scepisoftware@gmail.com'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Regresa al cliente la información destacable de una residencia
+ * que puede ser mostrada durante la evaluación usando el Anexo 30.
+ * 
+ * @param id ID único del enlace de evaluación del asesor.
+ */
+server.get('/infoAnexo30DesdeURL', (req, res) => {
+    const id: string = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        'call SP_InformacionResidenciaParaAnexo30(?);',
+        id,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0].length == 0) {
+                res.send(Response.userError('URL inválido. Vuelva a entrar con el mismo enlace. Si el problema persiste, comuníquese con algún administrador del sistema, un desarrollador, o a scepisoftware@gmail.com'));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
+/**
+ * Registra en la base de datos la evaluación de un 
+ * asesor (Ya sea interno o externo) sobre una residencia
+ * profesional, usando el anexo 29.
+ * 
+ * @param id            ID único de la evaluación.
+ * 
+ * @param evaluacion    Cadena de texto que contiene la evaluacion
+ *                      en cada rubro, separadas por coma.
+ *                      Por ejemplo, "4,2,6,10,15,4".
+ * 
+ * @param observaciones Observaciones personales del asesor.
+ */
+server.post('/registrarEvaluacionA29', (req, res) => {
+    const id: string = req.body.id;
+    const evaluacionString: string = req.body.evaluacion;
+    const observaciones: string = req.body.observaciones;
+
+    if (!id || !evaluacionString || !observaciones) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_EvaluacionA29(?, ?, ?);`,
+        [id, evaluacionString, observaciones],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] == -1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success());
+        }
+    );
+});
+
+
+/**
+ * Registra en la base de datos la evaluación de un 
+ * asesor (Ya sea interno o externo) sobre una residencia
+ * profesional, usando el anexo 30.
+ * 
+ * @param id            ID único de la evaluación.
+ * 
+ * @param evaluacion    Cadena de texto que contiene la evaluacion
+ *                      en cada rubro, separadas por coma.
+ *                      Por ejemplo, "4,2,6,10,15,4".
+ * 
+ * @param observaciones Observaciones personales del asesor.
+ */
+server.post('/registrarEvaluacionA30', (req, res) => {
+    const id: string = req.body.id;
+    const evaluacionString: string = req.body.evaluacion;
+    const observaciones: string = req.body.observaciones;
+
+    if (!id || !evaluacionString || !observaciones) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_EvaluacionA30(?, ?, ?);`,
+        [id, evaluacionString, observaciones],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] == -1) {
+                res.send(Response.sqlError(rows[0][0]['message']));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success());
+        }
+    );
+});
+
+
+/* ================================================================================================
+
+    Endpoints.
+
+================================================================================================ */
+/**
+ * Direcciones para las evaluaciones correspondientes a un anexo 29.
+ * Estas no requieren de autenticación por dos principales motivos:
+ *      1. Las personas que entren a este tipo de enlaces, son los únicos
+ *         con el ID único para acceder y evaluar.
+ *      2. Los asesores externos no tienen una cuenta para autenticar.
+ */
+// Asesor interno.
+server.get('/evaluacion-a29-ai', (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    res.sendFile('anexo-29-1-ai.html', { root: '../web-client/'});
+});
+
+// Asesor externo.
+server.get('/evaluacion-a29-ae', (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    res.sendFile('anexo-29-1-ae.html', { root: '../web-client/'});
+});
+
+
+/**
+ * Direcciones para las evaluaciones correspondientes a un anexo 30.
+ * Estas no requieren de autenticación por dos principales motivos:
+ *      1. Las personas que entren a este tipo de enlaces, son los únicos
+ *         con el ID único para acceder y evaluar.
+ *      2. Los asesores externos no tienen una cuenta para autenticar.
+ */
+server.get('/evaluacion-a30', (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    res.sendFile('anexo30.html', { root: '../web-client/'});
+});
+
 /* ================================================================================================
 
     Misc.
@@ -1579,8 +2110,12 @@ const getAdminMenu: () => Object = () => ({
         },
         'Panel de residencias': {
             'href': '/panel-residencias',
-            'icon': 'assignment'
+            'icon': 'ballot'
         },
+        'Activar evaluaciones': {
+            'href': '/activar-evaluacion',
+            'icon': 'assignment_turned_in'
+        }
     },
     'secondary': {
         'Cerrar sesión': {

@@ -54,7 +54,7 @@ const timestampToString = (ts: number) => {
 
 const getReport: () => Promise<Object> = () => new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();
-    xhr.open('get', `/reporte-preliminar${location.search ?? ''}`, true);
+    xhr.open('get', `/getInformacionReportePreliminar${location.search ?? ''}`, true);
     
     xhr.onload = () => {
         let response = JSON.parse(xhr.response);

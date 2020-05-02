@@ -26,7 +26,7 @@
                 <h2>Anexo XXIX</h2>
                 <hr>
                 <!-- <p>El objetivo de este formulario es el de evaluar el avance hasta el momento de la Residencia Profesional del estudiante <b>[NOMBRE DEL ESTUDIANTE]</b>, con número de control <b>[NO.CONTROL]</b>.</p> -->
-                <p>El objetivo de este formulario es el de evaluar el avance hasta el momento de la Residencia Profesional del estudiante <b>ROBERTO CARLOS DÍAZ SÁNCHEZ</b>, con número de control <b>17430057</b>.</p>
+                <p>El objetivo de este formulario es el de evaluar el avance hasta el momento del proyecto <b id="projectPlaceholderView">PROYECTO</b> del estudiante <b id="namePlaceholderView">RESIDENTE</b>, con número de control <b id="numPlaceholderView">NUM. CONTROL</b>.</p>
                 <p>A continuación, evalúe cada uno de los rubros que se indican con un valor numérico dentro del rango especificado, siendo 0 la calificación más baja. Después, podrá escribir sus observaciones personales.</p>
                 <div class="rubric">
                     <div class="rubric-entry">
@@ -37,55 +37,55 @@
                     <div class="rubric-entry">
                         <p class="entry-text">Asiste puntualmente en el horario establecido.</p>
                         <p class="entry-range">0 - 5</p>
-                        <input type="number" min="0" max="5">
+                        <input class="evaluation-input" type="number" min="0" max="5">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Trabaja en equipo y se comunica de forma efectiva (oral y escrita).</p>
                         <p class="entry-range">0 - 10</p>
-                        <input type="number" min="0" max="10">
+                        <input class="evaluation-input" type="number" min="0" max="10">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Tiene iniciativa para colaborar.</p>
                         <p class="entry-range">0 - 5</p>
-                        <input type="number" min="0" max="5">
+                        <input class="evaluation-input" type="number" min="0" max="5">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Propone mejoras al proyecto.</p>
                         <p class="entry-range">0 - 10</p>
-                        <input type="number" min="0" max="10">
+                        <input class="evaluation-input" type="number" min="0" max="10">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Cumple con los objetivos correspondientes al proyecto.</p>
                         <p class="entry-range">0 - 15</p>
-                        <input type="number" min="0" max="15">
+                        <input class="evaluation-input" type="number" min="0" max="15">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Es ordenado y cumple satisfactoriamente con las actividades encomendadas en los tiempos establecidos del cronograma.</p>
                         <p class="entry-range">0 - 15</p>
-                        <input type="number" min="0" max="15">
+                        <input class="evaluation-input" type="number" min="0" max="15">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Desmuestra liderazgo en su actuar.</p>
                         <p class="entry-range">0 - 10</p>
-                        <input type="number" min="0" max="10">
+                        <input class="evaluation-input" type="number" min="0" max="10">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Demuestra conocimiento en el área de su especialidad.</p>
                         <p class="entry-range">0 - 20</p>
-                        <input type="number" min="0" max="20">
+                        <input class="evaluation-input" type="number" min="0" max="20">
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Desmuestra un comportamiento ético (es disciplinado, acata órdenes, respeta a sus compañeros de trabajo, entre otros).</p>
                         <p class="entry-range">0 - 10</p>
-                        <input type="number" min="0" max="10">
+                        <input class="evaluation-input" type="number" min="0" max="10">
                     </div>
                 </div>
                 <h3>Observaciones</h3>
                 <div style="display: flex;">
-                    <textarea placeholder="Escriba aquí sus observaciones personales (limitado a 128 caracteres)..." rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
+                    <textarea id="observacionesView" placeholder="Escriba aquí sus observaciones personales (limitado a 128 caracteres)..." rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
                 </div>
                 <div class="button-container">
-                    <button class="primary-button">TERMINAR</button>
+                    <button id="evaluateButton" class="primary-button" type="button">TERMINAR</button>
                 </div>
             </form>
         </div>
@@ -138,5 +138,6 @@
             <p>Instituto Tecnológico de Piedras Negras</p>
             <p>Ingeniería en Sistemas Computacionales</p>
         </footer>
+        <script src="scripts/a29-evaluacion.js"></script>
     </body>
 </html>

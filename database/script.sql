@@ -287,11 +287,13 @@ DROP TABLE IF EXISTS `siger`.`anexo_29` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`anexo_29` (
 	`idanexo_29` INT NOT NULL AUTO_INCREMENT,
-	`fecha` VARCHAR(14) NOT NULL,
-	`evaluacion_externa` VARCHAR(24) NOT NULL,
-	`observaciones_externas` VARCHAR(128) NOT NULL,
-	`evaluacion_interna` VARCHAR(17) NOT NULL,
-	`observaciones_internas` VARCHAR(128) NOT NULL,
+	`fecha_activacion` VARCHAR(14) NOT NULL,
+	`fecha_externa` VARCHAR(14) NULL,
+	`fecha_interna` VARCHAR(14) NULL,
+	`evaluacion_externa` VARCHAR(24) NULL,
+	`observaciones_externas` VARCHAR(128) NULL,
+	`evaluacion_interna` VARCHAR(17) NULL,
+	`observaciones_internas` VARCHAR(128) NULL,
 	`id_residencia` INT NOT NULL,
 	PRIMARY KEY (`idanexo_29`),
 	INDEX `fk_anexo_29_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
@@ -310,11 +312,13 @@ DROP TABLE IF EXISTS `siger`.`anexo_30` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
 	`idanexo_30` INT NOT NULL AUTO_INCREMENT,
-	`fecha` VARCHAR(14) NOT NULL,
-	`evaluacion_externa` VARCHAR(28) NOT NULL,
-	`observaciones_externas` VARCHAR(128) NOT NULL,
-	`evaluacion_interna` VARCHAR(28) NOT NULL,
-	`observaciones_internas` VARCHAR(128) NOT NULL,
+	`fecha_activacion` VARCHAR(14) NOT NULL,
+	`fecha_externa` VARCHAR(14) NULL,
+	`fecha_interna` VARCHAR(14) NULL,
+	`evaluacion_externa` VARCHAR(28) NULL,
+	`observaciones_externas` VARCHAR(128) NULL,
+	`evaluacion_interna` VARCHAR(28) NULL,
+	`observaciones_internas` VARCHAR(128) NULL,
 	`id_residencia` INT NOT NULL,
 	PRIMARY KEY (`idanexo_30`),
 	INDEX `fk_anexo_30_residencia1_idx` (`id_residencia` ASC), -- VISIBLE,
@@ -324,6 +328,7 @@ CREATE TABLE IF NOT EXISTS `siger`.`anexo_30` (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `siger`.`confirmaciones_docentes`
@@ -340,6 +345,46 @@ CREATE TABLE IF NOT EXISTS `siger`.`confirmaciones_docentes` (
   CONSTRAINT `fk_confirmaciones_docentes_docentes1`
     FOREIGN KEY (`docentes_email`)
     REFERENCES `siger`.`docentes` (`email`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `siger`.`enlaces_anexo29`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`enlaces_anexo29` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`enlaces_anexo29` (
+  `id` VARCHAR(256) NOT NULL,
+  `es_asesor_externo` TINYINT NOT NULL DEFAULT 0,
+  `evaluado` TINYINT NOT NULL DEFAULT 0,
+  `id_anexo29` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_enlaces_anexo29_anexo_291_idx` (`id_anexo29` ASC), -- VISIBLE,
+  CONSTRAINT `fk_enlaces_anexo29_anexo_291`
+    FOREIGN KEY (`id_anexo29`)
+    REFERENCES `siger`.`anexo_29` (`idanexo_29`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `siger`.`enlaces_anexo30`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`enlaces_anexo30` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`enlaces_anexo30` (
+  `id` VARCHAR(256) NOT NULL,
+  `es_asesor_externo` TINYINT NOT NULL DEFAULT 0,
+  `evaluado` TINYINT NOT NULL DEFAULT 0,
+  `id_anexo30` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_enlaces_anexo30_anexo_301_idx` (`id_anexo30` ASC), -- VISIBLE,
+  CONSTRAINT `fk_enlaces_anexo30_anexo_301`
+    FOREIGN KEY (`id_anexo30`)
+    REFERENCES `siger`.`anexo_30` (`idanexo_30`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -596,7 +641,6 @@ END;;
                 
 			- Cerrar sesión.
 */
-
 DROP FUNCTION IF EXISTS estadoDocente;;
 CREATE FUNCTION estadoDocente(
 	v_email VARCHAR(64)
@@ -610,14 +654,207 @@ CREATE FUNCTION estadoDocente(
 	RETURN @estado;	
 END;;
 
-DELIMITER ;
+
+/*
+	Regresa la cantidad de registros que hay
+	en la tabla [anexo_29] asociados a la 
+	residencia con id [v_id_residencia].
+*/
+DROP FUNCTION IF EXISTS cantidadDeAnexos29;;
+CREATE FUNCTION cantidadDeAnexos29(
+	v_id_residencia INT
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			count(a29.idanexo_29)
+		FROM
+			anexo_29 as a29
+		WHERE 
+			a29.id_residencia = v_id_residencia
+	);
+END;;
+
+
+/*
+	Regresa la cantidad de registros que hay
+	en la tabla [anexo_30] asociados a la 
+	residencia con id [v_id_residencia].
+*/
+DROP FUNCTION IF EXISTS cantidadDeAnexos30;;
+CREATE FUNCTION cantidadDeAnexos30(
+	v_id_residencia INT
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			count(a30.idanexo_30)
+		FROM
+			anexo_30 as a30
+		WHERE 
+			a30.id_residencia = v_id_residencia
+	);
+END;;
+
+
+/*
+	Comprueba si la residencia con id [v_id_residencia] tiene
+	por lo menos algún anexo 29 pendiente de calificación.
+
+	Regresa
+		0 -> No tiene algún anexo 29 pendiente.
+		1 -> Tiene por lo menos un anexo 29 pendiente.
+*/
+DROP FUNCTION IF EXISTS tieneAnexo29Pendiente;;
+CREATE FUNCTION tieneAnexo29Pendiente(
+	v_id_residencia INT
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT
+			IF (
+				(0 IN (
+					SELECT 
+						IF (a29.fecha_externa IS NOT NULL AND a29.fecha_interna IS NOT NULL, 1, 0)
+					FROM 
+						residencias AS r LEFT JOIN anexo_29 AS a29
+							ON r.idresidencia = a29.id_residencia
+					WHERE
+						r.idresidencia = v_id_residencia
+				)) AND cantidadDeAnexos29(v_id_residencia) != 0,
+				1,
+				0
+			)
+	);
+END;;
+
+
+/*
+	Comprueba si la residencia con id [v_id_residencia] tiene
+	por lo menos algún anexo 30 pendiente de calificación.
+
+	Regresa
+		0 -> No tiene algún anexo 30 pendiente.
+		1 -> Tiene por lo menos un anexo 30 pendiente.
+*/
+DROP FUNCTION IF EXISTS tieneAnexo30Pendiente;;
+CREATE FUNCTION tieneAnexo30Pendiente(
+	v_id_residencia INT
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT
+			IF (
+				(0 IN (
+					SELECT 
+						IF (a30.fecha_externa IS NOT NULL AND a30.fecha_interna IS NOT NULL, 1, 0)
+					FROM 
+						residencias AS r LEFT JOIN anexo_30 AS a30
+							ON r.idresidencia = a30.id_residencia
+					WHERE
+						r.idresidencia = v_id_residencia
+				)) AND cantidadDeAnexos30(v_id_residencia) != 0,
+				1,
+				0
+			)
+	);
+END;;
+
+
+/*
+	Comprueba si una residencia ya está terminada.
+	Para que una residencia se considere terminada,
+	esta debe de tener un anexo 30 registrado por completo,
+	es decir, que cuente con evaluación del Asesor Interno
+	y Externo.
+
+	Regresa
+		0 -> La residencia aún no está terminada.
+		1 -> La residencia ha sido terminada.
+*/
+DROP FUNCTION IF EXISTS residenciaTerminada;;
+CREATE FUNCTION residenciaTerminada(
+	v_id_residencia INT
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT IF (
+			cantidadDeAnexos30(v_id_residencia) >= 1 AND
+			tieneAnexo30Pendiente(v_id_residencia) = 0
+		, 1, 0)
+	);
+END;;
+
+
+/*
+	Comprueba si una residencia es apta para comenzar
+	un nuevo periodo de evaluación (ya sea con el
+	anexo 29 o 30).
+
+	Para que una residencia sea apta, la residencia debe
+	estar aprobada, NO estar terminada, y NO contar con
+	ninguna evaluación pendiente (Anexo 29 o 30).
+
+	Regresa
+		0 -> La residencia no es apta.
+		1 -> Sí es apta.
+*/
+DROP FUNCTION IF EXISTS residenciaAptaParaEvaluacion;;
+CREATE FUNCTION residenciaAptaParaEvaluacion(
+	v_id_residencia INT
+) RETURNS INT DETERMINISTIC BEGIN
+	
+	RETURN (
+		SELECT 
+			IF (
+				tieneAnexo29Pendiente(v_id_residencia) = 0 AND
+				tieneAnexo30Pendiente(v_id_residencia) = 0 AND 
+				residenciaAprobada(v_id_residencia) = 1 AND 
+				residenciaTerminada(v_id_residencia) = 0
+			, 1, 0)
+	);
+
+END;;
+
+
+/*
+	Regresa el ID del registro en la tabla [anexo_29] que 
+	corresponde a un url único, ya sea de un A.I. o A.E.
+*/
+DROP FUNCTION IF EXISTS idAnexo29DeURL;;
+CREATE FUNCTION idAnexo29DeURL(
+	v_url VARCHAR(256)
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			e.id_anexo29
+		FROM 
+			enlaces_anexo29 AS e
+		WHERE
+			e.id = v_url
+	);
+END;;
+
+
+/*
+	Regresa el ID del registro en la tabla [anexo_30] que 
+	corresponde a un url único, ya sea de un A.I. o A.E.
+*/
+DROP FUNCTION IF EXISTS idAnexo30DeURL;;
+CREATE FUNCTION idAnexo30DeURL(
+	v_url VARCHAR(256)
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			e.id_anexo30
+		FROM 
+			enlaces_anexo30 AS e
+		WHERE
+			e.id = v_url
+	);
+END;;
+
 
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
 
 -------------------------------------------------------- */
-DELIMITER ;;
 
 /*
 	Muestra una lista simplificada de las carreras disponibles.
@@ -761,7 +998,6 @@ CREATE PROCEDURE SP_RegistroResidencia(
   v_periodo TINYINT,
   v_ano CHAR(4),
   v_descripcion_actividades VARCHAR(1024),
---   v_aprobado TINYINT,
   v_email_residente VARCHAR(64),
   v_fecha_elaboracion VARCHAR(14),
   v_nombre_empresa varchar(128),
@@ -796,9 +1032,9 @@ BEGIN
 
 	START TRANSACTION;
 		INSERT INTO `siger`.`residencias`
-		(nombre_proyecto, objetivo, justificacion, periodo, ano, descripcion_actividades,/*aprobado,*/email_residente,fecha_elaboracion)
+		(nombre_proyecto, objetivo, justificacion, periodo, ano, descripcion_actividades, email_residente,fecha_elaboracion)
 		VALUES
-		(v_nombre_proyecto, v_objetivo, v_justificacion, v_periodo, v_ano, v_descripcion_actividades, /*v_aprobado,*/ v_email_residente, v_fecha_elaboracion);
+		(v_nombre_proyecto, v_objetivo, v_justificacion, v_periodo, v_ano, v_descripcion_actividades, v_email_residente, v_fecha_elaboracion);
 
 		set @idr = last_insert_id();
 		
@@ -1226,6 +1462,442 @@ BEGIN
 		and
 		docentes.email=v_email;
 END;;
+
+
+/*
+	Se crea un nuevo registro en la tabla [anexo_29] para que el
+	asesor interno y externo puedan emitir una evaluación del 
+	avance en la residencia.
+*/
+DROP PROCEDURE IF EXISTS SP_ActivarAnexo29;;
+CREATE PROCEDURE SP_ActivarAnexo29(
+	v_id_residencia INT,
+	v_admin_email VARCHAR(64),
+	urlAI VARCHAR(256),
+	urlAE VARCHAR(256)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+
+	START TRANSACTION;
+
+		SET @residente_email = (SELECT r.email_residente FROM residencias AS r WHERE r.idresidencia = v_id_residencia);
+
+		IF puedeValidarResidente(@residente_email, v_admin_email) != 1 THEN BEGIN
+
+			SELECT "0" AS output, "Este usuario no puede activar evaluaciones para esta residencia" AS message;
+
+		END; ELSEIF residenciaAptaParaEvaluacion(v_id_residencia) != 1 THEN BEGIN 
+
+			SELECT "0" AS output, "Esta residencia aún es apta para evaluación" AS message;
+
+		END; ELSE BEGIN 
+
+			-- Crear el anexo 29.
+			INSERT INTO 
+				anexo_29 (fecha_activacion, id_residencia)
+			VALUES 
+				(UNIX_TIMESTAMP() * 1000, v_id_residencia);
+
+			SET @id = LAST_INSERT_ID();
+
+			-- Crear enlaces únicos para evaluación.
+			INSERT INTO 
+				enlaces_anexo29
+			VALUES 
+				(urlAI, 0, default, @id), -- Asesor interno.
+				(urlAE, 1, default, @id); -- Asesor externo.
+
+			SELECT 
+				"1" AS output, 
+				"Transaction committed successfully" AS message,
+
+				-- Información necesaria en el cliente.
+				ae.email AS 'ae_email',
+				i.email_docente AS 'ai_email',
+				r.nombre_proyecto as 'proyecto',
+				nombreCompleto(r.email_residente) AS 'residente'
+			FROM 
+				residencias AS r JOIN involucrados AS i
+					ON r.idresidencia = i.id_residencia
+				JOIN asesores_externos AS ae
+					ON r.idresidencia = ae.id_residencia
+			WHERE
+				r.idresidencia = v_id_residencia AND
+				i.es_asesor = 1;
+
+
+		END; END IF;
+
+	COMMIT;
+END;;
+
+
+/*
+	Se crea un nuevo registro en la tabla [anexo_30] para que el
+	asesor interno y externo puedan emitir una evaluación del 
+	avance en la residencia.
+*/
+DROP PROCEDURE IF EXISTS SP_ActivarAnexo30;;
+CREATE PROCEDURE SP_ActivarAnexo30(
+	v_id_residencia INT,
+	v_admin_email VARCHAR(64),
+	urlAI VARCHAR(256),
+	urlAE VARCHAR(256)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+
+	START TRANSACTION;
+
+		SET @residente_email = (SELECT r.email_residente FROM residencias AS r WHERE r.idresidencia = v_id_residencia);
+
+		IF puedeValidarResidente(@residente_email, v_admin_email) != 1 THEN BEGIN
+
+			SELECT "0" AS output, "Este usuario no puede activar evaluaciones para esta residencia" AS message;
+
+		END; ELSEIF residenciaAptaParaEvaluacion(v_id_residencia) != 1 THEN BEGIN 
+
+			SELECT "0" AS output, "Esta residencia aún es apta para evaluación" AS message;
+
+		END; ELSE BEGIN 
+
+			-- Crear el anexo 30.
+			INSERT INTO 
+				anexo_30 (fecha_activacion, id_residencia)
+			VALUES 
+				(UNIX_TIMESTAMP() * 1000, v_id_residencia);
+
+			SET @id = LAST_INSERT_ID();
+
+			-- Crear enlaces únicos para evaluación.
+			INSERT INTO 
+				enlaces_anexo30
+			VALUES 
+				(urlAI, 0, default, @id), -- Asesor interno.
+				(urlAE, 1, default, @id); -- Asesor externo.
+
+			SELECT 
+				"1" AS output, 
+				"Transaction committed successfully" AS message,
+
+				-- Información necesaria en el cliente.
+				ae.email AS 'ae_email',
+				i.email_docente AS 'ai_email',
+				r.nombre_proyecto as 'proyecto',
+				nombreCompleto(r.email_residente) AS 'residente'
+			FROM 
+				residencias AS r JOIN involucrados AS i
+					ON r.idresidencia = i.id_residencia
+				JOIN asesores_externos AS ae
+					ON r.idresidencia = ae.id_residencia
+			WHERE
+				r.idresidencia = v_id_residencia AND
+				i.es_asesor = 1;
+
+		END; END IF;
+
+	COMMIT;
+END;;
+
+
+/*
+	Lista de residencias aptas para evaluación.
+
+	Para que una residencia sea apta, la residencia debe
+	estar aprobada, NO estar terminada, y NO contar con
+	ninguna evaluación pendiente (Anexo 29 o 30).
+*/
+DROP PROCEDURE IF EXISTS SP_ResidenciasDisponiblesEvaluacion;;
+CREATE PROCEDURE SP_ResidenciasDisponiblesEvaluacion(
+	v_admin_email VARCHAR(64)
+) BEGIN
+	SELECT 
+		r.idresidencia as 'id',
+		r.nombre_proyecto AS 'proyecto', nombreCompleto(r.email_residente) AS 'residente',
+		e.nombre AS 'empresa', cantidadDeAnexos29(r.idresidencia) AS 'anexos29'
+	FROM
+		residencias AS r JOIN empresas AS e
+			ON r.idresidencia = e.id_residencia
+	WHERE
+		residenciaAptaParaEvaluacion(r.idresidencia) = 1 AND
+		puedeValidarResidente(r.email_residente, v_admin_email) = 1;
+END;;
+
+
+/*
+	Regresa una lista de las residencia que actualmente están siendo
+	evaluadas.
+
+	La información que incluirá cada fila será el ID de la residencia,
+	el nombre del proyecto, nombre completo del residente, anexo pendiente,
+	email y nombre del A.I y A.E, además de si indicar cuál de los asesores 
+	aún está pendiente de evaluación.
+*/
+DROP PROCEDURE IF EXISTS SP_ResidenciasEnEvaluacion;;
+CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
+	v_admin_email VARCHAR(64)
+) BEGIN
+	SELECT 
+		r.idresidencia as 'id', r.nombre_proyecto AS 'proyecto', 
+		nombreCompleto(r.email_residente) AS 'residente',
+		e.nombre AS 'empresa',
+		ae.email AS 'ae_email',
+		ae.nombre_completo AS 'ae_nombre',
+		IF(
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_29
+				WHERE
+					fecha_externa IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1 OR 
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_30
+				WHERE
+					fecha_externa IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1
+		, 1, 0) AS 'ae_pendiente',
+		d.email AS 'ai_email',
+		nombreCompleto(d.email) AS 'ai_nombre',
+		IF(
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_29
+				WHERE
+					fecha_interna IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1 OR 
+			(
+				SELECT 
+					COUNT(*)
+				FROM
+					anexo_30
+				WHERE
+					fecha_interna IS NULL AND
+					id_residencia = r.idresidencia
+			) >= 1
+		, 1, 0) AS 'ai_pendiente',
+		IF (
+			tieneAnexo29Pendiente(r.idresidencia) = 1
+		, 29, 30) AS 'anexo_pendiente'
+	FROM
+		residencias AS r JOIN empresas AS e
+			ON r.idresidencia = e.id_residencia
+		JOIN asesores_externos AS ae
+			ON r.idresidencia = ae.id_residencia
+		JOIN involucrados AS i
+			ON r.idresidencia = i.id_residencia
+		JOIN docentes AS d
+			ON i.email_docente = d.email
+	WHERE
+		i.es_asesor = 1 AND 
+		residenciaAprobada(r.idresidencia) = 1 AND
+		residenciaTerminada(r.idresidencia) = 0 AND
+		residenciaAptaParaEvaluacion(r.idresidencia) = 0 AND
+		puedeValidarResidente(r.email_residente, v_admin_email) = 1;
+END;;
+
+
+/*
+	Recupera información destacable para mostrar en un anexo 29 durante
+	una evaluación.
+*/
+DROP PROCEDURE IF EXISTS SP_InformacionResidenciaParaAnexo29;;
+CREATE PROCEDURE SP_InformacionResidenciaParaAnexo29(
+	v_url VARCHAR(256)
+) BEGIN
+
+	IF v_url NOT IN (SELECT id FROM enlaces_anexo29 WHERE evaluado = 0) THEN BEGIN
+
+		SELECT "0" AS output, "URL inválido." AS message;
+
+	END; ELSE BEGIN
+		SELECT 
+			"1" AS output, "Success" AS message,
+			r.nombre_proyecto AS 'proyecto',
+			nombreCompleto(r.email_residente) AS 'residente',
+			r.email_residente AS 'correo_residente'
+		FROM
+			residencias AS r JOIN anexo_29 AS a
+				ON r.idresidencia = a.id_residencia
+		WHERE
+			a.idanexo_29 = idAnexo29DeURL(v_url);
+	END; END IF;
+
+END;;
+
+
+/*
+	Recupera información destacable para mostrar en un anexo 30 durante
+	una evaluación.
+*/
+DROP PROCEDURE IF EXISTS SP_InformacionResidenciaParaAnexo30;;
+CREATE PROCEDURE SP_InformacionResidenciaParaAnexo30(
+	v_url VARCHAR(256)
+) BEGIN
+
+	IF v_url NOT IN (SELECT id FROM enlaces_anexo30 WHERE evaluado = 0) THEN BEGIN
+
+		SELECT "0" AS output, "URL inválido." AS message;
+
+	END; ELSE BEGIN
+		SELECT 
+			"1" AS output, "Success" AS message,
+			r.nombre_proyecto AS 'proyecto',
+			nombreCompleto(r.email_residente) AS 'residente',
+			r.email_residente AS 'correo_residente'
+		FROM
+			residencias AS r JOIN anexo_30 AS a
+				ON r.idresidencia = a.id_residencia
+		WHERE
+			a.idanexo_30 = idAnexo30DeURL(v_url);
+	END; END IF;
+
+END;;
+
+
+/*
+	Registra la evaluación de un asesor sobre una residencia profesional,
+	sin importar si es un asesor interno o externo.
+
+	[v_url] es el ID único que se le asignó a la evaluación en curso.
+	[v_evaluación] es una cadena de texto que contiene la calificación
+	asignada por el asesor en cada rubro, separada por una coma [,].
+*/
+DROP PROCEDURE IF EXISTS SP_EvaluacionA29;;
+CREATE PROCEDURE SP_EvaluacionA29(
+	v_url VARCHAR(256),
+	v_evaluacion VARCHAR(24),
+	v_observaciones VARCHAR(128)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	START TRANSACTION;
+		IF v_url NOT IN (SELECT id FROM enlaces_anexo29 WHERE evaluado = 0) THEN BEGIN
+
+			SELECT "0" AS output, "URL inválido." AS message;
+
+		END; ELSE BEGIN
+
+			IF (SELECT e.es_asesor_externo FROM enlaces_anexo29 AS e WHERE e.id = v_url) = 0 THEN BEGIN
+				-- Es asesor interno.
+				UPDATE anexo_29 SET 
+					fecha_interna = UNIX_TIMESTAMP() * 1000, 
+					evaluacion_interna = v_evaluacion, 
+					observaciones_internas = v_observaciones
+				WHERE
+					idanexo_29 = idAnexo29DeURL(v_url);
+			END; ELSE BEGIN
+				-- Es asesor externo.
+				UPDATE anexo_29 SET 
+					fecha_externa = UNIX_TIMESTAMP() * 1000, 
+					evaluacion_externa = v_evaluacion, 
+					observaciones_externas = v_observaciones
+				WHERE
+					idanexo_29 = idAnexo29DeURL(v_url);
+			END; END IF;
+
+			UPDATE enlaces_anexo29 SET
+				evaluado = 1
+			WHERE
+				id = v_url;
+
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		END; END IF;
+	COMMIT;
+END;;
+
+
+/*
+	Registra la evaluación de un asesor sobre una residencia profesional,
+	sin importar si es un asesor interno o externo.
+
+	[v_url] es el ID único que se le asignó a la evaluación en curso.
+	[v_evaluación] es una cadena de texto que contiene la calificación
+	asignada por el asesor en cada rubro, separada por una coma [,].
+*/
+DROP PROCEDURE IF EXISTS SP_EvaluacionA30;;
+CREATE PROCEDURE SP_EvaluacionA30(
+	v_url VARCHAR(256),
+	v_evaluacion VARCHAR(28),
+	v_observaciones VARCHAR(128)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	START TRANSACTION;
+		IF v_url NOT IN (SELECT id FROM enlaces_anexo30 WHERE evaluado = 0) THEN BEGIN
+
+			SELECT "0" AS output, "URL inválido." AS message;
+
+		END; ELSE BEGIN
+
+			IF (SELECT e.es_asesor_externo FROM enlaces_anexo30 AS e WHERE e.id = v_url) = 0 THEN BEGIN
+				-- Es asesor interno.
+				UPDATE anexo_30 SET 
+					fecha_interna = UNIX_TIMESTAMP() * 1000, 
+					evaluacion_interna = v_evaluacion, 
+					observaciones_internas = v_observaciones
+				WHERE
+					idanexo_30 = idAnexo30DeURL(v_url);
+			END; ELSE BEGIN
+				-- Es asesor externo.
+				UPDATE anexo_30 SET 
+					fecha_externa = UNIX_TIMESTAMP() * 1000, 
+					evaluacion_externa = v_evaluacion, 
+					observaciones_externas = v_observaciones
+				WHERE
+					idanexo_30 = idAnexo30DeURL(v_url);
+			END; END IF;
+
+			UPDATE enlaces_anexo30 SET
+				evaluado = 1
+			WHERE
+				id = v_url;
+
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		END; END IF;
+	COMMIT;
+END;;
+
 
 DELIMITER ;
 

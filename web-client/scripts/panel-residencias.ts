@@ -72,6 +72,7 @@ const populate = (query: string) => {
         }
     }).catch(err => {
         alert(err);
+        window.open('/home', '_self');
     });
 }
 
