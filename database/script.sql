@@ -1074,6 +1074,30 @@ CREATE PROCEDURE SP_AsignarDocentesAProyecto(
 	END; END IF;	
 END;;
 
+DROP PROCEDURE IF EXISTS SP_MostrarAsesorados;;
+CREATE PROCEDURE SP_MostrarAsesorados(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    residentes.email as remail, residentes.nombre as nombre, residentes.apellido_paterno as ap,
+    residentes.apellido_materno, residencias.nombre_proyecto as proyecto,
+    residencias.periodo as periodo, residencias.ano as ano, carreras.nombre_carrera as carrera
+	from docentes
+	join involucrados
+		on docentes.email=involucrados.email_docente
+	join residencias
+		on residencias.idresidencia = involucrados.id_residencia
+	join residentes
+		on residentes.email = residencias.email_residente
+	join carreras
+		on residentes.clave_carrera = carreras.clave
+	where
+		involucrados.es_asesor=1
+		and
+		docentes.email=v_email;
+END;;
+
 DELIMITER ;
 
 /* --------------------------------------------------------
