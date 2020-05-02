@@ -310,7 +310,8 @@ server.post('/auth', (req,res) =>{
                         email: results[0]['email'],
                         nombre: results[0]['nombre'],
                         apellido_paterno: results[0]['apellido_paterno'],
-                        apellido_materno: results[0]['apellido_materno']
+                        apellido_materno: results[0]['apellido_materno'],
+                        residente:''
                     }
                 };
                     
@@ -1003,6 +1004,292 @@ server.get('/mis-residentes',(req,res)=>
     res.sendFile('residentesasesorados.html', { root: '../web-client/' });
 
 });
+
+server.get('/asesorados',(req,res)=>
+{
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.DOCENTE) {
+        res.send(Response.authError());
+        return;
+    }
+    con.query('call SP_MostrarAsesorados(?);',
+    [
+        req.session.user.info.email
+    ],
+    (e,rows,f)=>
+    {
+        if(e)
+        {
+            console.log(e);
+            return;
+        }
+        try
+        {
+            let residentes=[{}];
+            residentes.pop();
+            for(let i = 0; i < rows[0].length; i++)
+            {
+                residentes.push(rows[0][i]);
+            }
+            residentes.push({length:rows[0].length});
+            res.json(residentes);
+        }
+        catch(e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/avancedemiresidente',(req,res)=>
+{
+    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.DOCENTE) {
+        res.send(Response.authError());
+        return;
+    }
+    req.session.user.info.residente=req.query.email;
+    res.sendFile('ravance.html', { root: '../web-client/'});
+});
+
+server.get('/asesor-aprobado',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+        // TODO: Agregar pantalla de Acesso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    console.log('email del residente: ' + req.session.user.info.residente);
+    con.query('call SP_MostrarAprobado(?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+        {
+            if(er)
+            {
+                console.log(er);
+                return;
+            }
+            try
+            {
+                if(rows[0][0]['aprobado']==0)
+                {
+                    const message = 0;
+                    const a = String(rows[0][0]['aprobado']);
+                    const p = String(rows[0][0]['proyecto']);
+                    const n = String(rows[0][0]['nombre']);
+                    const ap = String(rows[0][0]['ap']);
+                    const am = String(rows[0][0]['am']);
+                    const em = String(req.session.user.info.residente);
+                    const fecha = String(rows[0][0]['fecha']);
+
+                    res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                }
+                const message = 1;
+                const a = String(rows[0][0]['aprobado']);
+                const p = String(rows[0][0]['proyecto']);
+                const n = String(rows[0][0]['nombre']);
+                const ap = String(rows[0][0]['ap']);
+                const am = String(rows[0][0]['am']);
+                const em = String(req.session.user.info.residente);
+                const fecha = String(rows[0][0]['fecha']);
+
+                res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                }
+                catch(e)
+                {
+                    if(e instanceof TypeError)
+                    {
+                        const message = -3;
+                        const n = String(rows[0][0]['nombre']);
+                        const ap = String(rows[0][0]['ap']);
+                        const am = String(rows[0][0]['am']);
+                        const em = String(req.session.user.info.email);
+                        res.json({message:message,n:n,ap:ap,am:am,em:em});
+                    }
+                }
+        });          
+});
+
+server.get('/asesor-asesor',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+        // TODO: Agregar pantalla de Acesso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarAsesor(?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try {
+            const message = 1;
+            const nasesor = String(rows[0][0]['nombre']);
+            const apasesor = String(rows[0][0]['ap']);
+            const amasesor = String(rows[0][0]['am']);
+
+            res.json({message:message,nombre:nasesor,paternoasesor:apasesor,maternoasesor:amasesor});
+        } catch (e) {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/asesor-revisores',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+        // TODO: Agregar pantalla de Acesso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarRevisores(?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try {
+            const message = 1;
+            const n1 = String(rows[0][0]['nombre']);
+            const ap1 = String(rows[0][0]['ap']);
+            const am1 = String(rows[0][0]['am']);
+            const n2 = String(rows[0][1]['nombre']);
+            const ap2 = String(rows[0][1]['ap']);
+            const am2 = String(rows[0][1]['am']);
+
+            res.json({message:message,n1:n1,ap1:ap1,am1:am1,n2:n2,ap2:ap2,am2:am2});
+        } catch (e) {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/asesor-cal1',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+
+    con.query('call SP_MostrarAnexo29 (?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            const message = 1;
+            const ee = String(rows[0][0]['ee']);
+            const oe = String(rows[0][0]['oe']);
+            const ei = String(rows[0][0]['ei']);
+            const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/asesor-cal2',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+        // TODO: Agregar pantalla de Acceso No Autorizado.
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarAnexo30 (?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            const message = 1;
+            const ee = String(rows[0][0]['ee']);
+            const oe = String(rows[0][0]['oe']);
+            const ei = String(rows[0][0]['ei']);
+            const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+        
+    });
+});
+
 
 server.get('/getMenu', (req, res) => {
     if (!req.session.loggedin) {

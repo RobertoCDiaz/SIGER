@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avance del alumno :: SIGER</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/forms.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" srel="stylesheet">
+    <link rel="stylesheet" href="styles/timeline.css">
+</head>
+<body>
+    <!-- <button id="fixedbutton"><img src="assets/images/menu.png" onclick="openNav()"></button>
+    
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#"><img src="assets/images/reporte.png"> Reporte preliminar</a>
+            <a href="#"><img src="assets/images/progreso.png"> Progreso actual</a>
+            <a href="#"><img src="assets/images/brief.png"> Documentos</a>
+            <a href="#"><img src="assets/images/chat.png"> Contacto con docentes</a>
+        </div> -->
+
+        <header class="header-extension">
+            <div class="bar">
+                <!-- <h1><a href="/home">SIGER</a></h1> -->
+    <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                        <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                        <h1 style="margin-left: .5em;">SIGER</h1>
+                    </a>
+                <h2>Progeso actual</h2>
+            </div>
+        </header>
+            
+            <div id="main">
+
+                <div class="content" id="contenido">
+                    <form id="maininfo">
+                        <h2>Avance</h2><br>
+                        
+                    </form>
+
+                    <div class="timeline" id="timelinedef">
+
+                    </div>
+        
+                <div class="timeline" id="timeline">
+                    
+                </div>
+            </div>
+    </div>
+
+    <footer>
+        <div class="sections-container" id="foot">
+            <section class="seccion">
+                <h2>Integrantes</h2>
+                <div class="section-item">
+                    <p>Daniel Hernández Sánchez</p>
+                    <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+                </div>
+                <div class="section-item">
+                    <p>Roberto Carlos Díaz Sánchez</p>
+                    <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+                </div>
+            </section>
+            <section class="seccion">
+                <h2>Materias</h2>
+                <div class="section-item">
+                    <p>Administración de Bases de Datos</p>
+                    <p>SCB-1001</p>
+                </div>
+                <div class="section-item">
+                    <p>Ingeniería de Software</p>
+                    <p>SCD-1011</p>
+                </div>
+                <div class="section-item">
+                    <p>Programación Web</p>
+                    <p>AEB-1055</p>
+                </div>
+            </section>
+            <section class="seccion">
+                <h2>Enlaces de interés</h2>
+                <div class="section-item">
+                    <p>
+                        <a href="https://github.com/RobertoCDiaz/SIGER"
+                            >Repositorio en GitHub</a
+                        >
+                    </p>
+                    <p>
+                        <a
+                            href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw"
+                            >Documentación y evidencias</a
+                        >
+                    </p>
+                </div>
+            </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+    <script>
+        let ts;
+        let proyecto;
+        let fechareporte
+        let nresidente;
+        let apresidente;
+        let amresidente;
+        let ncontrol;
+
+        const getAprobado=()=>
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.open('get',`/asesor-aprobado`,true);
+            xhr.onload=()=>
+            {
+                let response = JSON.parse(xhr.responseText);
+                nresidente=response['n'];
+                apresidente=response['ap'];
+                amresidente=response['am'];
+                
+                ncontrol=response['em'].substring(1,9);
+
+                const maininfo = document.getElementById('maininfo');
+                let h = document.createElement('p');
+                if(amresidente!='null')
+                    h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+' '+amresidente+' con número de control '+ ncontrol +' respecto a su residencia profesional.';
+                else
+                    h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+'  con número de control '+ ncontrol +' respecto a su residencia profesional.';
+                maininfo.appendChild(h);
+
+                if(response['message']==1)
+                {
+                    proyecto = response['proyecto'];
+                    ts=Number.parseInt(String(response['fecha']));
+                    fechareporte = new Date(ts);
+                    let tl = document.getElementById('timelinedef');
+                    let contleft = document.createElement('div');
+                    contleft.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Reporte preliminar enviado para aprobación';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+
+                    tl = document.getElementById('timelinedef');
+                    contleft = document.createElement('div');
+                    contleft.className='container left';
+                    cont = document.createElement('div');
+                    cont.className='contentt';
+                    title = document.createElement('h2');
+                    title.innerText='Residencia aprobada.';
+                    cont.appendChild(title);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+                }
+                else if (response['message']==0)
+                {
+                    proyecto = response['proyecto'];
+                    ts=Number.parseInt(String(response['fecha']));
+                    fechareporte = new Date(ts);
+                    let tl = document.getElementById('timelinedef');
+                    let contleft = document.createElement('div');
+                    contleft.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Reporte preliminar enviado para aprobación';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+
+                    tl = document.getElementById('timelinedef');
+                    contleft = document.createElement('div');
+                    contleft.className='container left';
+                    cont = document.createElement('div');
+                    cont.className='contentt';
+                    title = document.createElement('h2');
+                    title.innerText='Proyecto pendiente para aprobación.';
+                    cont.appendChild(title);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+                }
+                else if (response['message']==-3)
+                {
+                    let tl = document.getElementById('timelinedef');
+                    let contleft = document.createElement('div');
+                    contleft.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Aún no hay avance para mostrar.';
+                    let inf = document.createElement('p');
+                    cont.appendChild(title);
+                    contleft.appendChild(cont);
+                    tl.appendChild(contleft);
+                }
+            }
+            xhr.send();
+        }
+        getAprobado();
+
+        const getAsesor=()=>
+        {
+            let b = new XMLHttpRequest();b.open('get',`/asesor-asesor`,true);
+            b.onload=()=>
+            {
+                let response = JSON.parse(b.responseText);
+                if(response['message']==1)
+                {
+                    const na = response['nombre'];
+                    const apa = response['paternoasesor'];
+                    const ama = response['maternoasesor'];
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    cont.id='asesorevisores';
+                    let title = document.createElement('h2');
+                    title.innerText='Asesor y revisores asignados';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Asesor interno: '+ na + ' ' + apa + ' ' + ama +'.';
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+                
+            }
+            b.send();
+        }
+        getAsesor();
+
+        const getRevisores=()=>
+        {
+            let c = new XMLHttpRequest();c.open('get',`/asesor-revisores`,true);
+            c.onload=()=>
+            {
+                let response = JSON.parse(c.responseText);
+                if(response['message']==1)
+                {
+                    const n1 = response['n1'];
+                    const ap1 = response['ap1'];
+                    const am1 = response['am1'];
+                    const n2 = response['n2'];
+                    const ap2 = response['ap2'];
+                    const am2 = response['am2'];
+                    let cont = document.getElementById('asesorevisores');
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Revisores: '+ n1 + ' ' + ap1 + ' ' + am1 +' y ' + n2 + ' ' + ap2 + ' ' + am2 + '.';
+                    cont.appendChild(inf);
+                }
+                
+            }
+            c.send();
+        }
+        getRevisores();
+
+        const getCal1=()=>
+        {
+            let d = new XMLHttpRequest();d.open('get',`/asesor-cal1`,true);
+            d.onload=()=>
+            {
+                let response = JSON.parse(d.responseText);
+                if(response['message']==1)
+                {
+                    const ee = response['ee'];
+                    const oe = response['oe'];
+                    const ei = response['ei'];
+                    const oi = response['oi'];
+                    let totalee=0;
+                    let totalei=0;
+                    const aee = String(ee).split(',');
+                    for(let i=0;i<aee.length;i++)
+                    {
+                        totalee+=Number.parseInt(aee[i]);
+                    }
+                    const aei = ei.split(',');
+                    for(let i=0;i<aei.length;i++)
+                    {
+                        totalei+=Number.parseInt(aei[i]);
+                    }
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Calificaciones parciales (Anexo 29)';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            d.send();
+        }
+        getCal1();
+
+        const getCal2=()=>
+        {
+            let e = new XMLHttpRequest();e.open('get',`/asesor-cal2`,true);
+            e.onload=()=>
+            {
+                let response = JSON.parse(e.responseText);
+                if(response['message']==1)
+                {
+                    const ee = response['ee'];
+                    const oe = response['oe'];
+                    const ei = response['ei'];
+                    const oi = response['oi'];
+                    let totalee=0;
+                    let totalei=0;
+                    const aee = String(ee).split(',');
+                    for(let i=0;i<aee.length;i++)
+                    {
+                        totalee+=Number.parseInt(aee[i]);
+                    }
+                    const aei = ei.split(',');
+                    for(let i=0;i<aei.length;i++)
+                    {
+                        totalei+=Number.parseInt(aei[i]);
+                    }
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container right';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Calificaciones parciales (Anexo 30)';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            e.send();
+        }
+        getCal2();
+        
+    </script>
+    <!-- <script src="scripts/sidebar.js"></script> -->
+    <script src="scripts/menu.js"></script>
+</body>
+</html>
