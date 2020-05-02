@@ -1,0 +1,39 @@
+#maindiv
+        {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+
+        #mainform, #bot
+        {
+            display: flex;
+            flex-direction: column;
+            align-items: center ;
+        }
+
+        .divs
+        {
+            margin: 2em;
+        }        
+
+        .form-input {
+            display: flex;
+            margin-bottom: .5em;
+            align-items: center;
+            justify-content: center;
+            justify-items: stretch;
+        }
+
+        .form-input > * {
+            flex: 1;
+        }
+
+        .form-input > label {
+            text-align: right;
+            margin-right: .5em;
+        }
+
+        form {
+            margin: 0 15%;
+        }
