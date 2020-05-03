@@ -42,8 +42,60 @@ server.use(session({
 
 enum USER_CLASSES {
     RESIDENTE = 1,
-    ADMIN = 2,
-    DOCENTE = 3
+    ADMIN = 10,
+    DOCENTE = 100
+}
+
+class UserUtils {
+    /**
+     * Comprueba si un tipo de usuario forma parte de algún grupo de usuarios específico.
+     * Regresa [true] o [false] dependiendo del resultado.
+     * 
+     * @param actualClass Valor binario a comprobar.
+     * 
+     * @param desiredClass Valor del grupo de usuarios con el cual hacer la comparación.
+     * 
+     * Ejemplos de uso:
+     * 
+     * $ belongsToClass(001, USER_CLASSES.RESIDENTE);
+     *      -> true
+     * 
+     * $ belongsToClass(110, USER_CLASSES.ADMIN);
+     *      -> true
+     * 
+     * $ belongsToClass(010, USER_CLASSES.DOCENTE);
+     *      -> true
+     * 
+     * $ belongsToClass(010, USER_CLASSES.ADMIN);
+     *      -> false
+     * 
+     */
+    static belongsToClass = (actualClass: number, desiredClass: number) =>
+        ((actualClass & (desiredClass)) == (desiredClass));
+
+    /**
+     * Junta distintos grupos de usuario y arroja el valor 
+     * numérico (Tomado como binario) que representaría el conjunto
+     * de todos los grupos de usuario introducidos.
+     * 
+     * @params Lista de grupos de usuarios a concatenar.
+     * 
+     * Ejemplos de uso:
+     * 
+     * $ concatenateClasses(USER_CLASSES.DOCENTE, USER_CLASSES.ADMIN);
+     *      -> 110
+     * 
+     * $ concatenateClasses(USER_CLASSES.DOCENTE, USER_CLASSES.ADMIN, USER_CLASSES.RESIDENTE);
+     *      -> 111
+     */
+    static concatenateClasses = (...classes: number[]) => {
+        let res = 0;
+        classes.forEach(c => 
+            res = res | c
+        );
+
+        return res;
+    }
 }
 
 /* ================================================================================================
@@ -76,7 +128,8 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
  * carreras que el administrador actual maneja.
  */
 server.get('/residentesNoValidados', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    // if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -101,7 +154,7 @@ server.get('/residentesNoValidados', (req, res) => {
  * electrónico que se pase al argumento [email_residente].
  */
 server.post('/validarResidente', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -218,7 +271,7 @@ server.post('/auth', (req,res) =>{
     }
 
     switch (parseInt(userClass)) {
-        case USER_CLASSES.RESIDENTE: {
+        case 1: {
             con.query('select * from residentes where email = ?',[email],(e,results,fi)=> {
                 if (e) {
                     res.send(Response.unknownError(e.toString()));
@@ -252,42 +305,9 @@ server.post('/auth', (req,res) =>{
             break;  
         }     
 
-        case USER_CLASSES.ADMIN: {
-            con.query('select * from administradores where email = ?',[email],(e,results,fi) => {
-                if (e) {
-                    res.send(Response.unknownError(e.toString()));
-                    return;
-                }
-                
-                if (results.length == 0) {
-                    res.send(Response.userError("El correo electrónico ingresado no está registrado."));
-                    return;
-                }
-        
-                if (pass != decrypt(results[0]['contrasena'])) {
-                    res.send(Response.userError("La contraseña no es correcta, verifique."));
-                    return;
-                }
-        
-                req.session.user = {
-                    class: USER_CLASSES.ADMIN,
-                    info: {
-                        email: results[0]['email'],
-                        nombre: results[0]['nombre'],
-                        apellido_paterno: results[0]['apellido_paterno'],
-                        apellido_materno: results[0]['apellido_materno']
-                    }
-                };
-        
-                req.session.loggedin = true;
-        
-                res.send(Response.success());
-            });  
-            break;  
-        }
-        case USER_CLASSES.DOCENTE:
+        case 2:
         {
-            con.query('select * from docentes where email = ?',[email],
+            con.query('select *, esAdmin(d.email) as `admin` from docentes as d where email = ?',[email],
             (e,results,fi)=>
             {
                 if (e) {
@@ -305,8 +325,13 @@ server.post('/auth', (req,res) =>{
                     return;
                 }
 
+                let userClass = USER_CLASSES.DOCENTE;
+                if (results[0]['admin'] == 1) {
+                    userClass = UserUtils.concatenateClasses(userClass, USER_CLASSES.ADMIN);
+                }
+
                 req.session.user = {
-                    class: USER_CLASSES.DOCENTE,
+                    class: userClass,
                     info: {
                         email: results[0]['email'],
                         nombre: results[0]['nombre'],
@@ -324,16 +349,17 @@ server.post('/auth', (req,res) =>{
         }
     }
 
+
 });
 
 server.get('/home',(req,res)=> {
     if(req.session.loggedin){
-        if (req.session.user.class == USER_CLASSES.RESIDENTE) {
+        if (UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
             res.sendFile("menu-residentes.html", { root: "../web-client/" });
             return
         }
 
-        if (req.session.user.class == USER_CLASSES.ADMIN) {
+        if (UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
             res.sendFile("menu-admin.html", { root: "../web-client/" });
             return
         }
@@ -350,7 +376,7 @@ server.get('/validar-residentes', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.redirect('/home');
         return;
     }
@@ -373,7 +399,7 @@ server.get('/nuevo-proyecto', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -394,7 +420,7 @@ server.get('/nuevo-proyecto', (req, res) => {
 server.post('/registro-residencia',(req,res)=>
 {
     
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.send(Response.authError());
         return;
     }
@@ -528,7 +554,7 @@ const registrarHorarios = (
  * número de control).
  */
 server.get('/listaResidenciasSinDocentes', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -546,7 +572,8 @@ server.get('/listaResidenciasSinDocentes', (req, res) => {
             }
 
             if (rows[0].length == 0) {
-                res.send(Response.userError('No hay ninguna residencia disponible'))
+                res.send(Response.userError('No hay ninguna residencia disponible'));
+                return;
             }
 
             res.send(Response.success(rows[0]));
@@ -561,7 +588,7 @@ server.get('/avance-proyecto', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -585,7 +612,7 @@ server.get('/aprobado',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -648,7 +675,7 @@ server.get('/asesor',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -687,7 +714,7 @@ server.get('/revisores',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -729,7 +756,7 @@ server.get('/cal1',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -772,7 +799,7 @@ server.get('/cal2',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -814,7 +841,7 @@ server.get('/docs', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.RESIDENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.redirect('/home');
         return;
     }
@@ -860,7 +887,7 @@ server.get('/panel-residencias', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.redirect('/home');
         return;
     }
@@ -874,7 +901,7 @@ server.get('/residencia', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.redirect('/home');
         return;
     }
@@ -893,7 +920,7 @@ server.get('/activar-evaluacion', (req, res) => {
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.redirect('/home');
         return;
     }
@@ -908,7 +935,7 @@ server.get('/activar-evaluacion', (req, res) => {
  * y cuando el adminsitrador esté a cargo de la carrera del residente.
  */
 server.get('/getInformacionReportePreliminar', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -946,7 +973,7 @@ server.get('/getInformacionReportePreliminar', (req, res) => {
  * de docentes que cumplan con [q] en su correo electrónico o nombre completo.
  */
 server.get('/buscarDocente', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -985,7 +1012,7 @@ server.get('/buscarDocente', (req, res) => {
  *      Docente con id [r2] -> Revisor 2.
  */
 server.post('/asignar-docentes', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -1024,7 +1051,7 @@ server.post('/asignar-docentes', (req, res) => {
 
 server.get('/mis-residentes',(req,res)=>
 {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         res.send(Response.authError());
         return;
     }
@@ -1035,7 +1062,7 @@ server.get('/mis-residentes',(req,res)=>
 
 server.get('/asesorados',(req,res)=>
 {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         res.send(Response.authError());
         return;
     }
@@ -1074,7 +1101,7 @@ server.get('/asesorados',(req,res)=>
 
 server.get('/avancedemiresidente',(req,res)=>
 {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         res.send(Response.authError());
         return;
     }
@@ -1089,7 +1116,7 @@ server.get('/asesor-aprobado',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         // TODO: Agregar pantalla de Acesso No Autorizado.
         res.redirect('/home');
         return;
@@ -1154,7 +1181,7 @@ server.get('/asesor-asesor',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         // TODO: Agregar pantalla de Acesso No Autorizado.
         res.redirect('/home');
         return;
@@ -1194,7 +1221,7 @@ server.get('/asesor-revisores',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         // TODO: Agregar pantalla de Acesso No Autorizado.
         res.redirect('/home');
         return;
@@ -1237,7 +1264,7 @@ server.get('/asesor-cal1',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         // TODO: Agregar pantalla de Acceso No Autorizado.
         res.redirect('/home');
         return;
@@ -1281,7 +1308,7 @@ server.get('/asesor-cal2',(req,res)=>
         return;
     }
 
-    if (req.session.user.class != USER_CLASSES.DOCENTE) {
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
         // TODO: Agregar pantalla de Acceso No Autorizado.
         res.redirect('/home');
         return;
@@ -1356,29 +1383,18 @@ server.get('/getMenu', (req, res) => {
         return;
     }
 
-    switch (req.session.user.class) {
-        case USER_CLASSES.ADMIN: {
-            res.send(Response.success(getAdminMenu()));
-            break;
-        };
-
-        case USER_CLASSES.DOCENTE: {
-            getTeacherMenu(
-                req.session.user.info.email,
-                (teacherMenu) =>
-                    res.send(Response.success(teacherMenu))
-            )
-            break;
-        };
-
-        case USER_CLASSES.RESIDENTE: {
-            getResidentMenu(
-                req.session.user.info.email,
-                (residentMenu) =>
-                    res.send(Response.success(residentMenu))
-            )
-            break;
-        };
+    if (UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
+        getTeacherMenu(
+            req.session.user.info.email,
+            (teacherMenu) =>
+                res.send(Response.success(teacherMenu))
+        )
+    } else {
+        getResidentMenu(
+            req.session.user.info.email,
+            (residentMenu) =>
+                res.send(Response.success(residentMenu))
+        )
     }
 });
 
@@ -2236,8 +2252,8 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
 const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => void) => Object =
     async (email, onDone) => {
         con.query(
-            `select estadoDocente(?) as estado;`,
-            email,
+            `select estadoDocente(?) as estado, esAdmin(?) as admin;`,
+            [email, email],
             (e, rows, f) => {
                 let menu: Object = {
                     'main': {
@@ -2255,6 +2271,7 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
                 };
 
                 const state: number = Number(rows[0]['estado']);
+                const admin: number = Number(rows[0]['admin']);
 
                 switch (state) {
                     case 0: menu = {
@@ -2291,6 +2308,13 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
                         }
                     }; break;
 
+                }
+
+                if (admin == 1) {
+                    menu = {
+                        main: Object.assign({}, menu['main'], getAdminMenu()['main']),
+                        secondary: Object.assign({}, menu['secondary'], getAdminMenu()['secondary']),
+                    }
                 }
                 
                 onDone(menu);

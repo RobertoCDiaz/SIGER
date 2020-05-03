@@ -84,13 +84,14 @@
 .options-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    margin: .5em 30%;
+    justify-content: center;
+    margin: .5em 0;
 }
 
 .options-container > p {
     color: var(--azul-tec);
     font-weight: bold;
+    margin: 0 2em;
     text-decoration: underline;
     cursor: pointer;
 }
