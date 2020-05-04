@@ -1150,7 +1150,10 @@ CREATE PROCEDURE `SP_MostrarAprobado`(
 v_email VARCHAR(64)
 )
 BEGIN
-	select "1" as output, "Transaction commited successfully" AS message, aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha
+	select "1" as output, "Transaction commited successfully" AS message,
+    aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha,
+    residentes.nombre as nombre, residentes.apellido_paterno as ap,
+    residentes.apellido_materno as am
     from residencias join residentes on residencias.email_residente=residentes.email
     where residencias.email_residente=v_email;
 END;;
