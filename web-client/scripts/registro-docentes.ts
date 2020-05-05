@@ -132,7 +132,7 @@ const register = () => {
         return;
     }
 
-    if (new RegExp(`[A-z]+\.[A-z]{2}@piedrasnegras\.tecnm\.mx`).test(emailDView.value.trim())) {
+    if (!(new RegExp(`[A-z]+\.[A-z]{2}@piedrasnegras\.tecnm\.mx`).test(emailDView.value.trim()))) {
         alert('El correo electrónico dado no cumple con la estructura de un correo electrónico institucional de un docente.')
         return;
     }

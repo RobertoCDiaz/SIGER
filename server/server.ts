@@ -128,7 +128,6 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
  * carreras que el administrador actual maneja.
  */
 server.get('/residentesNoValidados', (req, res) => {
-    // if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
     if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
@@ -1579,7 +1578,7 @@ server.get('/confirmarDocente', (req, res) => {
  * ninguna evaluación pendiente (Anexo 29 o 30).
  */
 server.get('/residenciasAptasParaEvaluacion', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -1615,7 +1614,7 @@ server.get('/residenciasAptasParaEvaluacion', (req, res) => {
  * aún está pendiente de evaluación.
  */
 server.get('/residenciasEnEvaluacion', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -1646,7 +1645,7 @@ server.get('/residenciasEnEvaluacion', (req, res) => {
  * con IDs incluidos en el arreglo [resArr].
  */
 server.get('/activarAnexo29', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
@@ -1755,7 +1754,7 @@ const activarA29Residencias = (
  * con IDs incluidos en el arreglo [resArr].
  */
 server.get('/activarAnexo30', (req, res) => {
-    if (!req.session.loggedin || req.session.user.class != USER_CLASSES.ADMIN) {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.ADMIN)) {
         res.send(Response.authError());
         return;
     }
