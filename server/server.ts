@@ -773,6 +773,11 @@ server.get('/cal1',(req,res)=>
         }
         try 
         {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
             const oe = String(rows[0][0]['oe']);
@@ -815,6 +820,11 @@ server.get('/cal2',(req,res)=>
         }
         try 
         {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
             const oe = String(rows[0][0]['oe']);
