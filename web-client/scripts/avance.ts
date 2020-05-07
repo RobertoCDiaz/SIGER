@@ -17,7 +17,7 @@ let ts;
         const getAprobado=()=>
         {
             let xhr = new XMLHttpRequest();
-            xhr.open('get',`/aprobado`,true);
+            xhr.open('get',`/aprobado`,false);
             xhr.onload=()=>
             {
                 let response = JSON.parse(xhr.responseText);
@@ -116,7 +116,7 @@ let ts;
 
         const getAsesor=()=>
         {
-            let b = new XMLHttpRequest();b.open('get',`/asesor`,true);
+            let b = new XMLHttpRequest();b.open('get',`/asesor`,false);
             b.onload=()=>
             {
                 let response = JSON.parse(b.responseText);
@@ -149,7 +149,7 @@ let ts;
 
         const getRevisores=()=>
         {
-            let c = new XMLHttpRequest();c.open('get',`/revisores`,true);
+            let c = new XMLHttpRequest();c.open('get',`/revisores`,false);
             c.onload=()=>
             {
                 let response = JSON.parse(c.responseText);
@@ -174,7 +174,7 @@ let ts;
 
         const getCal1=()=>
         {
-            let d = new XMLHttpRequest();d.open('get',`/cal1`,true);
+            let d = new XMLHttpRequest();d.open('get',`/cal1`,false);
             d.onload=()=>
             {
                 let response = JSON.parse(d.responseText);
@@ -218,7 +218,7 @@ let ts;
 
         const getCal2=()=>
         {
-            let e = new XMLHttpRequest();e.open('get',`/cal2`,true);
+            let e = new XMLHttpRequest();e.open('get',`/cal2`,false);
             e.onload=()=>
             {
                 let response = JSON.parse(e.responseText);
