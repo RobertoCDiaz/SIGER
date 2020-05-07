@@ -203,7 +203,7 @@ let ts;
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
-                    title.innerText='Calificaciones parciales (Anexo 29)';
+                    title.innerText='Calificaciones parciales (Anexo 29_1)';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
                     cont.appendChild(title);
@@ -215,6 +215,50 @@ let ts;
             d.send();
         }
         getCal1();
+
+        const getCal1_2=()=>
+        {
+            let f = new XMLHttpRequest();f.open('get',`/cal1_2`,false);
+            f.onload=()=>
+            {
+                let response = JSON.parse(f.responseText);
+                if(response['message']==1)
+                {
+                    const ee = response['ee'];
+                    const oe = response['oe'];
+                    const ei = response['ei'];
+                    const oi = response['oi'];
+                    let totalee=0;
+                    let totalei=0;
+                    const aee = String(ee).split(',');
+                    for(let i=0;i<aee.length;i++)
+                    {
+                        totalee+=Number.parseInt(aee[i]);
+                    }
+                    const aei = ei.split(',');
+                    for(let i=0;i<aei.length;i++)
+                    {
+                        totalei+=Number.parseInt(aei[i]);
+                    }
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Calificaciones parciales (Anexo 29_2)';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            f.send();
+        }
+        getCal1_2();
 
         const getCal2=()=>
         {

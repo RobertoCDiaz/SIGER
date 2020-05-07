@@ -796,6 +796,54 @@ server.get('/cal1',(req,res)=>
     });
 });
 
+server.get('/cal1_2',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.redirect('/home');
+        return;
+    }
+
+    con.query('call SP_MostrarAnexo29 (?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+            const message = 1;
+            const ee = String(rows[0][1]['ee']);
+            const oe = String(rows[0][1]['oe']);
+            const ei = String(rows[0][1]['ei']);
+            const oi = String(rows[0][1]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
 server.get('/cal2',(req,res)=>
 {
     if (!req.session.loggedin) {
