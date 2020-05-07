@@ -1178,7 +1178,6 @@ server.get('/asesor-aprobado',(req,res)=>
         res.redirect('/home');
         return;
     }
-    console.log('email del residente: ' + req.session.user.info.residente);
     con.query('call SP_MostrarAprobado(?);',
     [
         req.session.user.info.residente
@@ -1345,6 +1344,54 @@ server.get('/asesor-cal1',(req,res)=>
             const oe = String(rows[0][0]['oe']);
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/asesor_cal1_2',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
+        res.redirect('/home');
+        return;
+    }
+
+    con.query('call SP_MostrarAnexo29 (?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+            const message = 1;
+            const ee = String(rows[0][1]['ee']);
+            const oe = String(rows[0][1]['oe']);
+            const ei = String(rows[0][1]['ei']);
+            const oi = String(rows[0][1]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
         }
         catch (e)
