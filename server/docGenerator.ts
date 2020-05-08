@@ -4,7 +4,7 @@ var Docxtemplater = require('docxtemplater');
 var fs = require('fs');
 var path = require('path');
 
-export const generate = (data, inputDir, outputDir) => new Promise(async (resolve, reject) => {
+export const generateDoc = (data, inputDir, outputDir) => new Promise(async (resolve, reject) => {
     var content = fs
     .readFileSync(/*path.resolve(__dirname, 'input.docx')*/inputDir, 'binary');
 
@@ -17,13 +17,13 @@ export const generate = (data, inputDir, outputDir) => new Promise(async (resolv
 
     try {
         doc.render()
+
+        var buf = doc.getZip().generate({type: 'nodebuffer'});
+
+        await fs.writeFileSync(/*path.resolve(__dirname, 'output.docx')*/ outputDir, buf);
+    
+        resolve(buf);    
     } catch (error) {
         reject(error);
     }
-
-    var buf = doc.getZip().generate({type: 'nodebuffer'});
-
-    await fs.writeFileSync(/*path.resolve(__dirname, 'output.docx')*/ outputDir, buf);
-
-    resolve(buf);
 });

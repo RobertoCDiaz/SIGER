@@ -886,6 +886,66 @@ CREATE FUNCTION idAnexo30DeURL(
 END;;
 
 
+/*
+	Comprueba si el anexo 29 con id [v_id]
+	ya ha sido completamente evaluado.
+
+	Regresa
+		-1 	-> El ID no concuerda con ningún anexo 29.
+		0	-> El anexo no ha sido evaluado por los dos asesores.
+		1 	-> El anexo ya ha sido completamente evaluado.
+*/
+DROP FUNCTION IF EXISTS anexo29Evaluado;;
+CREATE FUNCTION anexo29Evaluado(
+	v_id INT
+) RETURNS INT DETERMINISTIC BEGIN
+
+	IF v_id NOT IN (SELECT idanexo_29 FROM anexo_29) THEN BEGIN
+		RETURN -1;
+	END; END IF;
+
+	RETURN (
+		SELECT 
+			a.fecha_externa IS NOT NULL AND
+			a.fecha_interna
+		FROM
+			anexo_29 AS a
+		WHERE
+			a.idanexo_29 = v_id
+	);
+END;;
+
+
+/*
+	Comprueba si el anexo 30 con id [v_id]
+	ya ha sido completamente evaluado.
+
+	Regresa
+		-1 	-> El ID no concuerda con ningún anexo 30.
+		0	-> El anexo no ha sido evaluado por los dos asesores.
+		1 	-> El anexo ya ha sido completamente evaluado.
+*/
+DROP FUNCTION IF EXISTS anexo30Evaluado;;
+CREATE FUNCTION anexo30Evaluado(
+	v_id INT
+) RETURNS INT DETERMINISTIC BEGIN
+
+	IF v_id NOT IN (SELECT idanexo_30 FROM anexo_30) THEN BEGIN
+		RETURN -1;
+	END; END IF;
+
+	RETURN (
+		SELECT 
+			a.fecha_externa IS NOT NULL AND
+			a.fecha_interna
+		FROM
+			anexo_30 AS a
+		WHERE
+			a.idanexo_30 = v_id
+	);
+END;;
+
+
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
@@ -1937,6 +1997,50 @@ CREATE PROCEDURE SP_EvaluacionA30(
 
 		END; END IF;
 	COMMIT;
+END;;
+
+
+/*
+	Muestra una tabla con toda la información necesaria
+	para llenar un anexo 29, partiendo del anexo con id
+	[v_id].
+*/	
+DROP PROCEDURE IF EXISTS SP_InfoAnexo29;;
+CREATE PROCEDURE SP_InfoAnexo29(
+	v_id INT
+) BEGIN
+
+	IF v_id NOT IN (SELECT idanexo_29 FROM anexo_29) THEN BEGIN
+
+		SELECT "0" AS output, "No existe un anexo 29 con este ID" AS message;
+
+	END; ELSEIF anexo29Evaluado(v_id) != 1 THEN BEGIN
+
+		SELECT "0" AS output, "Este anexo no ha se ha evaluado completamente" AS message;
+
+	END; ELSE BEGIN
+
+		SELECT 
+			a.*,
+			nombreCompleto(r.email_residente) AS 'residente',
+			r.email_residente AS 'email_residente',
+			r.nombre_proyecto AS 'proyecto',
+			CONCAT(
+				IF (
+					r.periodo = 1,
+					"Enero - Junio",
+					"Julio - Diciembre"
+				), 
+				" ",
+				r.ano
+			) AS 'periodo'
+		FROM
+			anexo_29 AS a JOIN residencias AS r
+				ON a.id_residencia = r.idresidencia
+		WHERE
+			a.idanexo_29 = v_id;
+
+	END; END IF;
 END;;
 
 

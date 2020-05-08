@@ -1,6 +1,10 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
-import { Mailer, Mail } from "./Mailer";
+import { Mailer } from "./Mailer";
+
+import { generateDoc } from "./docGenerator";
+var fs = require('fs');
+var path = require('path');
 
 const express   = require("express");
 const session   = require("express-session");
@@ -2374,6 +2378,86 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
         "content": content.trim()
     }, onDone);
 }
+
+/* ================================================================================================
+
+    Document generators.
+
+================================================================================================ */
+const getAnexo29Info = (id: number) => new Promise((resolve, reject) => {
+    con.query(
+        `call SP_InfoAnexo29(?);`,
+        id,
+        (e, rows, f) => {
+            if (e) {
+                reject(e.toString());
+                return;
+            }
+
+            // Objeto a regresar como resultado del Promise.
+            const dataObject = {};
+
+            // Información básica del proyecto.
+            dataObject['residente'] = rows[0][0]['residente'];
+            dataObject['noControl'] = rows[0][0]['email_residente'].substring(1, 9);
+            dataObject['proyecto'] = rows[0][0]['proyecto'];
+            dataObject['periodo'] = rows[0][0]['periodo'];
+            
+            // Evaluación de asesor externo.
+            const evalAE = (rows[0][0]['evaluacion_externa'] as string).split(',').map(c => Number(c));
+            for (let i = 0; i < evalAE.length; ++i) {
+                dataObject[`ae-${i + 1}`] = evalAE[i];
+            }
+            dataObject['ae-total'] = evalAE.reduce((previosNumber, currentNumber) =>
+                previosNumber + currentNumber
+            );
+            dataObject['ae-observaciones'] = rows[0][0]['observaciones_externas'];
+            const aeDate = new Date(Number(rows[0][0]['fecha_externa']));
+            dataObject['ae-fecha'] = `${aeDate.getDate()}/${aeDate.getMonth()}/${aeDate.getFullYear()}`;
+            
+            // Evaluación de asesor interno.
+            const evalAI = (rows[0][0]['evaluacion_interna'] as string).split(',').map(c => Number(c));
+            for (let i = 0; i < evalAI.length; ++i) {
+                dataObject[`ai-${i + 1}`] = evalAI[i];
+            }            
+            dataObject['ai-total'] = evalAI.reduce((previosNumber, currentNumber) =>
+                previosNumber + currentNumber
+            );
+            dataObject['ai-observaciones'] = rows[0][0]['observaciones_internas'];
+            const aiDate = new Date(Number(rows[0][0]['fecha_interna']));
+            dataObject['ai-fecha'] = `${aiDate.getDate()}/${aiDate.getMonth()}/${aiDate.getFullYear()}`;
+
+            dataObject['calificacion'] = 
+                (Number(dataObject['ai-total']) + Number(dataObject['ae-total'])) / 2;
+
+            resolve(dataObject);
+        }
+    );
+});
+
+server.get('/generarAnexo29', (req, res) => {
+    const id = req.query.id;
+
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    getAnexo29Info(id).then(async data => {
+        generateDoc(
+            data,
+            path.resolve(__dirname, 'formatos/a29-template.docx'),
+            path.resolve(__dirname, `formatos/output/a29-${id}.docx`),
+        ).then(val => {
+            res.send(Response.success(val as any));
+        }).catch(err => {
+            res.send(Response.unknownError(err));
+        })
+
+    }).catch(errorMsg => 
+        res.send(Response.unknownError(errorMsg))
+    );
+});
 
 /* ================================================================================================
 
