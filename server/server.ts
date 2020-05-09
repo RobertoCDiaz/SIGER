@@ -2,7 +2,7 @@ import { Keys } from "./Keys";
 import { Response } from "./Response";
 import { Mailer } from "./Mailer";
 
-import { generateDoc } from "./docGenerator";
+import { generateDocument } from "./DocumentGenerator";
 var fs = require('fs');
 var path = require('path');
 
@@ -2384,7 +2384,7 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
     Document generators.
 
 ================================================================================================ */
-const getAnexo29Info = (id: number) => new Promise((resolve, reject) => {
+const getAnexo29Info = (id: number) => new Promise<Object>((resolve, reject) => {
     con.query(
         `call SP_InfoAnexo29(?);`,
         id,
@@ -2401,6 +2401,7 @@ const getAnexo29Info = (id: number) => new Promise((resolve, reject) => {
             dataObject['residente'] = rows[0][0]['residente'];
             dataObject['noControl'] = rows[0][0]['email_residente'].substring(1, 9);
             dataObject['proyecto'] = rows[0][0]['proyecto'];
+            dataObject['programa'] = rows[0][0]['programa'];
             dataObject['periodo'] = rows[0][0]['periodo'];
             
             // Evaluación de asesor externo.
@@ -2444,12 +2445,11 @@ server.get('/generarAnexo29', (req, res) => {
     }
 
     getAnexo29Info(id).then(async data => {
-        generateDoc(
+        generateDocument(
             data,
             path.resolve(__dirname, 'formatos/a29-template.docx'),
-            path.resolve(__dirname, `formatos/output/a29-${id}.docx`),
-        ).then(val => {
-            res.send(Response.success(val as any));
+        ).then(generatedFile => {
+            res.send(generatedFile);
         }).catch(err => {
             res.send(Response.unknownError(err));
         })

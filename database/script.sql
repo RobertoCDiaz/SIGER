@@ -2025,6 +2025,7 @@ CREATE PROCEDURE SP_InfoAnexo29(
 			nombreCompleto(r.email_residente) AS 'residente',
 			r.email_residente AS 'email_residente',
 			r.nombre_proyecto AS 'proyecto',
+			c.nombre_carrera AS 'programa',
 			CONCAT(
 				IF (
 					r.periodo = 1,
@@ -2037,6 +2038,10 @@ CREATE PROCEDURE SP_InfoAnexo29(
 		FROM
 			anexo_29 AS a JOIN residencias AS r
 				ON a.id_residencia = r.idresidencia
+			JOIN residentes AS res
+				ON r.email_residente = res.email
+			JOIN carreras AS c
+				ON res.clave_carrera = c.clave
 		WHERE
 			a.idanexo_29 = v_id;
 
