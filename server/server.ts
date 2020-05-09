@@ -2460,31 +2460,6 @@ server.get('/generarAnexo29', (req, res) => {
             res.send(Response.unknownError(err));
         })
 
-        // playground
-
-
-        generateDocument(
-            {
-                residente: 'Roberto Carlos Díaz Sánchez',
-                noControl: '17430057',
-                proyecto: 'SIGER',
-                // ...
-            },
-            path.resolve(__dirname, 'formatos/a29-template.docx'),
-        ).then(archivo => {
-            // Esto se ejecutará si la generación se llevó a cabo correctamente.
-            // [archivo] es el documento generado.
-            res.send(archivo);
-        }).catch(error => {
-            // Si ocurre algún error, esto se ejecutará.
-            // [error] es el mensaje de error.
-            res.send(Response.unknownError(error));
-        });
-
-
-
-        // playground
-
     }).catch(errorMsg => 
         res.send(Response.unknownError(errorMsg))
     );

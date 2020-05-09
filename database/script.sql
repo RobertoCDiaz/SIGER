@@ -2051,7 +2051,7 @@ CREATE PROCEDURE SP_InfoAnexo29(
 		
 		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
 
-	IF v_id NOT IN (SELECT idanexo_29 FROM anexo_29) THEN BEGIN
+	END; ELSEIF v_id NOT IN (SELECT idanexo_29 FROM anexo_29) THEN BEGIN
 
 		SELECT "0" AS output, "No existe un anexo 29 con este ID" AS message;
 
@@ -2087,6 +2087,62 @@ CREATE PROCEDURE SP_InfoAnexo29(
 				ON res.clave_carrera = c.clave
 		WHERE
 			a.idanexo_29 = v_id;
+
+	END; END IF;
+END;;
+
+
+/*
+	Muestra una tabla con toda la información necesaria
+	para llenar un anexo 30, partiendo del anexo con id
+	[v_id].
+*/	
+DROP PROCEDURE IF EXISTS SP_InfoAnexo30;;
+CREATE PROCEDURE SP_InfoAnexo30(
+	v_id INT,
+	v_email VARCHAR(64)
+) BEGIN
+
+	IF relacionadoAlProyecto(v_id, v_email) != 1 THEN BEGIN
+		
+		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
+
+	END; ELSEIF v_id NOT IN (SELECT idanexo_30 FROM anexo_30) THEN BEGIN
+
+		SELECT "0" AS output, "No existe un anexo 30 con este ID" AS message;
+
+	END; ELSEIF anexo30Evaluado(v_id) != 1 THEN BEGIN
+
+		SELECT "0" AS output, "Este anexo no ha se ha evaluado completamente" AS message;
+
+	END; ELSE BEGIN
+
+		SELECT 
+			"1" AS output,
+			"Información recopilada" AS message,
+			a.*,
+			nombreCompleto(r.email_residente) AS 'residente',
+			r.email_residente AS 'email_residente',
+			r.nombre_proyecto AS 'proyecto',
+			c.nombre_carrera AS 'programa',
+			CONCAT(
+				IF (
+					r.periodo = 1,
+					"Enero - Junio",
+					"Julio - Diciembre"
+				), 
+				" ",
+				r.ano
+			) AS 'periodo'
+		FROM
+			anexo_30 AS a JOIN residencias AS r
+				ON a.id_residencia = r.idresidencia
+			JOIN residentes AS res
+				ON r.email_residente = res.email
+			JOIN carreras AS c
+				ON res.clave_carrera = c.clave
+		WHERE
+			a.idanexo_30 = v_id;
 
 	END; END IF;
 END;;
