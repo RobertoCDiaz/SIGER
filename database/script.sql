@@ -946,6 +946,42 @@ CREATE FUNCTION anexo30Evaluado(
 END;;
 
 
+/*
+	Comprueba si el usuario con email [v_email]
+	está relacionado de alguna manera a la residencia
+	con id [v_id_residencia].
+	Esta función es útil para comprobar si el usuario
+	debería tener acceso a documentos de la residencia.
+
+	Regresa
+		0 -> El usuario no tiene relación con la residencia.
+		1 -> Sí tiene relación.
+*/
+DROP FUNCTION IF EXISTS relacionadoAlProyecto;;
+CREATE FUNCTION relacionadoAlProyecto(
+	v_id_residencia INT,
+	v_email VARCHAR(64)
+) RETURNS INT DETERMINISTIC BEGIN
+	
+	RETURN (
+		SELECT IF (
+			-- Es el residente.
+			(SELECT r.email_residente FROM residencias AS r WHERE r.idresidencia = v_id_residencia) = v_email OR 
+
+			-- Es admin de la carrera del residente.
+			puedeValidarResidente(
+				(SELECT r.email_residente FROM residencias AS r WHERE r.idresidencia = v_id_residencia),
+				v_email
+			) = 1 OR
+
+			-- Es asesor o revisor del proyecto.
+			v_email IN (SELECT i.email_docente FROM involucrados AS i WHERE i.id_residencia = v_id_residencia)
+		, 1, 0)
+	);
+
+END;;
+
+
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
@@ -2007,8 +2043,13 @@ END;;
 */	
 DROP PROCEDURE IF EXISTS SP_InfoAnexo29;;
 CREATE PROCEDURE SP_InfoAnexo29(
-	v_id INT
+	v_id INT,
+	v_email VARCHAR(64)
 ) BEGIN
+
+	IF relacionadoAlProyecto(v_id, v_email) != 1 THEN BEGIN
+		
+		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
 
 	IF v_id NOT IN (SELECT idanexo_29 FROM anexo_29) THEN BEGIN
 
@@ -2021,6 +2062,8 @@ CREATE PROCEDURE SP_InfoAnexo29(
 	END; ELSE BEGIN
 
 		SELECT 
+			"1" AS output,
+			"Información recopilada" AS message,
 			a.*,
 			nombreCompleto(r.email_residente) AS 'residente',
 			r.email_residente AS 'email_residente',

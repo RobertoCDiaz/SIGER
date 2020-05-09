@@ -13,7 +13,15 @@ const getDocument = (output: string, httpPetition: string)  => {
     xhr.open('get', httpPetition, true);
     
     xhr.onload = () => {
-        downloadFile(xhr.response, `${output}.docx`);
+        try {
+            if (!xhr.response.message) {
+                throw "Es archivo";
+                return;
+            }
+            alert(xhr.response.message);
+        } catch(e) {
+            downloadFile(xhr.response, `${output}.docx`);
+        }
     };
     
     xhr.send();

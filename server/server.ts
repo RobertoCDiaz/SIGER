@@ -2381,16 +2381,21 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
 
 /* ================================================================================================
 
-    Document generators.
+    Documents.
 
 ================================================================================================ */
-const getAnexo29Info = (id: number) => new Promise<Object>((resolve, reject) => {
+const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resolve, reject) => {
     con.query(
-        `call SP_InfoAnexo29(?);`,
-        id,
+        `call SP_InfoAnexo29(?, ?);`,
+        [id, email],
         (e, rows, f) => {
             if (e) {
                 reject(e.toString());
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                reject(rows[0][0]['message']);
                 return;
             }
 
@@ -2444,7 +2449,8 @@ server.get('/generarAnexo29', (req, res) => {
         return;
     }
 
-    getAnexo29Info(id).then(async data => {
+    getAnexo29Info(id, req.session.user.info.email).then(async data => {
+
         generateDocument(
             data,
             path.resolve(__dirname, 'formatos/a29-template.docx'),
@@ -2453,6 +2459,31 @@ server.get('/generarAnexo29', (req, res) => {
         }).catch(err => {
             res.send(Response.unknownError(err));
         })
+
+        // playground
+
+
+        generateDocument(
+            {
+                residente: 'Roberto Carlos Díaz Sánchez',
+                noControl: '17430057',
+                proyecto: 'SIGER',
+                // ...
+            },
+            path.resolve(__dirname, 'formatos/a29-template.docx'),
+        ).then(archivo => {
+            // Esto se ejecutará si la generación se llevó a cabo correctamente.
+            // [archivo] es el documento generado.
+            res.send(archivo);
+        }).catch(error => {
+            // Si ocurre algún error, esto se ejecutará.
+            // [error] es el mensaje de error.
+            res.send(Response.unknownError(error));
+        });
+
+
+
+        // playground
 
     }).catch(errorMsg => 
         res.send(Response.unknownError(errorMsg))
