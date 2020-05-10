@@ -2179,6 +2179,15 @@ server.get('/carta-terminacion',(req,res)=>
     res.sendFile('carta-terminacion.html', { root: '../web-client/' });
 });
 
+server.get('/ej-repreliminar',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('ejrpreliminar.html', { root: '../web-client/' });
+});
+
 
 /* ================================================================================================
 
