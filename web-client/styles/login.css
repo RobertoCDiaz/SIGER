@@ -23,15 +23,17 @@
             align-items: center;
             justify-content: center;
             justify-items: stretch;
+            width: 450px;
         }
 
-        .form-input > * {
-            flex: 1;
+        .form-input > input {
+            flex: 3;
         }
 
         .form-input > label {
             text-align: right;
             margin-right: .5em;
+            flex: 1;
         }
 
         form {

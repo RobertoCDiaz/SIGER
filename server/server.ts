@@ -2384,6 +2384,14 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
     Documents.
 
 ================================================================================================ */
+/**
+ * Regresa un objeto JSON con la información y 
+ * estructura necesaria para llenar la plantilla del
+ * anexo 29.
+ * 
+ * @param id ID del anexo 29 a consultar.
+ * @param email Email del usuario actual.
+ */
 const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resolve, reject) => {
     con.query(
         `call SP_InfoAnexo29(?, ?);`,
@@ -2441,9 +2449,20 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
     );
 });
 
-server.get('/generarAnexo29', (req, res) => {
-    const id = req.query.id;
 
+/**
+ * Regresa al cliente un anexo 29 lleno con la información
+ * del anexo cuyo id sea [id].
+ * 
+ * @param id ID del anexo 29 a regresar en forma de documento.
+ */
+server.get('/generarAnexo29', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    const id = req.query.id;
     if (!id) {
         res.send(Response.notEnoughParams());
         return;
@@ -2463,6 +2482,102 @@ server.get('/generarAnexo29', (req, res) => {
     }).catch(errorMsg => 
         res.send(Response.unknownError(errorMsg))
     );
+});
+
+
+/**
+ * Regresa un JSON con la estructura e información para
+ * llenar un formato de anexo 30.
+ * 
+ * @param id ID del anexo 30.
+ * @param email Email del usuario actual.
+ */
+const getAnexo30Info = (id: number, email: string) => new Promise<Object>((resolve, reject) => {
+
+    con.query(
+        `call SP_InfoAnexo30(?, ?);`,
+        [id, email],
+        (e, rows, f) => {
+            if (e) {
+                reject(e.toString());
+                return;
+            }
+
+            if (rows[0][0]['output'] < 1) {
+                reject(rows[0][0]['message']);
+                return;
+            }
+
+            let anexoObj = {};
+
+            // Información básica de la residencia.
+            anexoObj['residente'] = rows[0][0]['residente'];
+            anexoObj['noControl'] = rows[0][0]['email_residente'].substring(1, 9);
+            anexoObj['proyecto'] = rows[0][0]['proyecto'];
+            anexoObj['programa'] = rows[0][0]['programa'];
+            anexoObj['periodo'] = rows[0][0]['periodo'];
+
+            // Evaluación de AE.
+            anexoObj['ae-observaciones'] = rows[0][0]['observaciones_externas']
+            const califsAE = (rows[0][0]['evaluacion_externa'] as string).split(',').map(s => Number(s));
+            for (let i = 0; i < califsAE.length; ++i) {
+                anexoObj[`ae-${i + 1}`] = califsAE[i];
+            }
+            const aeDate = new Date(Number(rows[0][0]['fecha_externa']));
+            anexoObj['ae-fecha'] = `${aeDate.getDate()} / ${aeDate.getMonth()} / ${aeDate.getFullYear()}`;
+
+            // Evaluación de AI.
+            anexoObj['ai-observaciones'] = rows[0][0]['observaciones_internas']
+            const califsAI = (rows[0][0]['evaluacion_interna'] as string).split(',').map(s => Number(s));
+            for (let i = 0; i < califsAI.length; ++i) {
+                anexoObj[`ai-${i + 1}`] = califsAI[i];
+            }
+            const aiDate = new Date(Number(rows[0][0]['fecha_interna']));
+            anexoObj['ai-fecha'] = `${aiDate.getDate()} / ${aiDate.getMonth()} / ${aiDate.getFullYear()}`;
+
+            const totalAE = califsAE.reduce((prev, curr) => prev + curr);
+            const totalAI = califsAI.reduce((prev, curr) => prev + curr);
+            const promedio = (totalAE + totalAI) / 2;
+
+            anexoObj['ae-total'] = totalAE;
+            anexoObj['ai-total'] = totalAI;
+            anexoObj['calificacion'] = promedio;
+
+            resolve(anexoObj);
+        }
+    );
+
+});
+
+
+server.get('/generarAnexo30', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    const id: number = req.query.id;
+    const email: string = req.session.user.info.email;
+    
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    getAnexo30Info(id, email).then(anexoObj => {
+        generateDocument(
+            anexoObj, 
+            path.resolve(__dirname, 'formatos/a30-template.docx'),
+        ).then(doc => {
+            res.send(doc);
+        }).catch(error => {
+            res.send(Response.unknownError(error));
+        })
+    }).catch(error => {
+        res.send(Response.unknownError(error));
+    })
+
+
 });
 
 /* ================================================================================================
