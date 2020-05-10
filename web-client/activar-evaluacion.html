@@ -28,6 +28,22 @@
             <p>A continuación, podrá ver una lista de las residencias que están disponibles para ser evaluadas, así como aquellas que estén en estado de evaluación. Para poner en marcha el periodo de evaluación de alguna residencia, simplemente presione sobre <i>Anexo 29</i> o <i>Anexo 30</i>, según sea el caso.
             </p>
         </div>
+        <script>
+            const fillUserEmail = () => {
+                const adminEmailView = document.getElementById('adminEmailView');
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('get', '/user-info', true);   
+                xhr.onload = () => {
+                    let response = JSON.parse(xhr.response);
+
+                    adminEmailView.innerHTML = response.object.email;
+                };
+                xhr.send();
+            }
+
+            fillUserEmail();
+        </script>
         <hr>
 
         <h2>Residencias disponibles</h2>
@@ -114,15 +130,17 @@
             <h2>Materias</h2>
             <div class="section-item">
                 <p>Administración de Bases de Datos</p>
+                <p>M. A. y L. Hilda Patricia Beltrán Hernández</p>
                 <p>SCB-1001</p>
             </div>
             <div class="section-item">
                 <p>Ingeniería de Software</p>
+                <p>M. C. Flor de María Rivera Sánchez</p>
                 <p>SCD-1011</p>
             </div>
             <div class="section-item">
                 <p>Programación Web</p>
-                <p>AEB-1055</p>
+                <p>Ing. Antonio Chávez Soto</p><p></p>AEB-1055</p>
             </div>
         </section>
         <section>
