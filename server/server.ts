@@ -2379,6 +2379,15 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
     }, onDone);
 }
 
+
+/**
+ * Promise que regresa un documento vacío, sin reemplazo en plantilla.
+ * 
+ * @param relativePath Localización del archivo, relativa a la carpeta [server]
+ */
+const getEmptyDocument = (relativePath: string) => 
+    generateDocument({}, path.resolve(__dirname, relativePath));
+
 /* ================================================================================================
 
     Documents.
@@ -2452,11 +2461,12 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
 
 /**
  * Regresa al cliente un anexo 29 lleno con la información
- * del anexo cuyo id sea [id].
+ * del anexo cuyo id sea [id]. Si no se provee un id, se 
+ * regresará al cliente el formato vacío.
  * 
  * @param id ID del anexo 29 a regresar en forma de documento.
  */
-server.get('/generarAnexo29', (req, res) => {
+server.get('/getAnexo29', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
@@ -2464,7 +2474,14 @@ server.get('/generarAnexo29', (req, res) => {
 
     const id = req.query.id;
     if (!id) {
-        res.send(Response.notEnoughParams());
+        getEmptyDocument('formatos/a29.docx').then(doc => {
+            res.send(doc);
+            return;
+        }).catch(error => {
+            res.send(Response.unknownError(error));
+            return;
+        })
+        
         return;
     }
 
@@ -2550,6 +2567,12 @@ const getAnexo30Info = (id: number, email: string) => new Promise<Object>((resol
 });
 
 
+/**
+ * Regresa al cliente un anexo 30 lleno con la información
+ * del anexo cuyo id sea [id].
+ * 
+ * @param id ID del anexo 30 a regresar en forma de documento.
+ */
 server.get('/generarAnexo30', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
