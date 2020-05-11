@@ -2569,11 +2569,12 @@ const getAnexo30Info = (id: number, email: string) => new Promise<Object>((resol
 
 /**
  * Regresa al cliente un anexo 30 lleno con la información
- * del anexo cuyo id sea [id].
+ * del anexo cuyo id sea [id]. Si no se proporciona un id
+ * de anexo 30, se regresará al cliente el formato vacío.
  * 
  * @param id ID del anexo 30 a regresar en forma de documento.
  */
-server.get('/generarAnexo30', (req, res) => {
+server.get('/getAnexo30', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
@@ -2583,7 +2584,13 @@ server.get('/generarAnexo30', (req, res) => {
     const email: string = req.session.user.info.email;
     
     if (!id) {
-        res.send(Response.notEnoughParams());
+        getEmptyDocument('formatos/a30.docx').then(doc => {
+            res.send(doc);
+            return;
+        }).catch(error => {
+            res.send(Response.unknownError(error));
+            return;
+        })
         return;
     }
 
