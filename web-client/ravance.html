@@ -111,7 +111,7 @@
         const getAprobado=()=>
         {
             let xhr = new XMLHttpRequest();
-            xhr.open('get',`/asesor-aprobado`,true);
+            xhr.open('get',`/asesor-aprobado`,false);
             xhr.onload=()=>
             {
                 let response = JSON.parse(xhr.responseText);
@@ -210,7 +210,7 @@
 
         const getAsesor=()=>
         {
-            let b = new XMLHttpRequest();b.open('get',`/asesor-asesor`,true);
+            let b = new XMLHttpRequest();b.open('get',`/asesor-asesor`,false);
             b.onload=()=>
             {
                 let response = JSON.parse(b.responseText);
@@ -243,7 +243,7 @@
 
         const getRevisores=()=>
         {
-            let c = new XMLHttpRequest();c.open('get',`/asesor-revisores`,true);
+            let c = new XMLHttpRequest();c.open('get',`/asesor-revisores`,false);
             c.onload=()=>
             {
                 let response = JSON.parse(c.responseText);
@@ -268,7 +268,7 @@
 
         const getCal1=()=>
         {
-            let d = new XMLHttpRequest();d.open('get',`/asesor-cal1`,true);
+            let d = new XMLHttpRequest();d.open('get',`/asesor-cal1`,false);
             d.onload=()=>
             {
                 let response = JSON.parse(d.responseText);
@@ -310,9 +310,53 @@
         }
         getCal1();
 
+        const getCal1_2=()=>
+        {
+            let f = new XMLHttpRequest();f.open('get',`/asesor_cal1_2`,false);
+            f.onload=()=>
+            {
+                let response = JSON.parse(f.responseText);
+                if(response['message']==1)
+                {
+                    const ee = response['ee'];
+                    const oe = response['oe'];
+                    const ei = response['ei'];
+                    const oi = response['oi'];
+                    let totalee=0;
+                    let totalei=0;
+                    const aee = String(ee).split(',');
+                    for(let i=0;i<aee.length;i++)
+                    {
+                        totalee+=Number.parseInt(aee[i]);
+                    }
+                    const aei = ei.split(',');
+                    for(let i=0;i<aei.length;i++)
+                    {
+                        totalei+=Number.parseInt(aei[i]);
+                    }
+
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.innerText='Calificaciones parciales (Anexo 29_2)';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            f.send();
+        }
+        getCal1_2();
+
         const getCal2=()=>
         {
-            let e = new XMLHttpRequest();e.open('get',`/asesor-cal2`,true);
+            let e = new XMLHttpRequest();e.open('get',`/asesor-cal2`,false);
             e.onload=()=>
             {
                 let response = JSON.parse(e.responseText);

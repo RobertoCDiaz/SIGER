@@ -777,11 +777,64 @@ server.get('/cal1',(req,res)=>
         }
         try 
         {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
             const oe = String(rows[0][0]['oe']);
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/cal1_2',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.redirect('/home');
+        return;
+    }
+
+    con.query('call SP_MostrarAnexo29 (?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+            const message = 1;
+            const ee = String(rows[0][1]['ee']);
+            const oe = String(rows[0][1]['oe']);
+            const ei = String(rows[0][1]['ei']);
+            const oi = String(rows[0][1]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
         }
         catch (e)
@@ -819,6 +872,11 @@ server.get('/cal2',(req,res)=>
         }
         try 
         {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
             const oe = String(rows[0][0]['oe']);
@@ -1124,7 +1182,6 @@ server.get('/asesor-aprobado',(req,res)=>
         res.redirect('/home');
         return;
     }
-    console.log('email del residente: ' + req.session.user.info.residente);
     con.query('call SP_MostrarAprobado(?);',
     [
         req.session.user.info.residente
@@ -1291,6 +1348,54 @@ server.get('/asesor-cal1',(req,res)=>
             const oe = String(rows[0][0]['oe']);
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
+            res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+        }
+        catch (e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/asesor_cal1_2',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
+        res.redirect('/home');
+        return;
+    }
+
+    con.query('call SP_MostrarAnexo29 (?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try 
+        {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+            const message = 1;
+            const ee = String(rows[0][1]['ee']);
+            const oe = String(rows[0][1]['oe']);
+            const ei = String(rows[0][1]['ei']);
+            const oi = String(rows[0][1]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
         }
         catch (e)
@@ -2031,6 +2136,60 @@ server.post('/registrarEvaluacionA30', (req, res) => {
             res.send(Response.success());
         }
     );
+});
+
+server.get('/carta-presentacion',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('carta-presentacion.html', { root: '../web-client/' });
+});
+
+server.get('/carta-aceptacion',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('carta-aceptacion.html', { root: '../web-client/' });
+});
+
+server.get('/ejemplo-anexo29',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('ejanexo29.html', { root: '../web-client/' });
+});
+
+server.get('/ejemplo-anexo30',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('ejanexo30.html', { root: '../web-client/' });
+});
+
+server.get('/carta-terminacion',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('carta-terminacion.html', { root: '../web-client/' });
+});
+
+server.get('/ej-repreliminar',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+    res.sendFile('ejrpreliminar.html', { root: '../web-client/' });
 });
 
 
