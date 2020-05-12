@@ -896,7 +896,7 @@ server.get('/cal2',(req,res)=>
     });
 });
 
-server.get('/docs', (req, res) => {
+server.get('/documentos', (req, res) => {
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
@@ -1465,7 +1465,7 @@ server.get('/asesor-cal2',(req,res)=>
  * {
  *      "main": {
  *          "opción1": {            Nombre de la opción. Este será el que se visualice.
- *              "href": ...,        Direccionamiento acorde a la opción, p.e: "/docs"
+ *              "href": ...,        Direccionamiento acorde a la opción, p.e: "/documentos"
  *              "icon": ...         Ícono de la opción, de https://material.io/icons
  *          },
  *          "opción2": {...},
@@ -2193,6 +2193,75 @@ server.get('/ej-repreliminar',(req,res)=>
 });
 
 
+/**
+ * Regresa al cliente el ID de la residencia aprobada del residente
+ * actual.
+ */
+server.get('/idDeMiResidencia', (req, res) => {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const email = req.session.user.info.email;
+    con.query(
+        `select idResidenciaDeAlumno(?) as 'email';`,
+        email,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0]['email'] == null) {
+                res.send(Response.userError("No tiene residencias aprobadas"));
+                return;
+            }
+
+            res.send(Response.success(rows[0]['email']));
+        }
+    )
+});
+
+/**
+ * Regresa al cliente los ID de los distintos documentos de la residencia.
+ * Ver [SP_GetDocumentosDeResidencia] del archivo .sql para más información.
+ * 
+ * @param req.query.id ID de la residencia de la cual se extraerán los documentos.
+ */
+server.get('/documentosDeResidencia', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const id = req.query.id;
+    const email = req.session.user.info.email;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_GetDocumentosDeResidencia(?, ?);`,
+        [id, email],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                res.send(Response.userError(rows[0][0]['message']));
+                return;
+            }
+
+            res.send(Response.success(rows[1][0]));
+        }
+    );
+});
+
+
 /* ================================================================================================
 
     Endpoints.
@@ -2359,7 +2428,7 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                                 'icon': 'note_add'
                             },
                             'Documentos': {
-                                'href': '/docs',
+                                'href': '/documentos',
                                 'icon': 'description'
                             }
                         },
@@ -2382,7 +2451,7 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                                 'icon': 'flag'
                             },
                             'Documentos': {
-                                'href': '/docs',
+                                'href': '/documentos',
                                 'icon': 'description'
                             },
                             'Chat': {
@@ -2619,6 +2688,33 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
 
 
 /**
+ * Regresa al cliente la información necesaria para llenar
+ * la vista web de un anexo 29.
+ * 
+ * @param req.query.id ID del anexo 29 a regresar.
+ */
+server.get('/getAnexo29Info', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const id = req.query.id;
+    const email = req.session.user.info.email;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    getAnexo29Info(id, email).then(obj => {
+        res.send(Response.success(obj));
+    }).catch(error => {
+        res.send(Response.unknownError(error));
+    });
+});
+
+
+/**
  * Regresa al cliente un anexo 29 lleno con la información
  * del anexo cuyo id sea [id]. Si no se provee un id, se 
  * regresará al cliente el formato vacío.
@@ -2723,6 +2819,33 @@ const getAnexo30Info = (id: number, email: string) => new Promise<Object>((resol
         }
     );
 
+});
+
+
+/**
+ * Regresa al cliente la información necesaria para llenar
+ * la vista web de un anexo 30.
+ * 
+ * @param req.query.id ID del anexo 30 a regresar.
+ */
+server.get('/getAnexo30Info', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const id = req.query.id;
+    const email = req.session.user.info.email;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    getAnexo29Info(id, email).then(obj => {
+        res.send(Response.success(obj));
+    }).catch(error => {
+        res.send(Response.unknownError(error));
+    });
 });
 
 

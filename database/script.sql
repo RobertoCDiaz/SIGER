@@ -982,6 +982,46 @@ CREATE FUNCTION relacionadoAlProyecto(
 END;;
 
 
+/*
+	Regresa el ID de la residencia aprobada del alumno 
+	con email [v_email]. En teoría solo debería haber
+	un proyecto aprobado por residente.
+
+	En caso de que el residente no tenga ninguna 
+	resdiencia aprobada, la función regresará NULL.
+*/
+DROP FUNCTION IF EXISTS idResidenciaDeAlumno;;
+CREATE FUNCTION idResidenciaDeAlumno(
+	v_email VARCHAR(64)
+) RETURNS INT DETERMINISTIC BEGIN
+
+	RETURN (
+		IF (
+			(
+				SELECT 
+					COUNT(r.idresidencia)
+				FROM 
+					residencias AS r 
+				WHERE 
+					r.email_residente = v_email AND
+					residenciaAprobada(r.idresidencia) = 1
+			) >= 1
+		, (
+			SELECT 
+				r.idresidencia
+			FROM 
+				residencias AS r 
+			WHERE 
+				r.email_residente = v_email AND
+				residenciaAprobada(r.idresidencia) = 1
+			LIMIT 
+				1
+		), NULL)
+	);
+	
+END;;
+
+
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
@@ -2047,7 +2087,7 @@ CREATE PROCEDURE SP_InfoAnexo29(
 	v_email VARCHAR(64)
 ) BEGIN
 
-	IF relacionadoAlProyecto(v_id, v_email) != 1 THEN BEGIN
+	IF relacionadoAlProyecto((SELECT a.id_residencia FROM anexo_29 AS a WHERE a.idanexo_29 = v_id), v_email) != 1 THEN BEGIN
 		
 		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
 
@@ -2103,7 +2143,7 @@ CREATE PROCEDURE SP_InfoAnexo30(
 	v_email VARCHAR(64)
 ) BEGIN
 
-	IF relacionadoAlProyecto(v_id, v_email) != 1 THEN BEGIN
+	IF relacionadoAlProyecto((SELECT a.id_residencia FROM anexo_30 AS a WHERE a.idanexo_30 = v_id), v_email) != 1 THEN BEGIN
 		
 		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
 
@@ -2145,6 +2185,127 @@ CREATE PROCEDURE SP_InfoAnexo30(
 			a.idanexo_30 = v_id;
 
 	END; END IF;
+END;;
+
+
+/*
+	Regresa una fila que nos dice la cantidad y cuáles documentos
+	ya están disponibles para la residencia con [v_id], siempre
+	y cuando el usuario con email [v_email] tenga acceso al
+	proyecto.
+
+	Información de cada columna:
+
+	* reporte_preliminar
+		Regresa el ID de la residencia (porque con eso es suficiente
+		para acceder al reporte preliminar) si es que la residencia
+		ya fue aprobada y está en marcha. En caso de que no haya 
+		docentes asignados al proyecto, esta columna será NULL.
+
+	* anexos_29
+		Regresa una lista separa por comas de todos los ID de los
+		anexos 29 asociados a la residencia. En caso de no haber ningún
+		anexo 29, regresa NULL.
+
+	* anexos_30
+		Regresa una lista separa por comas de todos los ID de los
+		anexos 30 asociados a la residencia. En caso de no haber ningún
+		anexo 30, regresa NULL.
+*/
+DROP PROCEDURE IF EXISTS SP_GetDocumentosDeResidencia;;
+CREATE PROCEDURE SP_GetDocumentosDeResidencia(
+	v_id INT,
+	v_email VARCHAR(64)
+) BEGIN
+
+	IF relacionadoAlProyecto(v_id, v_email) != 1 THEN BEGIN
+
+		SELECT "0" AS output, "No tiene acceso a esta residencia" AS message;
+
+	END; ELSE BEGIN
+
+		SELECT 
+			"1" AS output, "Documentos de la residencia" AS message;
+
+		SELECT			
+			-- Reporte preliminar.
+			IF (
+				residenciaAprobada(v_id) = 1
+			, v_id, NULL) AS 'reporte_preliminar',
+			IF (
+				residenciaAprobada(v_id) = 1
+			, (SELECT fecha_elaboracion FROM residencias WHERE idresidencia = v_id), NULL) AS 'fecha_reporte_preliminar',
+
+			-- Anexos 29.
+			IF (
+				cantidadDeAnexos29(v_id) > 0
+			, (
+				SELECT
+					GROUP_CONCAT(t.id SEPARATOR ',')
+				FROM (
+					SELECT 
+						idanexo_29 AS 'id'
+					FROM
+						anexo_29
+					WHERE
+						id_residencia = v_id
+					ORDER BY
+						idanexo_29
+				) AS t
+			), NULL) AS 'anexos_29',
+			IF (
+				cantidadDeAnexos29(v_id) > 0
+			, (
+				SELECT
+					GROUP_CONCAT(t.fecha SEPARATOR ',')
+				FROM (
+					SELECT 
+						fecha_activacion as 'fecha'
+					FROM
+						anexo_29
+					WHERE
+						id_residencia = v_id
+					ORDER BY
+						idanexo_29
+				) AS t
+			), NULL) AS 'fechas_anexos_29',
+
+			-- Anexos 30.
+			IF (
+				cantidadDeAnexos30(v_id) > 0
+			, (
+				SELECT
+					GROUP_CONCAT(t.id SEPARATOR ',')
+				FROM (
+					SELECT 
+						idanexo_30 AS 'id'
+					FROM
+						anexo_30
+					WHERE
+						id_residencia = v_id
+					ORDER BY
+						idanexo_30
+				) AS t
+			), NULL) AS 'anexos_30',
+			IF (
+				cantidadDeAnexos30(v_id) > 0
+			, (
+				SELECT
+					GROUP_CONCAT(t.fecha SEPARATOR ',')
+				FROM (
+					SELECT 
+						fecha_activacion as 'fecha'
+					FROM
+						anexo_30
+					WHERE
+						id_residencia = v_id
+					ORDER BY
+						idanexo_30
+				) AS t
+			), NULL) AS 'fechas_anexos_30';
+
+	END; END IF;
+	
 END;;
 
 
