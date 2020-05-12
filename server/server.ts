@@ -2141,7 +2141,7 @@ server.post('/registrarEvaluacionA30', (req, res) => {
 server.get('/carta-presentacion',(req,res)=>
 {
     if (!req.session.loggedin) {
-        res.send(Response.authError());
+        res.redirect('/login');
         return;
     }
     res.sendFile('carta-presentacion.html', { root: '../web-client/' });
@@ -2150,7 +2150,7 @@ server.get('/carta-presentacion',(req,res)=>
 server.get('/carta-aceptacion',(req,res)=>
 {
     if (!req.session.loggedin) {
-        res.send(Response.authError());
+        res.redirect('/login');
         return;
     }
     res.sendFile('carta-aceptacion.html', { root: '../web-client/' });
@@ -2159,7 +2159,7 @@ server.get('/carta-aceptacion',(req,res)=>
 server.get('/ejemplo-anexo29',(req,res)=>
 {
     if (!req.session.loggedin) {
-        res.send(Response.authError());
+        res.redirect('/login');
         return;
     }
     res.sendFile('ejanexo29.html', { root: '../web-client/' });
@@ -2168,7 +2168,7 @@ server.get('/ejemplo-anexo29',(req,res)=>
 server.get('/ejemplo-anexo30',(req,res)=>
 {
     if (!req.session.loggedin) {
-        res.send(Response.authError());
+        res.redirect('/login');
         return;
     }
     res.sendFile('ejanexo30.html', { root: '../web-client/' });
@@ -2177,7 +2177,7 @@ server.get('/ejemplo-anexo30',(req,res)=>
 server.get('/carta-terminacion',(req,res)=>
 {
     if (!req.session.loggedin) {
-        res.send(Response.authError());
+        res.redirect('/login');
         return;
     }
     res.sendFile('carta-terminacion.html', { root: '../web-client/' });
@@ -2186,7 +2186,7 @@ server.get('/carta-terminacion',(req,res)=>
 server.get('/ej-repreliminar',(req,res)=>
 {
     if (!req.session.loggedin) {
-        res.send(Response.authError());
+        res.redirect('/login');
         return;
     }
     res.sendFile('ejrpreliminar.html', { root: '../web-client/' });
