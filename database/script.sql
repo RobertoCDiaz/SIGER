@@ -1318,13 +1318,13 @@ END;;
 /*
 	Muestra la información necesaria para generar el formato
 	preliminar de la residencia con id [v_id_residencia], siempre 
-	y cuando el correo electrónico [v_email_admin] sea
-	encargado de asignar docentes al proyecto.
+	y cuando el usuario con email [v_email] tenga acceso al formato
+	preeliminar de esta residencia.
 */
 DROP PROCEDURE IF EXISTS SP_FormatoPreliminar;;
 CREATE PROCEDURE SP_FormatoPreliminar(
 	v_id_residencia INT,
-	v_email_admin VARCHAR(64)
+	v_email VARCHAR(64)
 ) BEGIN
 	SELECT 
 		DISTINCT r.idresidencia,
@@ -1361,7 +1361,7 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 			ON res.clave_carrera = c.clave
 	WHERE
 		r.idresidencia = v_id_residencia AND
-		administraCarrera(v_email_admin, c.clave);
+		relacionadoAlProyecto(v_id_residencia, v_email);
 END;;
 
 
