@@ -14,13 +14,11 @@ class Documentos {
         this.preliminar = {id: Number(idRes), fecha: new Date(Number(fechaRes)).toDateString()};
         this.anexos_29 = anexos_29?.split(',').map((id, index) => {
             let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a29.split(',')[index])).toDateString()};
-            console.log(`a: ${a}`);
 
             return a;
         });
         this.anexos_30 = anexos_30?.split(',').map((id, index) => {
             let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a30.split(',')[index])).toDateString()};
-            console.log(`a: ${a}`);
             
             return a;
         });

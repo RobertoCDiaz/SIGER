@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/anexos.css">
+    <link rel="stylesheet" href="/styles/residencia.css">
+    <title>Anexo 29 :: SIGER</title>
+    <style>
+        .signatures
+        {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .signatures div
+        {
+            width: 20%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header-extension">
+        <div class="bar">
+            <!-- <h1><a href="/home">SIGER</a></h1> -->
+                <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                    <img src="/assets/images/siger-img.png" height="40px" alt="SIGER">
+                    <h1 style="margin-left: .5em;">SIGER</h1>
+                </a>
+            <h2>Calificaciones Parciales Anexo 29</h2>
+        </div>
+    </header>
+    <div class="content">
+        <form>
+            <div class="page-header">
+                <img src="/assets/images/educacion.png">
+                <div class="text">
+                    
+                </div>
+                <!--<img src="/assets/images/tecnm.png" alt="TECNM">-->
+            </div>
+            <div class="page-content">
+                <p style="text-align: center;" class="section-title">ANEXO XXIX. FORMATO DE EVALUACIÓN Y SEGUIMIENTO DE RESIDENCIA PROFESIONAL</p>
+                <br>
+                <p>Nombre del residente: <b id="residenteView"></b></p>
+                <p>Número de control: <b id="noControlView"></b></p>
+                <p>Nombre del proyecto: <b id="proyectoView"></b></p>
+                <p>Programa Educativo (Carrera): <b id="programaView"></b></p>
+                <p>Período de realización de la residencia profesional: <b id="periodoView"></b></p>
+                <p>Calificación parcial (promedio de ambas evaluaciones): <b id="calificacionView"></b></p>
+                <br>
+                <h2>Evaluación por el asesor externo</h2>
+                <div class="rubric">
+                    <div class="rubric-entry">
+                        <h3>Criterio a evaluar</h3>
+                        <h3>Valor </h3>
+                        <h3> Evaluación</h3>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Asiste puntualmente en el horario establecido.</p>
+                        <p class="entry-range">5</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Trabaja en equipo y se comunica de forma efectiva (oral y escrita).</p>
+                        <p class="entry-range">10</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Tiene iniciativa para colaborar.</p>
+                        <p class="entry-range">5</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Propone mejoras al proyecto.</p>
+                        <p class="entry-range">10</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Cumple con los objetivos correspondientes al proyecto.</p>
+                        <p class="entry-range">15</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Es ordenado y cumple satisfactoriamente con las actividades encomendadas en los tiempos establecidos del cronograma.</p>
+                        <p class="entry-range">15</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Desmuestra liderazgo en su actuar.</p>
+                        <p class="entry-range">10</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Demuestra conocimiento en el área de su especialidad.</p>
+                        <p class="entry-range">20</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Desmuestra un comportamiento ético (es disciplinado, acata órdenes, respeta a sus compañeros de trabajo, entre otros).</p>
+                        <p class="entry-range">10</p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
+                    </div>
+                </div>
+                <h3>Observaciones</h3>
+                <div style="display: flex;">
+                    <textarea id="aeObsView" rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;" disabled></textarea>
+                </div>
+                <br>
+                <div class="signatures">
+                    <!-- <div>
+                        <img src="/assets/images/signature.png" alt="">
+                        <p><b>Ing. Carlos Hernández Ramírez</b></p>
+                        <p>Nombre y firma del asesor externo</p>
+                    </div>
+                    <div>
+                        <img src="/assets/images/certified.png" alt="">
+                        <p>Sello de la empresa, organismo o dependencia</p>
+                    </div> -->
+                    <div>
+                        <p><b id="aeCalView"></b></p>
+                        <p>Calificación de asesor interno</p>
+                    </div>
+                    <div>
+                        <p><b id="aeFechaView"></b></p>
+                        <p>Fecha de evaluación</p>
+                    </div>
+                </div>
+                <hr>
+                <h2>Evaluación por el asesor interno</h2>
+                <div class="rubric">
+                    <div class="rubric-entry">
+                        <h3>Criterio a evaluar</h3>
+                        <h3>Valor</h3>
+                        <h3>Evaluación</h3>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Asistió puntualmente a las reuniones de asesoría.</p>
+                        <p class="entry-range">10</p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Demuestra conocimiento en el área de su especialidad.</p>
+                        <p class="entry-range">20</p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Trabaja en equipo y se comunica de forma efectiva.</p>
+                        <p class="entry-range">15</p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Es dedicado y proactivo en las actividades encomendadas.</p>
+                        <p class="entry-range">20</p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Es ordenado y cumple satisfactoriamente con las actividades encomendadas en los tiempos establecidos.</p>
+                        <p class="entry-range">20</p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
+                    </div>
+                    <div class="rubric-entry">
+                        <p class="entry-text">Propone mejoras al proyecto.</p>
+                        <p class="entry-range">15</p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
+                    </div>
+                </div>
+                <h3>Observaciones</h3>
+                <div style="display: flex;">
+                    <textarea id="aiObsView"  rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;" disabled></textarea>
+                </div>
+                <div class="signatures">
+                    <!-- <div>
+                        <img src="/assets/images/signature.png" alt="">
+                        <p><b>Ing. Carla Hernández Flores</b></p>
+                        <p>Nombre y firma del asesor interno</p>
+                    </div>
+                    <div>
+                        <img src="/assets/images/certified.png" alt="">
+                        <p>Sello de la empresa, organismo o dependencia</p>
+                    </div>  -->
+                    <div>
+                        <p><b id="aiCalView"></b></p>
+                        <p>Calificación de asesor interno</p>
+                    </div>
+                    <div>
+                        <p><b id="aiFechaView"></b></p>
+                        <p>Fecha de evaluación</p>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons-container">
+                <button class="secondary-button"><a href="/documentos">VOLVER AL MENÚ DE DOCUMENTOS</a></button>
+                <!-- TODO: Implementar descarga de formato. -->
+                <button id="emptyDownloadButton" type="button" class="primary-button">DESCARGAR FORMATO</button>
+                <button id="infoDownloadButton" type="button" class="primary-button">DESCARGAR DOCUMENTO CON INFORMACIÓN</button>
+            </div>
+        </form>
+    </div>
+    <script src="/scripts/menu.js"></script>
+    <script src="/scripts/descarga-formatos.js"></script>
+    <script src="/scripts/documentos/anexo29.js"></script>
+</body>
+</html>

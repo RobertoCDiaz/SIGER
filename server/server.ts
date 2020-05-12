@@ -2138,7 +2138,7 @@ server.post('/registrarEvaluacionA30', (req, res) => {
     );
 });
 
-server.get('/carta-presentacion',(req,res)=>
+server.get('/documentos/carta-presentacion',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -2147,7 +2147,7 @@ server.get('/carta-presentacion',(req,res)=>
     res.sendFile('carta-presentacion.html', { root: '../web-client/' });
 });
 
-server.get('/carta-aceptacion',(req,res)=>
+server.get('/documentos/carta-aceptacion',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -2156,16 +2156,24 @@ server.get('/carta-aceptacion',(req,res)=>
     res.sendFile('carta-aceptacion.html', { root: '../web-client/' });
 });
 
-server.get('/ejemplo-anexo29',(req,res)=>
+server.get('/documentos/anexo-29',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
     }
-    res.sendFile('ejanexo29.html', { root: '../web-client/' });
+
+    const id = req.query.id;
+    if (!id) {
+        res.sendFile('ejanexo29.html', { root: '../web-client/docs-pages/' });
+        return;
+    }
+
+    res.sendFile('anexo-29.html', { root: '../web-client/docs-pages/' });
+
 });
 
-server.get('/ejemplo-anexo30',(req,res)=>
+server.get('/documentos/anexo-30',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -2174,7 +2182,7 @@ server.get('/ejemplo-anexo30',(req,res)=>
     res.sendFile('ejanexo30.html', { root: '../web-client/' });
 });
 
-server.get('/carta-terminacion',(req,res)=>
+server.get('/documentos/carta-terminacion',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
@@ -2183,7 +2191,7 @@ server.get('/carta-terminacion',(req,res)=>
     res.sendFile('carta-terminacion.html', { root: '../web-client/' });
 });
 
-server.get('/ej-repreliminar',(req,res)=>
+server.get('/documentos/reporte-preliminar',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
