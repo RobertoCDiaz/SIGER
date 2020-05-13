@@ -2156,6 +2156,16 @@ server.get('/documentos/carta-aceptacion',(req,res)=>
     res.sendFile('carta-aceptacion.html', { root: '../web-client/' });
 });
 
+
+/**
+ * Regresa al cliente la pantalla del 
+ * anexo apropiada. Si no se incluye un
+ * ID en la dirección, se enviará al cliente
+ * el .html con el formato de ejemplo. En caso
+ * de sí haber un ID, se enviará la página lista
+ * para llenarse con información del anexo 
+ * especificado.
+ */
 server.get('/documentos/anexo-29',(req,res)=>
 {
     if (!req.session.loggedin) {
@@ -2170,16 +2180,32 @@ server.get('/documentos/anexo-29',(req,res)=>
     }
 
     res.sendFile('anexo-29.html', { root: '../web-client/docs-pages/' });
-
 });
 
+
+/**
+ * Regresa al cliente la pantalla del 
+ * anexo apropiada. Si no se incluye un
+ * ID en la dirección, se enviará al cliente
+ * el .html con el formato de ejemplo. En caso
+ * de sí haber un ID, se enviará la página lista
+ * para llenarse con información del anexo 
+ * especificado.
+ */
 server.get('/documentos/anexo-30',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
     }
-    res.sendFile('ejanexo30.html', { root: '../web-client/' });
+
+    const id = req.query.id;
+    if (!id) {
+        res.sendFile('ejanexo30.html', { root: '../web-client/docs-pages/' });
+        return;
+    }
+
+    res.sendFile('anexo-30.html', { root: '../web-client/docs-pages/' });
 });
 
 server.get('/documentos/carta-terminacion',(req,res)=>
@@ -2849,7 +2875,7 @@ server.get('/getAnexo30Info', (req, res) => {
         return;
     }
 
-    getAnexo29Info(id, email).then(obj => {
+    getAnexo30Info(id, email).then(obj => {
         res.send(Response.success(obj));
     }).catch(error => {
         res.send(Response.unknownError(error));
