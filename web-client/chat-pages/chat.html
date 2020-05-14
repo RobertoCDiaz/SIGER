@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat :: SIGER</title>
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/chat.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+    <div class="blue-header">...</div>
+
+    <div class="chat-window-container">
+        <div class="chat-window">
+            <div class="contacts-side">
+                <div class="search-widget">
+                    <div class="search-bar">
+                        <i class="material-icons">search</i>
+                        <input type="text" placeholder="Buscar...">
+                    </div>
+                </div>
+                <div class="contacts-list prevent-selection">
+                    <div class="contact">
+                        <p class="name">Alonso Sánchez Sotomayor</p>
+                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
+                            <i class="material-icons seen">visibility</i>
+                            Me vale verga, puñetón, me val...
+                        </p>
+                    </div>
+                    <div class="contact">
+                        <p class="name">Celia Pastor Domínguez</p>
+                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
+                            No seas meco, mijo
+                        </p>
+                    </div>
+                    <div class="contact active">
+                        <p class="name">Martín Rodríguez Pozos</p>
+                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
+                            <i class="material-icons">visibility</i>
+                            Ya revisé y no dejé el reload().
+                        </p>
+                    </div>
+                    <div class="contact">
+                        <p class="name">Izan Martín Malillos</p>
+                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
+                            izan.mm@piedrasnegras.tecnm.mx
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="messages-side">
+                <div class="top-bar prevent-selection">
+                    <p class="name">Martín Rodríguez Pozos</p>
+                    <div class="options">
+                        <i class="material-icons" title="Copiar correo electrónico al portapapeles">email</i>
+                    </div>
+                </div>
+                <div class="chat">
+                    <div id="messagesContainer" class="messages-container">
+                        <p class="date prevent-selection">12/05/2020</p>
+                        <div class="message mine">
+                            <p class="content">Como los "aquí vamos" que hacíamos con Arlín</p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div>
+                        <div class="message">
+                            <p class="content">
+                                Esto ya me está preocupando, corregí esto, ahora al entrar a la vista web del reporte se hacen un chingo de peticiones seguidas y no se detienen.
+                            </p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div>
+                        <p class="date prevent-selection">13/05/2020</p>
+                        <div class="message mine">
+                            <p class="content">
+                                Aber.
+                            </p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div> 
+                        <div class="message">
+                            <p class="content">
+                                Aber, me perdí en este aspecto ayer, ¿de dónde tomo el ID si la página está, por así decirlo, estática?
+                            </p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div>
+                        <div class="message mine">
+                            <p class="content">
+                                Ah cabrón. Es como si se estuviese recargando la página hasta el infinito.
+                            </p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div>
+                        <div class="message mine">
+                            <p class="content">
+                                Me suena que en lo que hice hay un sitio donde recargo la pantalla, ¿Lo pusiste? Si sí, intenta comentándolo.
+                            </p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div>
+                        <div class="message mine">
+                            <p class="content">
+                                Ya revisé y no dejé el reload().
+                            </p>
+                            <p class="hour prevent-selection">19:53</p>
+                        </div>
+                    </div>
+                    <script>
+                        const messages = Array.from(document.getElementsByClassName('message')).filter(m => m.parentNode.id == 'messagesContainer');
+                        const messagesContainer = document.getElementById('messagesContainer');
+                    </script>
+                    <div class="writer-container">
+                        <div class="writer">
+                            <textarea id="messageView" rows="1" type="text" placeholder="Mensaje..."></textarea>
+                            <i class="material-icons" title="Enviar mensaje">send</i>
+                            <script>
+                                // Altura de textarea dinámica.
+                                const messageView = document.getElementById('messageView');
+                                messageView.oninput = (e) => {
+                                    const lines = messageView.value.split('\n').length;
+                                    const maxLines = 5;
+                                    messageView.rows = lines <= maxLines ? lines : maxLines;
+                                }
+                            </script>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/menu.js"></script>
+</body>
+</html>

@@ -2082,6 +2082,16 @@ server.get('/evaluacion-a30', (req, res) => {
     res.sendFile('anexo30.html', { root: '../web-client/'});
 });
 
+
+server.get('/chat', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
+});
+
 /* ================================================================================================
 
     Misc.
