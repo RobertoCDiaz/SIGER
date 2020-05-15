@@ -2153,7 +2153,7 @@ server.get('/documentos/carta-aceptacion',(req,res)=>
         res.redirect('/login');
         return;
     }
-    res.sendFile('carta-aceptacion.html', { root: '../web-client/' });
+    res.sendFile('carta-aceptacion.html', { root: '../web-client/docs-pages/' });
 });
 
 
@@ -2214,7 +2214,7 @@ server.get('/documentos/carta-terminacion',(req,res)=>
         res.redirect('/login');
         return;
     }
-    res.sendFile('carta-terminacion.html', { root: '../web-client/' });
+    res.sendFile('carta-terminacion.html', { root: '../web-client/docs-pages/' });
 });
 
 server.get('/documentos/reporte-preliminar',(req,res)=>
@@ -2922,9 +2922,42 @@ server.get('/getAnexo30', (req, res) => {
     }).catch(error => {
         res.send(Response.unknownError(error));
     })
-
-
 });
+
+
+/**
+ * Envía al cliente el formato vacío de una 
+ * Carta de Aceptación de ejemplo para las residencias 
+ * profesionales.
+ */
+server.get('/getFormatoCartaAceptacion', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    getEmptyDocument('formatos/carta-aceptacion.docx').then(doc => {
+        res.send(doc);
+    }).catch(error => res.send(Response.unknownError(error.toString())));
+});
+
+
+/**
+ * Envía al cliente el formato vacío de una 
+ * Carta de Terminación de ejemplo para las residencias 
+ * profesionales.
+ */
+server.get('/getFormatoCartaTerminacion', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    getEmptyDocument('formatos/carta-terminacion.docx').then(doc => {
+        res.send(doc);
+    }).catch(error => res.send(Response.unknownError(error.toString())));
+});
+
 
 /* ================================================================================================
 
