@@ -1367,7 +1367,7 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 	v_email VARCHAR(64)
 ) BEGIN
 	SELECT 
-		DISTINCT r.idresidencia,
+		DISTINCT '1' as output, r.idresidencia,
 		r.fecha_elaboracion AS 'fecha', r.nombre_proyecto AS 'proyecto',
 		r.objetivo AS 'objetivo', r.justificacion AS 'justificacion',
 		r.periodo AS 'periodo', r.ano AS 'ano', r.descripcion_actividades AS 'actividades',
@@ -1377,6 +1377,8 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 
 		ae.nombre_completo AS 'nombre_ae', ae.puesto AS 'puesto_ae', ae.grado_estudios AS 'grado_ae', 
 		ae.telefono AS 'telefono_ae', ae.email AS 'email_ae',
+        
+        nombreCompleto(ai.email) AS 'nombre_ai',
 
 		nombreCompleto(res.email) as 'nombre_res', SUBSTRING(res.email, 2, 8) as 'noControl_res',
 		c.nombre_carrera as 'carrera', 
@@ -1399,9 +1401,14 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 			ON r.email_residente = res.email
 		LEFT JOIN carreras AS c
 			ON res.clave_carrera = c.clave
+		LEFT JOIN involucrados AS i
+			ON r.idresidencia = i.id_residencia
+		LEFT JOIN docentes AS ai
+			ON i.email_docente = ai.email
 	WHERE
 		r.idresidencia = v_id_residencia AND
-		relacionadoAlProyecto(v_id_residencia, v_email);
+		relacionadoAlProyecto(v_id_residencia, v_email) AND
+        i.es_asesor = 1;
 END;;
 
 

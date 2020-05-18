@@ -2197,7 +2197,13 @@ server.get('/documentos/reporte-preliminar',(req,res)=>
         res.redirect('/login');
         return;
     }
-    res.sendFile('ejrpreliminar.html', { root: '../web-client/' });
+    const id = req.query.id;
+    if(!id)
+    {
+        res.sendFile('ejrepreliminar.html', { root: '../web-client/'} );
+        return;
+    }
+    res.sendFile('repreliminar.html', { root: '../web-client/' });
 });
 
 
@@ -2263,7 +2269,7 @@ server.get('/documentosDeResidencia', (req, res) => {
                 res.send(Response.userError(rows[0][0]['message']));
                 return;
             }
-
+            console.log(rows[1][0]);
             res.send(Response.success(rows[1][0]));
         }
     );
@@ -2624,6 +2630,36 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
 const getEmptyDocument = (relativePath: string) => 
     generateDocument({}, path.resolve(__dirname, relativePath));
 
+/* */
+const getDocument = (output:string, httpPetition:string) =>
+{
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.open('get',httpPetition, true);
+    xhr.onload = () =>
+    {
+        downloadFile(xhr.response, `${output}.docx`);
+    };
+    xhr.send;
+};
+
+const downloadFile = (blob, fileName) =>
+{
+    const link = document.createElement('a');
+
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+
+    document.body.append(link);
+
+    link.click();
+
+    link.remove();
+    window.addEventListener('focus', e => URL.revokeObjectURL(link.href), {once:true});
+};
+
+
+
 /* ================================================================================================
 
     Documents.
@@ -2898,6 +2934,146 @@ server.get('/getAnexo30', (req, res) => {
     })
 
 
+});
+
+/**
+ * Regresa un objeto JSON con la información y 
+ * estructura necesaria para llenar la plantilla del
+ * reporte preliminar.
+ * 
+ * @param id ID de la residencia a consultar.
+ * @param email Email del usuario actual.
+ */
+const getReportePreliminarInfo = (id: number, email: string) =>
+new Promise<Object>((resolve, reject)=> {
+    con.query(
+        `call SP_FormatoPreliminar(?, ?);`,
+        [id, email],
+        (e, rows, f) => {
+            if (e) {
+                reject(e.toString());
+                return;
+            }
+
+            if (rows[0][0]['output'] != 1) {
+                reject(rows[0][0]['message']);
+                return;
+            }
+            // Objeto a regresar como resultado del Promise.
+            const dataObject = {};
+
+            // Información de la residencia.
+            dataObject['proyecto'] = rows[0][0]['proyecto'];
+            dataObject['objetivo'] = rows[0][0]['objetivo'];
+            dataObject['justificacion'] = rows[0][0]['justificacion'];
+            if(rows[0][0]['periodo']==1)
+            {
+                dataObject['periodo'] = 'Enero - Junio';
+            }
+            else
+            {
+                dataObject['periodo'] = 'Agosto - Diciembre';
+            }
+            dataObject['ano'] = rows[0][0]['ano'];
+            dataObject['actividades'] = rows[0][0]['actividades'];
+            dataObject['empresa'] = rows[0][0]['empresa'];
+            dataObject['representante_e'] = rows[0][0]['representante_e'];
+            dataObject['direccion_e'] = rows[0][0]['direccion_e'];
+            dataObject['telefono_e'] = rows[0][0]['telefono_e'];
+            dataObject['ciudad_e'] = rows[0][0]['ciudad_e'];
+            dataObject['email_e'] = rows[0][0]['email_e'];
+            dataObject['departamento_e'] = rows[0][0]['departamento_e'];
+            dataObject['nombre_ae'] = rows[0][0]['nombre_ae'];
+            dataObject['puesto_ae'] = rows[0][0]['puesto_ae'];
+            dataObject['grado_ae'] = rows[0][0]['grado_ae'];
+            dataObject['telefono_ae'] = rows[0][0]['telefono_ae'];
+            dataObject['email_ae'] = rows[0][0]['email_ae'];
+            dataObject['nombre_res'] = rows[0][0]['nombre_res'];
+            dataObject['noControl_res'] = rows[0][0]['noControl_res'];
+            dataObject['carrera'] = rows[0][0]['carrera'];
+            dataObject['tel_casa'] = rows[0][0]['tel_casa'];
+            dataObject['celular'] = rows[0][0]['celular'];
+            dataObject['email_res'] = rows[0][0]['email_res'];
+            dataObject['horarios'] = rows[0][0]['horarios'];
+            dataObject['nombre_ai'] = rows[0][0]['nombre_ai']
+            const tsToString = (ts: number) => {
+                const monthsArr: String[] = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            
+                const d: Date = new Date(ts);
+            
+                return `${d.getDate()} de ${monthsArr[d.getMonth()]} del ${d.getFullYear()}`;
+            }
+            dataObject['fecha'] = tsToString(Number(rows[0][0]['fecha']));
+            
+            resolve(dataObject);
+        }
+    );
+});
+
+
+/**
+ * Regresa al cliente la información necesaria para llenar
+ * la vista web de un reporte preliminar.
+ * 
+ * @param req.query.id ID de la residencia a regresar.
+ */
+server.get('/getReportePreliminarInfo', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const id = req.query.id;
+    const email = req.session.user.info.email;
+    if (!id) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    getReportePreliminarInfo(id, email).then(obj => {
+        res.send(Response.success(obj));
+    }).catch(error => {
+        res.send(Response.unknownError(error));
+    });
+});
+
+
+/**
+ * Regresa al cliente un reporte preliminar lleno con la información
+ * de la residencia cuyo id sea [id]. Si no se provee un id, se 
+ * regresará al cliente el formato vacío.
+ * 
+ * @param id ID de la residencia a regresar en forma de documento.
+ */
+server.get('/getReportePreliminar', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+    const id = req.query.id;
+    if (!id) {
+        getEmptyDocument('formatos/reporte-preliminar.docx').then(doc => {
+            res.send(doc);
+            return;
+        }).catch(error => {
+            res.send(Response.unknownError(error));
+            return;
+        })
+        return; }
+
+    getReportePreliminarInfo(id, req.session.user.info.email).then(async data => {
+        generateDocument(
+            data,
+            path.resolve(__dirname, 'formatos/reporte-preliminar-template.docx'),
+        ).then(generatedFile => {
+            res.send(generatedFile);
+        }).catch(err => {
+            res.send(Response.unknownError(err));
+        })
+
+    }).catch(errorMsg => 
+        res.send(Response.unknownError(errorMsg))
+    );
 });
 
 /* ================================================================================================
