@@ -2267,6 +2267,36 @@ server.get('/idDeMiResidencia', (req, res) => {
 });
 
 /**
+ * Regresa al cliente el ID de la residencia aprobada del residente
+ * actual.
+ */
+server.get('/idDeMiResidenciaAsesorada', (req, res) => {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const email = req.session.user.info.residente;
+    con.query(
+        `select idResidenciaDeAlumno(?) as 'email';`,
+        email,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            if (rows[0]['email'] == null) {
+                res.send(Response.userError("No tiene residencias aprobadas"));
+                return;
+            }
+
+            res.send(Response.success(rows[0]['email']));
+        }
+    )
+});
+
+/**
  * Regresa al cliente los ID de los distintos documentos de la residencia.
  * Ver [SP_GetDocumentosDeResidencia] del archivo .sql para más información.
  * 

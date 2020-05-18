@@ -1,40 +1,39 @@
-        let ts;
-        let proyecto;
-        let fechareporte
-        let nresidente;
-        let apresidente;
-        let amresidente;
-        let ncontrol;
-        //
-        let id_residencia;
+        let timest;
+        let project;
+        let reportDate;
+        let residentName;
+        let residentPatSurname;
+        let residentMatSurname;
+        let controlNumber;
+        let residenceID;
 
-        const timeToString = (ts: number) => {
+        const timemstampString = (timest: number) => {
             const monthsArr: String[] = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
-            const d: Date = new Date(ts);
+            const d: Date = new Date(timest);
 
             return `${d.getDate()} de ${monthsArr[d.getMonth()]} del ${d.getFullYear()}`;
         }
 
-        const getAprobado=()=>
+        const getAprobadoA=()=>
         {
             let xhr = new XMLHttpRequest();
-            xhr.open('get',`/aprobado`,false);
+            xhr.open('get',`/asesor-aprobado`,false);
             xhr.onload=()=>
             {
                 let response = JSON.parse(xhr.responseText);
-                nresidente=response['n'];
-                apresidente=response['ap'];
-                amresidente=response['am'];
+                residentName=response['n'];
+                residentPatSurname=response['ap'];
+                residentMatSurname=response['am'];
                 
-                ncontrol=response['em'].substring(1,9);
+                controlNumber=response['em'].substring(1,9);
 
                 const maininfo = document.getElementById('maininfo');
                 let h = document.createElement('p');
-                if(amresidente!='null')
-                    h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+' '+amresidente+' con número de control '+ ncontrol +' respecto a su residencia profesional.';
+                if(residentMatSurname!='null')
+                    h.innerText='Se muestra el avance del(la) alumno(a) '+residentName+' '+residentPatSurname+' '+' '+residentMatSurname+' con número de control '+ controlNumber +' respecto a su residencia profesional.';
                 else
-                    h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+'  con número de control '+ ncontrol +' respecto a su residencia profesional.';
+                    h.innerText='Se muestra el avance del(la) alumno(a) '+residentName+' '+residentPatSurname+' '+'  con número de control '+ controlNumber +' respecto a su residencia profesional.';
 
                 let info = document.createElement('p');
                 info.innerText = 'Si desea ir a la vista web del documento relacionado al evento de progreso, por favor haga click en el nombre del mismo.';
@@ -43,13 +42,13 @@
                 maininfo.appendChild(br);
                 maininfo.appendChild(info);
 
+
                 if(response['message']==1)
                 {
-                    //
-                    id_residencia = response['id_residencia']
-                    proyecto = response['proyecto'];
-                    ts=Number.parseInt(String(response['fecha']));
-                    fechareporte = timeToString(ts);
+                    residenceID = response['id_residencia']
+                    project = response['proyecto'];
+                    timest=Number.parseInt(String(response['fecha']));
+                    reportDate = timemstampString(timest);
                     let tl = document.getElementById('timelinedef');
                     let contleft = document.createElement('div');
                     contleft.className='container right';
@@ -57,10 +56,10 @@
                     cont.className='contentt';
                     let title = document.createElement('h2');
                     title.id = 'linkReportePreliminar';
+                    title.style.cursor='pointer';
                     title.innerText='Reporte preliminar enviado para aprobación';
-                    title.style.cursor = 'pointer';
                     let inf = document.createElement('p');
-                    inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
+                    inf.innerText = 'Proyecto: '+ project + '\nFecha de elaboración: ' + reportDate;
                     cont.appendChild(title);
                     cont.appendChild(inf);
                     contleft.appendChild(cont);
@@ -79,20 +78,20 @@
                 }
                 else if (response['message']==0)
                 {
-                    proyecto = response['proyecto'];
-                    ts=Number.parseInt(String(response['fecha']));
-                    fechareporte = new Date(ts);
+                    project = response['proyecto'];
+                    timest=Number.parseInt(String(response['fecha']));
+                    reportDate = new Date(timest);
                     let tl = document.getElementById('timelinedef');
                     let contleft = document.createElement('div');
                     contleft.className='container right';
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
-                    title.id = 'linkReportePreliminar';
                     title.style.cursor='pointer';
                     title.innerText='Reporte preliminar enviado para aprobación';
+                    title.id = 'linkReportePreliminar';
                     let inf = document.createElement('p');
-                    inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
+                    inf.innerText = 'project: '+ project + '\nFecha de elaboración: ' + reportDate;
                     cont.appendChild(title);
                     cont.appendChild(inf);
                     contleft.appendChild(cont);
@@ -104,7 +103,7 @@
                     cont = document.createElement('div');
                     cont.className='contentt';
                     title = document.createElement('h2');
-                    title.innerText='Proyecto pendiente para aprobación.';
+                    title.innerText='project pendiente para aprobación.';
                     cont.appendChild(title);
                     contleft.appendChild(cont);
                     tl.appendChild(contleft);
@@ -126,15 +125,11 @@
             }
             xhr.send();
         }
-        getAprobado();
+        getAprobadoA();
 
-        
-
-        
-
-        const getAsesor=()=>
+        const getAsesorA=()=>
         {
-            let b = new XMLHttpRequest();b.open('get',`/asesor`,false);
+            let b = new XMLHttpRequest();b.open('get',`/asesor-asesor`,false);
             b.onload=()=>
             {
                 let response = JSON.parse(b.responseText);
@@ -163,11 +158,11 @@
             }
             b.send();
         }
-        getAsesor();
+        getAsesorA();
 
-        const getRevisores=()=>
+        const getRevisoresA=()=>
         {
-            let c = new XMLHttpRequest();c.open('get',`/revisores`,false);
+            let c = new XMLHttpRequest();c.open('get',`/asesor-revisores`,false);
             c.onload=()=>
             {
                 let response = JSON.parse(c.responseText);
@@ -188,11 +183,11 @@
             }
             c.send();
         }
-        getRevisores();
+        getRevisoresA();
 
-        const getCal1=()=>
+        const getCal1A=()=>
         {
-            let d = new XMLHttpRequest();d.open('get',`/cal1`,false);
+            let d = new XMLHttpRequest();d.open('get',`/asesor-cal1`,false);
             d.onload=()=>
             {
                 let response = JSON.parse(d.responseText);
@@ -221,8 +216,9 @@
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
-                    title.innerText='Calificaciones parciales (Anexo 29_1)';
+                    title.innerText='Calificaciones parciales (Anexo 29)';
                     title.id = 'linkAnexo29_1';
+                    title.style.cursor='pointer';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
                     cont.appendChild(title);
@@ -233,11 +229,11 @@
             }
             d.send();
         }
-        getCal1();
+        getCal1A();
 
-        const getCal1_2=()=>
+        const getCal1_2A=()=>
         {
-            let f = new XMLHttpRequest();f.open('get',`/cal1_2`,false);
+            let f = new XMLHttpRequest();f.open('get',`/asesor_cal1_2`,false);
             f.onload=()=>
             {
                 let response = JSON.parse(f.responseText);
@@ -266,7 +262,7 @@
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
-                    title.id = 'linkAnexo29_2';
+                    title.style.cursor='pointer';
                     title.innerText='Calificaciones parciales (Anexo 29_2)';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
@@ -278,11 +274,11 @@
             }
             f.send();
         }
-        getCal1_2();
+        getCal1_2A();
 
-        const getCal2=()=>
+        const getCal2A=()=>
         {
-            let e = new XMLHttpRequest();e.open('get',`/cal2`,false);
+            let e = new XMLHttpRequest();e.open('get',`/asesor-cal2`,false);
             e.onload=()=>
             {
                 let response = JSON.parse(e.responseText);
@@ -312,6 +308,7 @@
                     cont.className='contentt';
                     let title = document.createElement('h2');
                     title.id = 'linkAnexo30';
+                    title.style.cursor='pointer';
                     title.innerText='Calificaciones parciales (Anexo 30)';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
@@ -323,20 +320,19 @@
             }
             e.send();
         }
-        getCal2();
+        getCal2A();
 
-        //------------------------------------------------------
-        //const misDocumentosContainer = document.getElementById('misDocumentosContainer');
-        const linkReportePreliminar = document.getElementById('linkReportePreliminar');
-        const linkAnexo29_1 = document.getElementById('linkAnexo29_1');
-        const linkAnexo29_2 = document.getElementById('linkAnexo29_2');
-        const linkAnexo30 = document.getElementById('linkAnexo30');
+        //---------------------------------------------------------------
+        const linkRP = document.getElementById('linkReportePreliminar');
+        const linkA29_1 = document.getElementById('linkAnexo29_1');
+        const linkA29_2 = document.getElementById('linkAnexo29_2');
+        const linkA30 = document.getElementById('linkAnexo30');
         interface DocumentInfo {
             id: number,
             fecha: string
         }
 
-        class Documents {
+        class DocumentsA {
             preliminar: DocumentInfo;
             anexos_29: DocumentInfo[];
             anexos_30: DocumentInfo[];
@@ -356,8 +352,8 @@
             }
         }
 
-        const getDocumentos = () => new Promise<Documents>((resolve, reject) => {
-            get_Petition('/idDeMiResidencia', idResponse => {
+        const getDocumentosA = () => new Promise<DocumentsA>((resolve, reject) => {
+            get_PetitionA('/idDeMiResidenciaAsesorada', idResponse => {
                 if (idResponse['code'] <= 0) {
                     reject(idResponse['message']);
                     return;
@@ -365,7 +361,7 @@
 
                 const id = idResponse['object'];
 
-                get_Petition(`/documentosDeResidencia?id=${id}`, docResponse => {
+                get_PetitionA(`/documentosDeResidencia?id=${id}`, docResponse => {
                     if (docResponse['code'] <= 0) {
                         reject(docResponse['message']);
                         return;
@@ -373,12 +369,12 @@
 
                     const docs: Object = docResponse['object'];
 
-                    resolve(new Documents(docs['reporte_preliminar'], docs['fecha_reporte_preliminar'], docs['anexos_29'], docs['fechas_anexos_29'], docs['anexos_30'], docs['fechas_anexos_30']));
+                    resolve(new DocumentsA(docs['reporte_preliminar'], docs['fecha_reporte_preliminar'], docs['anexos_29'], docs['fechas_anexos_29'], docs['anexos_30'], docs['fechas_anexos_30']));
                 });
             });
         });
 
-        const get_Petition = (petition: string, callback: (response: JSON) => void) => {
+        const get_PetitionA = (petition: string, callback: (response: JSON) => void) => {
             let xhr = new XMLHttpRequest();
             xhr.open('get', `${petition}`, true);
             
@@ -391,42 +387,42 @@
             xhr.send();
         }
 
-        const createLinks = () => {
+        const createLinksA = () => {
 
-            getDocumentos().then(docs => {
+            getDocumentosA().then(docs => {
 
                 if (docs.preliminar) {
 
-                    linkReportePreliminar.addEventListener('click',()=>
+                    linkRP.addEventListener('click',()=>
                     {
-                        location.href=`/documentos/reporte-preliminar?id=${id_residencia}`;
+                        location.href=`/documentos/reporte-preliminar?id=${residenceID}`;
                     });
                     
                 }
 
                 if (docs.anexos_29) {
-                        if(linkAnexo29_1)
+                        if(linkA29_1)
                         {
-                            linkAnexo29_1.addEventListener('click',()=>
+                            linkA29_1.addEventListener('click',()=>
                             {
-                                location.href=`/documentos/anexo-29?id=${id_residencia}`;
+                                location.href=`/documentos/anexo-29?id=${residenceID}`;
                             });
                         }
-                        if(linkAnexo29_2)
+                        if(linkA29_2)
                         {
-                            linkAnexo29_2.addEventListener('click',()=>
+                            linkA29_2.addEventListener('click',()=>
                             {
-                                location.href=`/documentos/anexo-29?id=${id_residencia}`;
+                                location.href=`/documentos/anexo-29?id=${residenceID}`;
                             });
                         }
                 }
 
                 if (docs.anexos_30) {
-                    if(linkAnexo30)
+                    if(linkA30)
                     {
-                        linkAnexo30.addEventListener('click',()=>
+                        linkA30.addEventListener('click',()=>
                         {
-                            location.href=`/documentos/anexo-30?id=${id_residencia}`;
+                            location.href=`/documentos/anexo-30?id=${residenceID}`;
                         });
                     }
                         
@@ -437,6 +433,4 @@
 
         }
 
-        createLinks();
-        //------------------------------------------------------
-        
+        createLinksA();
