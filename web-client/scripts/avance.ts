@@ -1,10 +1,12 @@
-let ts;
+        let ts;
         let proyecto;
         let fechareporte
         let nresidente;
         let apresidente;
         let amresidente;
         let ncontrol;
+        //
+        let id_residencia;
 
         const timeToString = (ts: number) => {
             const monthsArr: String[] = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -33,10 +35,18 @@ let ts;
                     h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+' '+amresidente+' con número de control '+ ncontrol +' respecto a su residencia profesional.';
                 else
                     h.innerText='Se muestra el avance del(la) alumno(a) '+nresidente+' '+apresidente+' '+'  con número de control '+ ncontrol +' respecto a su residencia profesional.';
+
+                let info = document.createElement('p');
+                info.innerText = 'Si desea ir a la vista web del documento relacionado al evento de progreso, por favor haga click en el nombre del mismo.';
+                let br = document.createElement('br');
                 maininfo.appendChild(h);
+                maininfo.appendChild(br);
+                maininfo.appendChild(info);
 
                 if(response['message']==1)
                 {
+                    //
+                    id_residencia = response['id_residencia']
                     proyecto = response['proyecto'];
                     ts=Number.parseInt(String(response['fecha']));
                     fechareporte = timeToString(ts);
@@ -46,7 +56,9 @@ let ts;
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
+                    title.id = 'linkReportePreliminar';
                     title.innerText='Reporte preliminar enviado para aprobación';
+                    title.style.cursor = 'pointer';
                     let inf = document.createElement('p');
                     inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
                     cont.appendChild(title);
@@ -76,6 +88,7 @@ let ts;
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
+                    
                     title.innerText='Reporte preliminar enviado para aprobación';
                     let inf = document.createElement('p');
                     inf.innerText = 'Proyecto: '+ proyecto + '\nFecha de elaboración: ' + fechareporte;
@@ -113,6 +126,10 @@ let ts;
             xhr.send();
         }
         getAprobado();
+
+        
+
+        
 
         const getAsesor=()=>
         {
@@ -204,6 +221,7 @@ let ts;
                     cont.className='contentt';
                     let title = document.createElement('h2');
                     title.innerText='Calificaciones parciales (Anexo 29_1)';
+                    title.id = 'linkAnexo29_1';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
                     cont.appendChild(title);
@@ -247,6 +265,7 @@ let ts;
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
+                    title.id = 'linkAnexo29_2';
                     title.innerText='Calificaciones parciales (Anexo 29_2)';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
@@ -291,6 +310,7 @@ let ts;
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');
+                    title.id = 'linkAnexo30';
                     title.innerText='Calificaciones parciales (Anexo 30)';
                     let inf = document.createElement('p');
                     inf.innerText = 'Calificación externa: '+ totalee+ '\nCalificación interna: ' + totalei;
@@ -303,4 +323,119 @@ let ts;
             e.send();
         }
         getCal2();
+
+        //------------------------------------------------------
+        //const misDocumentosContainer = document.getElementById('misDocumentosContainer');
+        const linkReportePreliminar = document.getElementById('linkReportePreliminar');
+        const linkAnexo29_1 = document.getElementById('linkAnexo29_1');
+        const linkAnexo29_2 = document.getElementById('linkAnexo29_2');
+        const linkAnexo30 = document.getElementById('linkAnexo30');
+        interface DocumentInfo {
+            id: number,
+            fecha: string
+        }
+
+        class Documents {
+            preliminar: DocumentInfo;
+            anexos_29: DocumentInfo[];
+            anexos_30: DocumentInfo[];
+
+            constructor(idRes: any, fechaRes: string, anexos_29: string, fechas_a29: string, anexos_30: string, fechas_a30: string) {
+                this.preliminar = {id: Number(idRes), fecha: new Date(Number(fechaRes)).toDateString()};
+                this.anexos_29 = anexos_29?.split(',').map((id, index) => {
+                    let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a29.split(',')[index])).toDateString()};
+
+                    return a;
+                });
+                this.anexos_30 = anexos_30?.split(',').map((id, index) => {
+                    let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a30.split(',')[index])).toDateString()};
+                    
+                    return a;
+                });
+            }
+        }
+
+        const getDocumentos = () => new Promise<Documents>((resolve, reject) => {
+            get_Petition('/idDeMiResidencia', idResponse => {
+                if (idResponse['code'] <= 0) {
+                    reject(idResponse['message']);
+                    return;
+                }
+
+                const id = idResponse['object'];
+
+                get_Petition(`/documentosDeResidencia?id=${id}`, docResponse => {
+                    if (docResponse['code'] <= 0) {
+                        reject(docResponse['message']);
+                        return;
+                    }
+
+                    const docs: Object = docResponse['object'];
+
+                    resolve(new Documents(docs['reporte_preliminar'], docs['fecha_reporte_preliminar'], docs['anexos_29'], docs['fechas_anexos_29'], docs['anexos_30'], docs['fechas_anexos_30']));
+                });
+            });
+        });
+
+        const get_Petition = (petition: string, callback: (response: JSON) => void) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('get', `${petition}`, true);
+            
+            xhr.onload = () => {
+                const response = JSON.parse(xhr.response);
+                
+                callback(response);
+            };
+            
+            xhr.send();
+        }
+
+        const createLinks = () => {
+
+            getDocumentos().then(docs => {
+
+                if (docs.preliminar) {
+
+                    linkReportePreliminar.addEventListener('click',()=>
+                    {
+                        location.href=`/documentos/reporte-preliminar?id=${id_residencia}`;
+                    });
+                    
+                }
+
+                if (docs.anexos_29) {
+                        if(linkAnexo29_1)
+                        {
+                            linkAnexo29_1.addEventListener('click',()=>
+                            {
+                                location.href=`/documentos/anexo-29?id=${id_residencia}`;
+                            });
+                        }
+                        if(linkAnexo29_2)
+                        {
+                            linkAnexo29_2.addEventListener('click',()=>
+                            {
+                                location.href=`/documentos/anexo-29?id=${id_residencia}`;
+                            });
+                        }
+                }
+
+                if (docs.anexos_30) {
+                    if(linkAnexo30)
+                    {
+                        linkAnexo30.addEventListener('click',()=>
+                        {
+                            location.href=`/documentos/anexo-30?id=${id_residencia}`;
+                        });
+                    }
+                        
+                }
+                
+
+            }).catch(error => alert(error));
+
+        }
+
+        createLinks();
+        //------------------------------------------------------
         
