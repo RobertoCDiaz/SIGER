@@ -2153,9 +2153,19 @@ server.get('/documentos/carta-aceptacion',(req,res)=>
         res.redirect('/login');
         return;
     }
-    res.sendFile('carta-aceptacion.html', { root: '../web-client/' });
+    res.sendFile('carta-aceptacion.html', { root: '../web-client/docs-pages/' });
 });
 
+
+/**
+ * Regresa al cliente la pantalla del 
+ * anexo apropiada. Si no se incluye un
+ * ID en la dirección, se enviará al cliente
+ * el .html con el formato de ejemplo. En caso
+ * de sí haber un ID, se enviará la página lista
+ * para llenarse con información del anexo 
+ * especificado.
+ */
 server.get('/documentos/anexo-29',(req,res)=>
 {
     if (!req.session.loggedin) {
@@ -2170,16 +2180,32 @@ server.get('/documentos/anexo-29',(req,res)=>
     }
 
     res.sendFile('anexo-29.html', { root: '../web-client/docs-pages/' });
-
 });
 
+
+/**
+ * Regresa al cliente la pantalla del 
+ * anexo apropiada. Si no se incluye un
+ * ID en la dirección, se enviará al cliente
+ * el .html con el formato de ejemplo. En caso
+ * de sí haber un ID, se enviará la página lista
+ * para llenarse con información del anexo 
+ * especificado.
+ */
 server.get('/documentos/anexo-30',(req,res)=>
 {
     if (!req.session.loggedin) {
         res.redirect('/login');
         return;
     }
-    res.sendFile('ejanexo30.html', { root: '../web-client/' });
+
+    const id = req.query.id;
+    if (!id) {
+        res.sendFile('ejanexo30.html', { root: '../web-client/docs-pages/' });
+        return;
+    }
+
+    res.sendFile('anexo-30.html', { root: '../web-client/docs-pages/' });
 });
 
 server.get('/documentos/carta-terminacion',(req,res)=>
@@ -2188,7 +2214,7 @@ server.get('/documentos/carta-terminacion',(req,res)=>
         res.redirect('/login');
         return;
     }
-    res.sendFile('carta-terminacion.html', { root: '../web-client/' });
+    res.sendFile('carta-terminacion.html', { root: '../web-client/docs-pages/' });
 });
 
 server.get('/documentos/reporte-preliminar',(req,res)=>
@@ -2885,7 +2911,7 @@ server.get('/getAnexo30Info', (req, res) => {
         return;
     }
 
-    getAnexo29Info(id, email).then(obj => {
+    getAnexo30Info(id, email).then(obj => {
         res.send(Response.success(obj));
     }).catch(error => {
         res.send(Response.unknownError(error));
@@ -2932,8 +2958,40 @@ server.get('/getAnexo30', (req, res) => {
     }).catch(error => {
         res.send(Response.unknownError(error));
     })
+});
 
 
+/**
+ * Envía al cliente el formato vacío de una 
+ * Carta de Aceptación de ejemplo para las residencias 
+ * profesionales.
+ */
+server.get('/getFormatoCartaAceptacion', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    getEmptyDocument('formatos/carta-aceptacion.docx').then(doc => {
+        res.send(doc);
+    }).catch(error => res.send(Response.unknownError(error.toString())));
+});
+
+
+/**
+ * Envía al cliente el formato vacío de una 
+ * Carta de Terminación de ejemplo para las residencias 
+ * profesionales.
+ */
+server.get('/getFormatoCartaTerminacion', (req, res) => {
+    if (!req.session.loggedin) {
+        res.send(Response.authError());
+        return;
+    }
+
+    getEmptyDocument('formatos/carta-terminacion.docx').then(doc => {
+        res.send(doc);
+    }).catch(error => res.send(Response.unknownError(error.toString())));
 });
 
 /**

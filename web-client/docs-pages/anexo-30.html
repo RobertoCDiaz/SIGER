@@ -31,7 +31,7 @@
                     <img src="/assets/images/siger-img.png" height="40px" alt="SIGER">
                     <h1 style="margin-left: .5em;">SIGER</h1>
                 </a>
-            <h2>Calificaciones Parciales Anexo 30 // Ejemplo</h2>
+            <h2>Calificaciones Parciales Anexo 30</h2>
         </div>
     </header>
     <div class="content">
@@ -46,12 +46,12 @@
             <div class="page-content">
                 <p style="text-align: center;" class="section-title">ANEXO XXX. FORMATO DE EVALUACIÓN DE REPORTE DE RESIDENCIA PROFESIONAL</p>
                 <br>
-                <p>Nombre del residente: <b>Marcelo Jiménez Flores</b></p>
-                <p>Número de control: <b>10430051</b></p>
-                <p>Nombre del proyecto: <b>Volt Breaker</b></p>
-                <p>Programa Educativo (Carrera): <b>Ingeniería en Sistemas Computacionales</b></p>
-                <p>Período de realización de la residencia profesional: <b>Enero - Junio 2010</b></p>
-                <p>Calificación parcial (promedio de ambas evaluaciones): <b>100</b></p>
+                <p>Nombre del residente: <b id="residenteView"></b></p>
+                <p>Número de control: <b id="noControlView"></b></p>
+                <p>Nombre del proyecto: <b id="proyectoView"></b></p>
+                <p>Programa Educativo (Carrera): <b id="programaView"></b></p>
+                <p>Período de realización de la residencia profesional: <b id="periodoView"></b></p>
+                <p>Calificación parcial (promedio de ambas evaluaciones): <b id="calificacionView"></b></p>
                 <br>
                 <h2>Evaluación por el asesor externo</h2>
                 <div class="rubric">
@@ -63,76 +63,76 @@
                     <div class="rubric-entry">
                         <p class="entry-text">Portada</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Agradecimientos</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Resumen</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Índice</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Introducción</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Problemas a resolver, priorizándolos.</p>
                         <p class="entry-range">5</p>
-                        <p class="entry-range"><b>5</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Objetivos</p>
                         <p class="entry-range">5</p>
-                        <p class="entry-range"><b>5</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Marco teórico (fundamentos teóricos)</p>
                         <p class="entry-range">10</p>
-                        <p class="entry-range"><b>10</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Procedimiento y descripción de las actividades realizadas.</p>
                         <p class="entry-range">5</p>
-                        <p class="entry-range"><b>5</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Resultados, planos, gráficas, prototipos, manuales, programas, análisis estadísticos, modelos matemáticos, simulaciones, normativas, regulaciones y restricciones, entre otros.</p>
                         <p class="entry-range">45</p>
-                        <p class="entry-range"><b>45</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Conclusiones, recomendaciones y experiencia profesional adquirida.</p>
                         <p class="entry-range">15</p>
-                        <p class="entry-range"><b>15</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Competencias desarrolladas y/o aplicadas.</p>
                         <p class="entry-range">3</p>
-                        <p class="entry-range"><b>3</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Fuentes de información.</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ae-cal"></b></p>
                     </div>
                 </div>
                 <h3>Observaciones</h3>
                 <div style="display: flex;">
-                    <textarea readonly id="observacionesView" rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
+                    <textarea id="ae-observacionesView" readonly id="observacionesView" rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
                 </div>
                 <br>
                 <div class="signatures">
-                    <div>
+                    <!-- <div>
                         <img src="/assets/images/signature.png" alt="">
                         <p><b>Ing. Carlos Hernández Ramírez</b></p>
                         <p>Nombre y firma del asesor externo</p>
@@ -140,9 +140,13 @@
                     <div>
                         <img src="/assets/images/certified.png" alt="">
                         <p>Sello de la empresa, organismo o dependencia</p>
+                    </div> -->
+                    <div>
+                        <p><b id="ae-totalView"></b></p>
+                        <p>Calificación de asesor externo</p>
                     </div>
                     <div>
-                        <p><b>21 de marzo de 2020</b></p>
+                        <p><b id="ae-fechaView"></b></p>
                         <p>Fecha de evaluación</p>
                     </div>
                 </div>
@@ -157,96 +161,93 @@
                     <div class="rubric-entry">
                         <p class="entry-text">Portada</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Agradecimientos</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Resumen</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Índice</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Introducción</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Problemas a resolver, priorizándolos.</p>
                         <p class="entry-range">5</p>
-                        <p class="entry-range"><b>5</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Objetivos</p>
                         <p class="entry-range">5</p>
-                        <p class="entry-range"><b>5</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Marco teórico (fundamentos teóricos)</p>
                         <p class="entry-range">10</p>
-                        <p class="entry-range"><b>10</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Procedimiento y descripción de las actividades realizadas.</p>
                         <p class="entry-range">5</p>
-                        <p class="entry-range"><b>5</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Resultados, planos, gráficas, prototipos, manuales, programas, análisis estadísticos, modelos matemáticos, simulaciones, normativas, regulaciones y restricciones, entre otros.</p>
                         <p class="entry-range">45</p>
-                        <p class="entry-range"><b>45</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Conclusiones, recomendaciones y experiencia profesional adquirida.</p>
                         <p class="entry-range">15</p>
-                        <p class="entry-range"><b>15</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Competencias desarrolladas y/o aplicadas.</p>
                         <p class="entry-range">3</p>
-                        <p class="entry-range"><b>3</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                     <div class="rubric-entry">
                         <p class="entry-text">Fuentes de información.</p>
                         <p class="entry-range">2</p>
-                        <p class="entry-range"><b>2</b></p>
+                        <p class="entry-range"><b class="ai-cal"></b></p>
                     </div>
                 </div>
                 <h3>Observaciones</h3>
                 <div style="display: flex;">
-                    <textarea readonly id="observacionesView"  rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
+                    <textarea readonly id="ai-observacionesView"  rows="5" maxlength="128" style="margin: 1em 2em; flex: 1;"></textarea>
                 </div>
                 <div class="signatures">
                     <div>
-                        <img src="/assets/images/signature.png" alt="">
-                        <p><b>Ing. Carla Hernández Flores</b></p>
-                        <p>Nombre y firma del asesor interno</p>
+                        <p><b id="ai-totalView"></b></p>
+                        <p>Calificación de asesor externo</p>
                     </div>
                     <div>
-                        <img src="/assets/images/certified.png" alt="">
-                        <p>Sello de la empresa, organismo o dependencia</p>
-                    </div>
-                    <div>
-                        <p><b>21 de marzo de 2020</b></p>
+                        <p><b id="ai-fechaView"></b></p>
                         <p>Fecha de evaluación</p>
                     </div>
                 </div>
             </div>
             <div class="buttons-container">
-                <button class="secondary-button"><a href="/documentos">VOLVER AL MENÚ DE DOCUMENTOS</a></button>
-                <!-- TODO: Implementar descarga de formato. -->
-                <button class="primary-button">DESCARGAR FORMATO</button>
+                <button type="button" class="secondary-button"><a href="/documentos">VOLVER AL MENÚ DE DOCUMENTOS</a></button>
+                <button id="emptyDownloadButton" type="button" class="primary-button">DESCARGAR FORMATO</button>
+                <button id="infoDownloadButton" type="button" class="primary-button">DESCARGAR DOCUMENTO CON INFORMACIÓN</button>
             </div>
         </form>
     </div>
     <script src="/scripts/menu.js"></script>
+    <script src="/scripts/descarga-formatos.js"></script>
+    <script src="/scripts/documentos/anexo30.js"></script>
 </body>
 </html>

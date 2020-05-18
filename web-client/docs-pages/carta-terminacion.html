@@ -69,9 +69,8 @@
     </div>
     <div class="buttons-container">
         <button class="secondary-button"><a href="/documentos">VOLVER AL MENÚ DE DOCUMENTOS</a></button>
-        <!-- TODO: Implementar descarga de formato. -->
-        <button class="primary-button">DESCARGAR FORMATO</button>
-    </div>
+        <button id="downloadButton" type="button" class="primary-button">DESCARGAR FORMATO</button>
+</div>
     </form>
     </div>
     <footer>
@@ -123,5 +122,10 @@
     <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
     <script src="/scripts/menu.js"></script>
+    <script src="/scripts/descarga-formatos.js"></script>
+    <script>
+        document.querySelector('#downloadButton').onclick = () =>
+            getDocument('carta-terminación', '/getFormatoCartaTerminacion');
+    </script>
 </body>
 </html>
