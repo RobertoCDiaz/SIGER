@@ -988,7 +988,7 @@ END;;
 	un proyecto aprobado por residente.
 
 	En caso de que el residente no tenga ninguna 
-	resdiencia aprobada, la función regresará NULL.
+	residencia aprobada, la función regresará NULL.
 */
 DROP FUNCTION IF EXISTS idResidenciaDeAlumno;;
 CREATE FUNCTION idResidenciaDeAlumno(
@@ -1289,7 +1289,8 @@ BEGIN
 	select "1" as output, "Transaction commited successfully" AS message,
     aprobado, nombre_proyecto as proyecto, fecha_elaboracion as fecha,
     residentes.nombre as nombre, residentes.apellido_paterno as ap,
-    residentes.apellido_materno as am
+    residentes.apellido_materno as am,
+	idResidenciaDeAlumno(v_email) as 'id_residencia'
     from residencias join residentes on residencias.email_residente=residentes.email
     where residencias.email_residente=v_email;
 END;;
@@ -1367,29 +1368,40 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 	v_email VARCHAR(64)
 ) BEGIN
 	SELECT 
-		DISTINCT '1' as output, r.idresidencia,
+		DISTINCT r.idresidencia,
+		'1' AS output, 
 		r.fecha_elaboracion AS 'fecha', r.nombre_proyecto AS 'proyecto',
 		r.objetivo AS 'objetivo', r.justificacion AS 'justificacion',
 		r.periodo AS 'periodo', r.ano AS 'ano', r.descripcion_actividades AS 'actividades',
 
-		e.nombre AS 'empresa', e.representante as 'representante_e', e.direccion AS 'direccion_e',
+		e.nombre AS 'empresa', e.representante AS 'representante_e', e.direccion AS 'direccion_e',
 		e.telefono AS 'telefono_e', e.ciudad AS 'ciudad_e', e.email AS 'email_e', e.departamento AS 'departamento_e',
 
 		ae.nombre_completo AS 'nombre_ae', ae.puesto AS 'puesto_ae', ae.grado_estudios AS 'grado_ae', 
 		ae.telefono AS 'telefono_ae', ae.email AS 'email_ae',
         
-        nombreCompleto(ai.email) AS 'nombre_ai',
+        -- nombreCompleto(ai.email) AS 'nombre_ai',
+		(
+			SELECT 
+				nombreCompleto(ai.email)
+			FROM 
+				involucrados AS i JOIN docentes AS ai 
+					ON i.email_docente = ai.email
+			WHERE 
+				i.es_asesor = 1 AND
+				i.id_residencia = r.idresidencia
+		) AS 'nombre_ai',
 
-		nombreCompleto(res.email) as 'nombre_res', SUBSTRING(res.email, 2, 8) as 'noControl_res',
-		c.nombre_carrera as 'carrera', 
+		nombreCompleto(res.email) AS 'nombre_res', SUBSTRING(res.email, 2, 8) AS 'noControl_res',
+		c.nombre_carrera AS 'carrera', 
 		(
 			SELECT telefono FROM telefonos_residentes WHERE email_residente = res.email AND fijo = 1
-		) as 'tel_casa',
+		) AS 'tel_casa',
 		(
 			SELECT telefono FROM telefonos_residentes WHERE email_residente = res.email AND fijo = 0
-		) as 'celular',
-		res.email as 'email_res',
-		concatenarHorarios(r.idresidencia) as 'horarios'
+		) AS 'celular',
+		res.email AS 'email_res',
+		concatenarHorarios(r.idresidencia) AS 'horarios'
 	FROM 
 		residencias AS r LEFT JOIN empresas AS e
 			ON r.idresidencia = e.id_residencia
@@ -1401,14 +1413,15 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 			ON r.email_residente = res.email
 		LEFT JOIN carreras AS c
 			ON res.clave_carrera = c.clave
-		LEFT JOIN involucrados AS i
-			ON r.idresidencia = i.id_residencia
-		LEFT JOIN docentes AS ai
-			ON i.email_docente = ai.email
+		-- LEFT JOIN involucrados AS i
+		-- 	ON r.idresidencia = i.id_residencia
+		-- LEFT JOIN docentes AS ai
+		-- 	ON i.email_docente = ai.email
 	WHERE
 		r.idresidencia = v_id_residencia AND
-		relacionadoAlProyecto(v_id_residencia, v_email) AND
-        i.es_asesor = 1;
+		relacionadoAlProyecto(v_id_residencia, v_email) = 1;
+		-- relacionadoAlProyecto(v_id_residencia, v_email) AND
+        -- i.es_asesor = 1;
 END;;
 
 

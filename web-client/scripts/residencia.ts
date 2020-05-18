@@ -255,3 +255,18 @@ assignButton.onclick = () => {
         alert(error);
     })
 }
+
+/* ================================================================================================
+
+    Descarga de reporte preliminar.
+
+================================================================================================ */
+{const searchJSON = {};
+const updateSearchJSON = () => location.search.substring(1).split('&').forEach(pair => {
+    searchJSON[decodeURI(pair.split('=')[0])] = decodeURI(pair.split('=')[1]);
+})
+updateSearchJSON();
+
+const downloadButton: HTMLButtonElement = document.querySelector('#downloadButton');
+downloadButton.onclick = () =>
+    getDocument(`reporte-preliminar-${searchJSON['id']}`, `/getReportePreliminar?id=${searchJSON['id']}`);}

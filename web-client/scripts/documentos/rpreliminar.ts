@@ -100,7 +100,7 @@ populateDocumentr();
 
 ================================================================================================ */
 
-//document.getElementById('emptyDownloadButton').onclick = () => getDocument(`reporte-preliminar`, `/getReportePreliminar`);
+document.getElementById('emptyDownloadButton').onclick = () => getDocument(`reporte-preliminar`, `/getReportePreliminar`);
 
 document.getElementById('downloadButton').onclick = () =>
 getDocument(`reporte-preliminar-${searchJSONr['id']}`,

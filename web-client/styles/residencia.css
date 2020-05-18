@@ -106,3 +106,99 @@ form p {
 hr {
     margin: 5em 5vw;
 }
+
+.assigner-container > p {
+    margin-top: 1em;
+    text-align: justify;
+}
+
+.assigner {
+    background-color: white;
+    border: 1px solid var(--gray-border-color);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 3em;
+    overflow: hidden;
+}
+
+.assigner > .searchBar {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.assigner > .searchBar > * {
+    display: flex;
+    align-items: center;
+}
+
+.assigner > .searchBar > input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--gray-border-color);
+}
+
+.assigner > .searchBar > i {
+    background-color: var(--azul-tec);
+    color: white;
+    padding: .5em;
+}
+
+.teacher > .title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--gray-content-color);
+}
+
+.teacher > .title > * {
+    color: var(--secondary-text);
+    padding: .25em;
+    color: white;
+}
+
+.teacher > .teacherName {
+    padding: .25em 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.teacher > .teacherName > i {
+    margin-right: .5em;
+}
+
+.teacher > .teacherName > i:hover {
+    color: red;
+}
+
+.result {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.result > * {
+    padding: .25em;
+}
+
+.result:hover > i {
+    background-color: green;
+    color: white;
+}
+
+i {
+    cursor: pointer;
+}
+
+.assigner-container > .buttons-container {
+    display: flex;
+    margin: 2em 10%;
+    flex-direction: row;
+}
+
+.assigner-container > .buttons-container > button:not(:first-child) {
+    margin-left: 3em;
+}

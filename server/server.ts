@@ -642,8 +642,9 @@ server.get('/aprobado',(req,res)=>
                     const am = String(req.session.user.info.apellido_materno);
                     const em = String(req.session.user.info.email);
                     const fecha = String(rows[0][0]['fecha']);
+                    const idRes = String(rows[0][0]['id_residencia']);
 
-                    res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                    res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: idRes});
                 }
                 const message = 1;
                 const a = String(rows[0][0]['aprobado']);
@@ -653,8 +654,9 @@ server.get('/aprobado',(req,res)=>
                 const am = String(req.session.user.info.apellido_materno);
                 const em = String(req.session.user.info.email);
                 const fecha = String(rows[0][0]['fecha']);
+                const idRes = String(rows[0][0]['id_residencia']);
 
-                res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: idRes});
                 }
                 catch(e)
                 {
@@ -1016,7 +1018,7 @@ server.get('/getInformacionReportePreliminar', (req, res) => {
                 res.send(Response.unknownError(e.toString()));
                 return;
             }
-
+            
             if (rows[0].length == 0) {
                 res.send(Response.userError(`No se encontró esta residencia`));
                 return;
@@ -1206,7 +1208,7 @@ server.get('/asesor-aprobado',(req,res)=>
                     const em = String(req.session.user.info.residente);
                     const fecha = String(rows[0][0]['fecha']);
 
-                    res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                    res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: rows[0][0]['id_residencia']});
                 }
                 const message = 1;
                 const a = String(rows[0][0]['aprobado']);
@@ -1216,8 +1218,9 @@ server.get('/asesor-aprobado',(req,res)=>
                 const am = String(rows[0][0]['am']);
                 const em = String(req.session.user.info.residente);
                 const fecha = String(rows[0][0]['fecha']);
+                
 
-                res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha});
+                res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: rows[0][0]['id_residencia']});
                 }
                 catch(e)
                 {
@@ -2295,7 +2298,6 @@ server.get('/documentosDeResidencia', (req, res) => {
                 res.send(Response.userError(rows[0][0]['message']));
                 return;
             }
-            console.log(rows[1][0]);
             res.send(Response.success(rows[1][0]));
         }
     );
@@ -3053,7 +3055,7 @@ new Promise<Object>((resolve, reject)=> {
             dataObject['celular'] = rows[0][0]['celular'];
             dataObject['email_res'] = rows[0][0]['email_res'];
             dataObject['horarios'] = rows[0][0]['horarios'];
-            dataObject['nombre_ai'] = rows[0][0]['nombre_ai']
+            dataObject['nombre_ai'] = rows[0][0]['nombre_ai'] ?? 'Aún no ha sido asignado'
             const tsToString = (ts: number) => {
                 const monthsArr: String[] = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
             

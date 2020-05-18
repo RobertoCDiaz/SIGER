@@ -81,110 +81,11 @@
                 </div>
                 <div class="buttons-container">
                     <button class="secondary-button" type="button" onclick="goBack();">VOLVER AL PANEL DE RESIDENCIAS</button>
-                    <!-- TODO: Implementar descarga de formato. -->
-                    <button class="primary-button" type="button">DESCARGAR FORMATO</button>
+                    <button id="downloadButton" class="primary-button" type="button">DESCARGAR FORMATO</button>
                 </div>
             </form>
 
             <hr>
-
-            <style>
-                .assigner-container > p {
-                    margin-top: 1em;
-                    text-align: justify;
-                }
-
-                .assigner {
-                    background-color: white;
-                    border: 1px solid var(--gray-border-color);
-                    border-radius: 4px;
-                    display: flex;
-                    flex-direction: column;
-                    margin-top: 3em;
-                    overflow: hidden;
-                }
-
-                .assigner > .searchBar {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: stretch;
-                }
-
-                .assigner > .searchBar > * {
-                    display: flex;
-                    align-items: center;
-                }
-
-                .assigner > .searchBar > input {
-                    flex: 1;
-                    border: none;
-                    border-bottom: 1px solid var(--gray-border-color);
-                }
-
-                .assigner > .searchBar > i {
-                    background-color: var(--azul-tec);
-                    color: white;
-                    padding: .5em;
-                }
-
-                .teacher > .title {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    background-color: var(--gray-content-color);
-                }
-
-                .teacher > .title > * {
-                    color: var(--secondary-text);
-                    padding: .25em;
-                    color: white;
-                }
-
-                .teacher > .teacherName {
-                    padding: .25em 1em;
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                }
-
-                .teacher > .teacherName > i {
-                    margin-right: .5em;
-                }
-
-                .teacher > .teacherName > i:hover {
-                    color: red;
-                }
-
-                .result {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    cursor: pointer;
-                }
-
-                .result > * {
-                    padding: .25em;
-                }
-
-                .result:hover > i {
-                    background-color: green;
-                    color: white;
-                }
-
-                i {
-                    cursor: pointer;
-                }
-                
-                .assigner-container > .buttons-container {
-                    display: flex;
-                    margin: 2em 10%;
-                    flex-direction: row;
-                }
-
-                .assigner-container > .buttons-container > button:not(:first-child) {
-                    margin-left: 3em;
-                }
-            </style>
             <div class="assigner-container">
                 <h2>Asignar asesor interno y revisores</h2>
                 <p>Con este buscador podrá encontrar docentes registrados en el SIGER y asignarlos al proyecto como asesor interno o revisores. El buscador hace consultas basadas en nombre, apellidos, o correo electrónico. Para seleccionar a un docente, simplemente haga click en el resultado deseado.</p>
@@ -198,14 +99,6 @@
                     </div>
                     <div id="resultsContainer" class="resultsContainer">
                         <p style="padding: 1em;">Introduzca un criterio de búsqueda</p>
-                        <!-- <div class="result">
-                            <i class="material-icons">person_add</i>
-                            <p>Daniel Hernández Sánchez (daniel.hs@piedrasnegras.tecnm.mx)</p>
-                        </div>
-                        <div class="result">
-                            <i class="material-icons">person_add</i>
-                            <p>Roberto Carlos Sánchez (roberto.ds@piedrasnegras.tecnm.mx)</p>
-                        </div> -->
                     </div>
                 </div>
 
@@ -241,8 +134,9 @@
             </div>
         </div>
 
-        <script src="scripts/menu.js"></script>
-        <script src="scripts/residencia.js"></script>
+        <script src="/scripts/menu.js"></script>
+        <script src="/scripts/descarga-formatos.js"></script>
+        <script src="/scripts/residencia.js"></script>
 
         <footer>
             <div class="sections-container">

@@ -186,8 +186,7 @@
                 </div>
                 <div class="buttons-container">
                     <button class="secondary-button"><a href="/documentos">VOLVER AL MENÚ DE DOCUMENTOS</a></button>
-                    <!-- TODO: Implementar descarga de formato. -->
-                    <button id="emptyDownloadButton" class="primary-button">DESCARGAR FORMATO</button>
+                    <button type="button" id="emptyDownloadButton" class="primary-button">DESCARGAR FORMATO</button>
                 </div>
         </form>
     </div>
@@ -241,6 +240,7 @@
     </footer>
     
     <script src="/scripts/menu.js"></script>
+    <script src="/scripts/descarga-formatos.js"></script>
     <script>
         document.getElementById('emptyDownloadButton').onclick = () => getDocument(`reporte-preliminar`, `/getReportePreliminar`);
     </script>
