@@ -1,0 +1,31 @@
+#uploader {
+  margin: 4em 20%;
+  background-color: #eaeaea;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid var(--gray-border-color);
+  border-radius: 2px;
+  align-items: center;
+}
+#uploader > i {
+  font-size: 48px;
+  padding: 0.25em;
+}
+#uploader > p {
+  flex: 1;
+}
+#uploader:hover {
+  background-color: var(--gray-content-color);
+}
+#uploader:hover * {
+  color: white;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+}
+.buttons > button {
+  margin: 0 2em;
+}

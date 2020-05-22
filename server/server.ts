@@ -3,14 +3,14 @@ import { Response } from "./Response";
 import { Mailer } from "./Mailer";
 
 import { generateDocument } from "./DocumentGenerator";
-var fs = require('fs');
 var path = require('path');
 
-const express   = require("express");
-const session   = require("express-session");
-const bParser   = require("body-parser");
-const mysql     = require("mysql");
-const AES       = require("aes.js-wrapper");
+const express           = require("express");
+const session           = require("express-session");
+const expressFileUpload = require("express-fileupload");
+const bParser           = require("body-parser");
+const mysql             = require("mysql");
+const AES               = require("aes.js-wrapper");
 
 const server = express();
 const port: number = 8080;
@@ -43,6 +43,7 @@ server.use(session({
     resave: true,
     saveUninitialized: true
 }));
+server.use(expressFileUpload());
 
 enum USER_CLASSES {
     RESIDENTE = 1,
@@ -2334,6 +2335,29 @@ server.get('/documentosDeResidencia', (req, res) => {
 });
 
 
+//TODO: Crear registro en la base de datos, ya sea usando express-fileupload o firebase-storage.
+server.post('/anexarCartaAceptacion', async (req, res) => {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.send(Response.authError());
+        return;
+    }
+
+    if ((await getResidentState(req.session.user.info.email)) != 2) {
+        res.send(Response.userError("Ya no puede enviar carta de aceptación"));
+        return;
+    }
+
+    req.files.newfile.mv(`files/${req.files.newfile.name}`, err => {
+        if (err) {
+            res.send(Response.unknownError(err.toString()));
+            return;
+        }
+
+        res.send(Response.success());
+    });
+});
+
+
 /* ================================================================================================
 
     Endpoints.
@@ -2385,6 +2409,28 @@ server.get('/evaluacion-a30', (req, res) => {
 
     res.sendFile('anexo30.html', { root: '../web-client/'});
 });
+
+
+/**
+ * Sitio en el cual los residentes con estado 2 (Con residencia aprobada
+ * por un admin de SIGER, pero no por la empresa) podrán subir la evidencia
+ * de la aprobación en la empresa, en forma de foto.
+ */
+server.get('/residentes/subir-carta-aceptacion', async (req, res) => {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.redirect('/home');
+        return;
+    }
+
+    const state: number = await getResidentState(req.session.user.info.email);
+    if (state != 2) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.sendFile('nueva-carta-aceptacion.html', { root: '../web-client/residentes/'});
+});
+
 
 /* ================================================================================================
 
@@ -2513,6 +2559,33 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                     }; break;
 
                     case 2: menu = {
+                        'main': {
+                            'Inicio': {
+                                'href': '/home',
+                                'icon': 'home'
+                            },
+                            'Carta de Aceptación': {
+                                'href': '/residentes/subir-carta-aceptacion',
+                                'icon': 'thumb_up'
+                            },
+                            'Progreso actual': {
+                                'href': '/avance-proyecto',
+                                'icon': 'flag'
+                            },
+                            'Documentos': {
+                                'href': '/documentos',
+                                'icon': 'description'
+                            },
+                        },
+                        'secondary': {
+                            'Cerrar sesión': {
+                                'href': '/logout',
+                                'icon': 'exit_to_app'
+                            }
+                        }
+                    }; break;
+
+                    case 3: menu = {
                         'main': {
                             'Inicio': {
                                 'href': '/home',
@@ -2687,35 +2760,6 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
  */
 const getEmptyDocument = (relativePath: string) => 
     generateDocument({}, path.resolve(__dirname, relativePath));
-
-/* */
-const getDocument = (output:string, httpPetition:string) =>
-{
-    let xhr = new XMLHttpRequest();
-    xhr.responseType = 'blob';
-    xhr.open('get',httpPetition, true);
-    xhr.onload = () =>
-    {
-        downloadFile(xhr.response, `${output}.docx`);
-    };
-    xhr.send;
-};
-
-const downloadFile = (blob, fileName) =>
-{
-    const link = document.createElement('a');
-
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-
-    document.body.append(link);
-
-    link.click();
-
-    link.remove();
-    window.addEventListener('focus', e => URL.revokeObjectURL(link.href), {once:true});
-};
-
 
 
 /* ================================================================================================

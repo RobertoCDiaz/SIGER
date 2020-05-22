@@ -269,4 +269,4 @@ updateSearchJSON();
 
 const downloadButton: HTMLButtonElement = document.querySelector('#downloadButton');
 downloadButton.onclick = () =>
-    getDocument(`reporte-preliminar-${searchJSON['id']}`, `/getReportePreliminar?id=${searchJSON['id']}`);}
+    getDocument(`reporte-preliminar-${searchJSON['id']}.docx`, `/getReportePreliminar?id=${searchJSON['id']}`);}

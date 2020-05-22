@@ -82,5 +82,5 @@ populateDocument();
 
 ================================================================================================ */
 
-document.getElementById('emptyDownloadButton').onclick = () => getDocument(`formato-anexo-29`, `/getAnexo29`);
-document.getElementById('infoDownloadButton').onclick = () => getDocument(`anexo-29-${searchJSON['id']}`, `/getAnexo29?id=${encodeURI(searchJSON['id'])}`);
+document.getElementById('emptyDownloadButton').onclick = () => getDocument(`formato-anexo-29.docx`, `/getAnexo29`);
+document.getElementById('infoDownloadButton').onclick = () => getDocument(`anexo-29-${searchJSON['id']}.docx`, `/getAnexo29?id=${encodeURI(searchJSON['id'])}`);

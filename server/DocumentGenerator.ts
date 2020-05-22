@@ -12,20 +12,20 @@ const Filesystem    = require('fs');
 export const generateDocument = (data: Object, inputDir) => new Promise(async (resolve, reject) => {
     let content = Filesystem.readFileSync(inputDir, 'binary');
 
-    let zip = new PizZip(content);
-
-    let doc = new Docxtemplater();
-    doc.loadZip(zip);
-
-    doc.setData(data);
-
     try {
+        let zip = new PizZip(content);
+    
+        let doc = new Docxtemplater();
+        doc.loadZip(zip);
+    
+        doc.setData(data);
+
         doc.render()
 
         let buf = doc.getZip().generate({type: 'nodebuffer'});
     
         resolve(buf);    
     } catch (error) {
-        reject(error);
+        reject(error.toString());
     }
 });

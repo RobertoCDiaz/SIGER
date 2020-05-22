@@ -20,7 +20,8 @@ const getDocument = (output: string, httpPetition: string)  => {
             }
             alert(xhr.response.message);
         } catch(e) {
-            downloadFile(xhr.response, `${output}.docx`);
+            downloadFile(xhr.response, `${output}`);
+            // downloadFile(xhr.response, `${output}.docx`);
         }
     };
     

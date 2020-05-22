@@ -392,6 +392,27 @@ CREATE TABLE IF NOT EXISTS `siger`.`enlaces_anexo30` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `siger`.`cartas_aceptacion`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`cartas_aceptacion` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`cartas_aceptacion` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `url` VARCHAR(512) NOT NULL,
+  `timestamp` VARCHAR(14) NOT NULL,
+  `id_residencia` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_cartas_aceptacion_residencias1_idx` (`id_residencia` ASC), -- VISIBLE,
+  UNIQUE INDEX `residencias_idresidencia_UNIQUE` (`id_residencia` ASC), -- VISIBLE,
+  CONSTRAINT `fk_cartas_aceptacion_residencias1`
+    FOREIGN KEY (`id_residencia`)
+    REFERENCES `siger`.`residencias` (`idresidencia`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
@@ -611,10 +632,17 @@ END;;
 			- Documentos.
 			- Cerrar sesión.
 
-		2. Con residencia aprobada.
+		2. Con residencia aprobada por admin SIGER.
 			- Progreso actual.
+			- Subir Carta de Aceptación
 			- Documentos.
+			- Cerrar
+
+		TODO: Separar bien los accesos entre estados 2 y 3. Ver residenciaAprobada().
+		3. Con residencia aprobada en empresa.
+			- Progreso actual.
 			- Chat.
+			- Documentos.
 			- Cerrar
 */
 DROP FUNCTION IF EXISTS estadoResidente;;
@@ -629,6 +657,10 @@ CREATE FUNCTION estadoResidente(
 
 	IF v_email IN (SELECT email_residente FROM residencias AS r WHERE residenciaAprobada(r.idresidencia) = 1) THEN BEGIN
 		SET @estado := 2;
+	END; END IF;
+
+	IF v_email IN (SELECT r.email_residente FROM residencias AS r JOIN cartas_aceptacion AS c ON r.idresidencia = c.id_residencia) THEN BEGIN
+		SET @estado := 3;
 	END; END IF;
 
 	RETURN @estado;	
