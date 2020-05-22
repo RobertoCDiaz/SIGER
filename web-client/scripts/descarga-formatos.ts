@@ -1,8 +1,8 @@
 /**
- * Desencadena el proceso de petición al server por un documento,
+ * Desencadena el proceso de petición al server por un archivo,
  * además de comenzar la descarga una vez se obtenga una respuesta.
  * 
- * @param output        Nombre que se le dará al archivo .docx descargado. NO agregar la extensión. 
+ * @param output        Nombre que se le dará al archivo a descargar. DEBE agregar la extensión. 
  *                      La mayoría de navegadores dejan al usuario final cambiar este nombre.
  * 
  * @param httpPetition  Petición que hará que el server regrese el archivo.
@@ -21,7 +21,6 @@ const getDocument = (output: string, httpPetition: string)  => {
             alert(xhr.response.message);
         } catch(e) {
             downloadFile(xhr.response, `${output}`);
-            // downloadFile(xhr.response, `${output}.docx`);
         }
     };
     
