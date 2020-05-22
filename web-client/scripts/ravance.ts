@@ -395,7 +395,7 @@
 
                     linkRP.addEventListener('click',()=>
                     {
-                        location.href=`/documentos/reporte-preliminar?id=${residenceID}`;
+                        location.href=`/documentos/reporte-preliminar?id=${docs.preliminar.id}`;
                     });
                     
                 }
@@ -405,14 +405,14 @@
                         {
                             linkA29_1.addEventListener('click',()=>
                             {
-                                location.href=`/documentos/anexo-29?id=${residenceID}`;
+                                location.href=`/documentos/anexo-29?id=${docs.anexos_29[0].id}`;
                             });
                         }
                         if(linkA29_2)
                         {
                             linkA29_2.addEventListener('click',()=>
                             {
-                                location.href=`/documentos/anexo-29?id=${residenceID}`;
+                                location.href=`/documentos/anexo-29?id=${docs.anexos_29[1].id}`;
                             });
                         }
                 }
@@ -422,7 +422,7 @@
                     {
                         linkA30.addEventListener('click',()=>
                         {
-                            location.href=`/documentos/anexo-30?id=${residenceID}`;
+                            location.href=`/documentos/anexo-30?id=${docs.anexos_30[0].id}`;
                         });
                     }
                         
