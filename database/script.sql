@@ -2287,11 +2287,19 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 		SELECT			
 			-- Reporte preliminar.
 			IF (
-				residenciaAprobada(v_id) = 1
+				residenciaAprobada(v_id) >= 1
 			, v_id, NULL) AS 'reporte_preliminar',
 			IF (
-				residenciaAprobada(v_id) = 1
+				residenciaAprobada(v_id) >= 1
 			, (SELECT fecha_elaboracion FROM residencias WHERE idresidencia = v_id), NULL) AS 'fecha_reporte_preliminar',
+
+			-- Carta de Aceptación
+			IF (
+				residenciaAprobada(v_id) = 2
+			, (SELECT c.`id` FROM cartas_aceptacion AS c WHERE c.id_residencia = v_id), NULL) as 'carta_aceptacion',
+			IF (
+				residenciaAprobada(v_id) = 2
+			, (SELECT c.`timestamp` FROM cartas_aceptacion AS c WHERE c.id_residencia = v_id), NULL) as 'fecha_carta_aceptacion',
 
 			-- Anexos 29.
 			IF (

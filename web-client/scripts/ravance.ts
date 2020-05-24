@@ -330,11 +330,20 @@ interface DocumentInfo {
 
 class DocumentsA {
     preliminar: DocumentInfo;
+    carta_aceptacion: DocumentInfo;
     anexos_29: DocumentInfo[];
     anexos_30: DocumentInfo[];
 
-    constructor(idRes: any, fechaRes: string, anexos_29: string, fechas_a29: string, anexos_30: string, fechas_a30: string) {
+    constructor(
+        idRes: number, fechaRes: string, 
+        idCartaAceptacion: number, fechaCartaAceptacion: string, 
+        anexos_29: string, fechas_a29: string, 
+        anexos_30: string, fechas_a30: string
+    ) {
         this.preliminar = {id: Number(idRes), fecha: new Date(Number(fechaRes)).toDateString()};
+
+        this.carta_aceptacion = {id: Number(idCartaAceptacion), fecha: new Date(Number(fechaCartaAceptacion)).toDateString()}
+
         this.anexos_29 = anexos_29?.split(',').map((id, index) => {
             let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a29.split(',')[index])).toDateString()};
 
@@ -357,7 +366,12 @@ const getDocumentosA = (id: number) => new Promise<DocumentsA>((resolve, reject)
 
         const docs: Object = docResponse['object'];
 
-        resolve(new DocumentsA(docs['reporte_preliminar'], docs['fecha_reporte_preliminar'], docs['anexos_29'], docs['fechas_anexos_29'], docs['anexos_30'], docs['fechas_anexos_30']));
+        resolve(new DocumentsA(
+            docs['reporte_preliminar'], docs['fecha_reporte_preliminar'],
+            docs['carta_aceptacion'], docs['fecha_carta_aceptacion'],
+            docs['anexos_29'], docs['fechas_anexos_29'],
+            docs['anexos_30'], docs['fechas_anexos_30']
+        ));
     });
 });
 
