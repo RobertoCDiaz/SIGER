@@ -1,12 +1,11 @@
 import { Keys } from "./Keys";
 import { Response } from "./Response";
 import { Mailer } from "./Mailer";
-
 import { generateDocument } from "./DocumentGenerator";
-var path = require('path');
 
 const express           = require("express");
 const session           = require("express-session");
+const path              = require('path');
 const expressFileUpload = require("express-fileupload");
 const bParser           = require("body-parser");
 const mysql             = require("mysql");
@@ -47,6 +46,58 @@ server.use(expressFileUpload({
     createParentPath: true,
 }));
 
+
+/* ================================================================================================
+
+    SIGER Cloud.
+
+================================================================================================ */
+/*
+    Se asegura que solo usuarios autenticados tengan acceso a los archivos.
+*/
+server.use('/siger-cloud/files', (req, res, next) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    next();
+})
+
+/*
+    Restringe el acceso a los archivos de una residencia
+    solo a aquellos usuarios con relación a esta.
+*/
+server.use('/siger-cloud/files/residencias/:id', (req, res, next) => {
+    const id = req.params.id;
+
+    con.query(
+        `select relacionadoAlProyecto(?, ?) as relacionado`,
+        [id, req.session.user.info.email],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(`Ha ocurrido un error al intentar acceder a un archivo. Por favor, comuníquese con un administrador de SIGER.\n${e.toString()}`));
+                return;
+            }
+
+            if (rows[0]['relacionado'] != 1) {
+                // TODO: Agregar pantalla de acceso no autorizado.
+                res.redirect('/home');
+                return;
+            }
+
+            next();
+        }
+    )
+});
+server.use('/siger-cloud/files', express.static("files/"));
+
+
+/* ================================================================================================
+
+    Lógica de usuarios.
+
+================================================================================================ */
 enum USER_CLASSES {
     RESIDENTE = 1,
     ADMIN = 10,
@@ -2298,7 +2349,7 @@ server.post('/anexarCartaAceptacion', async (req, res) => {
         //      residentes/L17430057/2020523180455-carta.jpg
         const d = new Date();
         const fileName = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${file.name}`;
-        const directory = `residentes/${req.session.user.info.email.split('@')[0]}`;
+        const directory = `residencias/${idRes}`;
         const fullPath = `${directory}/${fileName}`
     
         file.mv(`files/${fullPath}`, err => {
