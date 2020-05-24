@@ -18,7 +18,7 @@
                 <img src="/assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
             </a>
-            <h2>Subir carta de aceptación</h2>
+            <h2>Carta de Aceptación</h2>
         </div>
     </header>
 
@@ -40,63 +40,6 @@
             </div>
         </form>
     </div>
-
-    <script>
-        const uploader = document.querySelector('#uploader');
-        const fileInputView = document.querySelector('#fileInputView');
-        const fileNameView = document.querySelector('#fileNameView');
-        const goBackButton = document.querySelector('#goBackButton');
-        const uploadButton = document.querySelector('#uploadButton');
-
-        uploader.onclick = () => fileInputView.click();
-
-        const anexar = (file) => new Promise((resolve, reject) => {
-            let xhr = new XMLHttpRequest();
-            xhr.open('post', `/anexarCartaAceptacion`, true);
-            // xhr.setRequestHeader('Content-type', 'application/binary');
-
-            let postData = new FormData();
-            postData.append('newfile', file);
-            
-            xhr.onload = () => {
-                const response = JSON.parse(xhr.response);
-
-                if (response['code'] != 1) {
-                    reject(response['message']);
-                    return;
-                }
-                
-                resolve(response['object']);
-            };
-            
-            xhr.send(postData);
-        });
-
-        let img;
-        fileInputView.onchange = () => {
-            if (!/image\/[A-z]+/.test(fileInputView.files[0].type)) {
-                alert('Solo se admiten archivos de imagen');
-                return;
-            }
-
-            img = fileInputView.files[0];
-            fileNameView.innerHTML = img.name;
-        }
-
-        uploadButton.onclick = () => {
-            if (!img) {
-                alert('Por favor, seleccione una fotografía de su carta de aceptación')
-                return;
-            }
-
-            anexar(img).then(obj => {
-                alert("Se ha subido la carta de aceptación con éxito");
-                window.open('/home', '_self');
-            }).catch(error => {
-                alert(error);
-            });
-        }
-    </script>
 
     <footer>
         <div class="sections-container">
@@ -140,5 +83,7 @@
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
 
+    <script src="/scripts/menu.js"></script>
+    <script src="/residentes/nueva-carta-aceptacion.js"></script>
 </body>
 </html>

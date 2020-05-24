@@ -25,7 +25,5 @@
 .buttons {
   display: flex;
   flex-direction: row;
-}
-.buttons > button {
-  margin: 0 2em;
+  justify-content: space-evenly;
 }

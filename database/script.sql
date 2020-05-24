@@ -399,12 +399,13 @@ DROP TABLE IF EXISTS `siger`.`cartas_aceptacion` ;
 
 CREATE TABLE IF NOT EXISTS `siger`.`cartas_aceptacion` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `url` VARCHAR(512) NOT NULL,
+  `ruta` VARCHAR(128) NOT NULL,
   `timestamp` VARCHAR(14) NOT NULL,
   `id_residencia` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_cartas_aceptacion_residencias1_idx` (`id_residencia` ASC), -- VISIBLE,
-  UNIQUE INDEX `residencias_idresidencia_UNIQUE` (`id_residencia` ASC), -- VISIBLE,
+  UNIQUE INDEX `ruta_UNIQUE` (`ruta` ASC), -- VISIBLE,
+  UNIQUE INDEX `id_residencia_UNIQUE` (`id_residencia` ASC), -- VISIBLE,
   CONSTRAINT `fk_cartas_aceptacion_residencias1`
     FOREIGN KEY (`id_residencia`)
     REFERENCES `siger`.`residencias` (`idresidencia`)
@@ -638,7 +639,6 @@ END;;
 			- Documentos.
 			- Cerrar
 
-		TODO: Separar bien los accesos entre estados 2 y 3. Ver residenciaAprobada().
 		3. Con residencia aprobada en empresa.
 			- Progreso actual.
 			- Chat.
@@ -659,7 +659,7 @@ CREATE FUNCTION estadoResidente(
 		SET @estado := 2;
 	END; END IF;
 
-	IF v_email IN (SELECT r.email_residente FROM residencias AS r JOIN cartas_aceptacion AS c ON r.idresidencia = c.id_residencia) THEN BEGIN
+	IF v_email IN (SELECT email_residente FROM residencias AS r WHERE residenciaAprobada(r.idresidencia) = 2) THEN BEGIN
 		SET @estado := 3;
 	END; END IF;
 
@@ -670,12 +670,12 @@ END;;
 
 
 /*
-	Esta función comprueba si una residencia ha sido
-	aprobada, es decir, que ya tenga docentes asignados
-	como asesor interno y revisores.
+	Determina el nivel de aprobación de una residencia.
 
-	Si la residencia está aprobada, regresará 1.
-	Regresará 0 si no hay docentes asignados.
+	Regresa
+		0 -> No ha sido aprobada por nadie.
+		1 -> Solo ha sido aprobada por un administrador del SIGER.
+		2 -> Ha sido aprobada también en la empresa.
 */
 DROP FUNCTION IF EXISTS residenciaAprobada;;
 CREATE FUNCTION residenciaAprobada(
@@ -683,11 +683,16 @@ CREATE FUNCTION residenciaAprobada(
 ) RETURNS TINYINT DETERMINISTIC BEGIN
 
 	IF v_id_residencia IN (SELECT DISTINCT id_residencia FROM involucrados) THEN BEGIN
-		RETURN 1;
+		IF v_id_residencia IN (SELECT DISTINCT id_residencia FROM cartas_aceptacion) THEN BEGIN
+			-- Ha registrado una carta de aceptación.
+			RETURN 2;
+		END; ELSE BEGIN
+			-- Solo ha sido aprobado por un admin de SIGER.
+			RETURN 1;
+		END; END IF;
 	END; END IF;
 
 	RETURN 0;
-	
 END;;
 
 
@@ -872,7 +877,7 @@ CREATE FUNCTION residenciaAptaParaEvaluacion(
 			IF (
 				tieneAnexo29Pendiente(v_id_residencia) = 0 AND
 				tieneAnexo30Pendiente(v_id_residencia) = 0 AND 
-				residenciaAprobada(v_id_residencia) = 1 AND 
+				residenciaAprobada(v_id_residencia) = 2 AND 
 				residenciaTerminada(v_id_residencia) = 0
 			, 1, 0)
 	);
@@ -1036,7 +1041,7 @@ CREATE FUNCTION idResidenciaDeAlumno(
 					residencias AS r 
 				WHERE 
 					r.email_residente = v_email AND
-					residenciaAprobada(r.idresidencia) = 1
+					residenciaAprobada(r.idresidencia) >= 1
 			) >= 1
 		, (
 			SELECT 
@@ -1045,7 +1050,7 @@ CREATE FUNCTION idResidenciaDeAlumno(
 				residencias AS r 
 			WHERE 
 				r.email_residente = v_email AND
-				residenciaAprobada(r.idresidencia) = 1
+				residenciaAprobada(r.idresidencia) >= 1
 			LIMIT 
 				1
 		), NULL)
@@ -1378,7 +1383,7 @@ CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 		JOIN carreras AS c
 			on c.clave = res.clave_carrera
 	WHERE 
-		residenciaAprobada(r.idresidencia) != 1 AND
+		residenciaAprobada(r.idresidencia) < 1 AND
 		administraCarrera(v_email_admin, c.clave) = 1 AND (
 			r.nombre_proyecto LIKE CONCAT('%', v_query, '%') OR
 			e.nombre LIKE CONCAT('%', v_query, '%') OR
@@ -1943,7 +1948,7 @@ CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
 			ON i.email_docente = d.email
 	WHERE
 		i.es_asesor = 1 AND 
-		residenciaAprobada(r.idresidencia) = 1 AND
+		residenciaAprobada(r.idresidencia) = 2 AND
 		residenciaTerminada(r.idresidencia) = 0 AND
 		residenciaAptaParaEvaluacion(r.idresidencia) = 0 AND
 		puedeValidarResidente(r.email_residente, v_admin_email) = 1;
@@ -2358,6 +2363,50 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 
 	END; END IF;
 	
+END;;
+
+
+/*
+	Registra en la base de datos la existencia de una 
+	carta de aceptación en para la residencia con id
+	[v_id_residencia]. 
+
+	[v_ruta] es la ruta dentro del servidor que hay
+	que seguir para llegar al archivo que almacena
+	la evidencia.
+*/
+DROP PROCEDURE IF EXISTS SP_AgregarCartaDeAceptacion;;
+CREATE PROCEDURE SP_AgregarCartaDeAceptacion(
+	v_id_residencia INT,
+	v_ruta VARCHAR(128)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	
+	START TRANSACTION;
+
+		IF residenciaAprobada(v_id_residencia) != 1 THEN BEGIN
+
+			SELECT "0" AS output, "No se puede anexar una carta de aceptación a esta residencia" AS message;
+
+		END; ELSE BEGIN
+
+			INSERT INTO
+				cartas_aceptacion (`ruta`, `timestamp`, `id_residencia`)
+			VALUES
+				(v_ruta, UNIX_TIMESTAMP() * 1000, v_id_residencia);
+
+				SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		END; END IF;
+	COMMIT;
 END;;
 
 

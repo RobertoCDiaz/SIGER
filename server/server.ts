@@ -43,7 +43,9 @@ server.use(session({
     resave: true,
     saveUninitialized: true
 }));
-server.use(expressFileUpload());
+server.use(expressFileUpload({
+    createParentPath: true,
+}));
 
 enum USER_CLASSES {
     RESIDENTE = 1,
@@ -473,28 +475,6 @@ server.post('/registro-residencia',(req,res)=>
                 return;
             }
             idres=Number(rows[0][0]['idresidencia']);
-
-            // for(let i = 0;i<counter;i++)
-            // {
-            //     con.query('call SP_RegistraHorarios(?,?,?);',
-            //         [
-            //             entradas[i],salidas[i],idres
-            //         ],
-            //     (er,r,fi)=>
-            //     {
-            //         if(er)
-            //         {
-            //             res.send(Response.unknownError(er.toString()));
-            //             return;
-            //         }
-            //         if(r[0][0]['output']!=1)
-            //         {
-            //             res.send(Response.sqlError(r[0][0]['message']));
-            //             return;
-            //         }
-            //     });
-            // }
-            // res.send(Response.success());
 
             registrarHorarios(
                 idres, entradas, salidas, counter, 
@@ -1166,7 +1146,7 @@ server.get('/asesorados',(req,res)=>
 server.get('/avancedemiresidente',(req,res)=>
 {
     if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
-        res.send(Response.authError());
+        res.redirect('/login')
         return;
     }
     req.session.user.info.residente=req.query.email;
@@ -1502,11 +1482,11 @@ server.get('/getMenu', (req, res) => {
                 res.send(Response.success(teacherMenu))
         )
     } else {
-        getResidentMenu(
-            req.session.user.info.email,
-            (residentMenu) =>
-                res.send(Response.success(residentMenu))
-        )
+        getResidentMenu(req.session.user.info.email).then(residentMenu =>
+            res.send(Response.success(residentMenu))
+        ).catch(error => 
+            res.send(Response.unknownError(error.toString()))
+        );
     }
 });
 
@@ -2248,54 +2228,13 @@ server.get('/idDeMiResidencia', (req, res) => {
     }
 
     const email = req.session.user.info.email;
-    con.query(
-        `select idResidenciaDeAlumno(?) as 'email';`,
-        email,
-        (e, rows, f) => {
-            if (e) {
-                res.send(Response.unknownError(e.toString()));
-                return;
-            }
-
-            if (rows[0]['email'] == null) {
-                res.send(Response.userError("No tiene residencias aprobadas"));
-                return;
-            }
-
-            res.send(Response.success(rows[0]['email']));
-        }
-    )
+    getResidenciaIDDeResidente(email).then(id => {
+        res.send(Response.success(id));
+    }).catch(error => {
+        res.send(Response.unknownError(error));
+    })
 });
 
-/**
- * Regresa al cliente el ID de la residencia aprobada del residente
- * actual.
- */
-server.get('/idDeMiResidenciaAsesorada', (req, res) => {
-    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
-        res.send(Response.authError());
-        return;
-    }
-
-    const email = req.session.user.info.residente;
-    con.query(
-        `select idResidenciaDeAlumno(?) as 'email';`,
-        email,
-        (e, rows, f) => {
-            if (e) {
-                res.send(Response.unknownError(e.toString()));
-                return;
-            }
-
-            if (rows[0]['email'] == null) {
-                res.send(Response.userError("No tiene residencias aprobadas"));
-                return;
-            }
-
-            res.send(Response.success(rows[0]['email']));
-        }
-    )
-});
 
 /**
  * Regresa al cliente los ID de los distintos documentos de la residencia.
@@ -2335,26 +2274,60 @@ server.get('/documentosDeResidencia', (req, res) => {
 });
 
 
-//TODO: Crear registro en la base de datos, ya sea usando express-fileupload o firebase-storage.
+/**
+ * Crea en disco la evidencia de carta de aceptación [file] enviada 
+ * desde el cliente, para después hacer el registro en la base 
+ * de datos.
+ */
 server.post('/anexarCartaAceptacion', async (req, res) => {
-    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
-        res.send(Response.authError());
-        return;
-    }
-
-    if ((await getResidentState(req.session.user.info.email)) != 2) {
-        res.send(Response.userError("Ya no puede enviar carta de aceptación"));
-        return;
-    }
-
-    req.files.newfile.mv(`files/${req.files.newfile.name}`, err => {
-        if (err) {
-            res.send(Response.unknownError(err.toString()));
+    try {
+        if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+            res.send(Response.authError());
             return;
         }
-
-        res.send(Response.success());
-    });
+    
+        if ((await getResidentState(req.session.user.info.email)) != 2) {
+            res.send(Response.userError("Ya no puede enviar carta de aceptación"));
+            return;
+        }
+    
+        const file = req.files.file;
+        const idRes: number = await getResidenciaIDDeResidente(req.session.user.info.email);
+    
+        // Genera la ruta dinámica para cada archivo. Por ejemplo:
+        //      residentes/L17430057/2020523180455-carta.jpg
+        const d = new Date();
+        const fileName = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${file.name}`;
+        const directory = `residentes/${req.session.user.info.email.split('@')[0]}`;
+        const fullPath = `${directory}/${fileName}`
+    
+        file.mv(`files/${fullPath}`, err => {
+            if (err) {
+                res.send(Response.unknownError(err.toString()));
+                return;
+            }
+    
+            con.query(
+                `call SP_AgregarCartaDeAceptacion(?, ?);`,
+                [idRes, fullPath],
+                (e, rows, f) => {
+                    if (e) {
+                        res.send(Response.unknownError(e.toString()));
+                        return;
+                    }
+    
+                    if (rows[0][0]['output'] < 1) {
+                        res.send(Response.userError(rows[0][0]['message']));
+                        return;
+                    }
+    
+                    res.send(Response.success());
+                }
+            );
+        });    
+    } catch (e) {
+        res.send(Response.unknownError(e.toString()));
+    }
 });
 
 
@@ -2494,15 +2467,27 @@ const getAdminMenu: () => Object = () => ({
  * Consigue el menú con las opciones específicas del estado de un residente.
  * 
  * @param email Correo electrónico del residente del cual se quiere conocer su menú.
- * @param onDone Qué hacer cuándo un menú sea "calculado".
  */
-const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => void) => Object =
-    async (email, onDone) => {
-        con.query(
-            `select estadoResidente(?) as estado;`,
-            email,
-            (e, rows, f) => {
-                let menu: Object = {
+const getResidentMenu = (email: string) =>
+    new Promise<Object>((resolve, reject) => {
+        getResidentState(email).then(state => {
+            let menu: Object = {
+                'main': {
+                    'Inicio': {
+                        'href': '/home',
+                        'icon': 'home'
+                    }
+                },
+                'secondary': {
+                    'Cerrar sesión': {
+                        'href': '/logout',
+                        'icon': 'exit_to_app'
+                    }
+                }
+            };
+
+            switch (state) {
+                case 0: menu = {
                     'main': {
                         'Inicio': {
                             'href': '/home',
@@ -2515,108 +2500,89 @@ const getResidentMenu: (residentEmail: string, onDone: (resultMenu :Object) => v
                             'icon': 'exit_to_app'
                         }
                     }
-                };
+                }; break;
 
-                const state: number = Number(rows[0]['estado']);
-
-                switch (state) {
-                    case 0: menu = {
-                        'main': {
-                            'Inicio': {
-                                'href': '/home',
-                                'icon': 'home'
-                            }
+                case 1: menu = {
+                    'main': {
+                        'Inicio': {
+                            'href': '/home',
+                            'icon': 'home'
                         },
-                        'secondary': {
-                            'Cerrar sesión': {
-                                'href': '/logout',
-                                'icon': 'exit_to_app'
-                            }
-                        }
-                    }; break;
-
-                    case 1: menu = {
-                        'main': {
-                            'Inicio': {
-                                'href': '/home',
-                                'icon': 'home'
-                            },
-                            'Nuevo proyecto': {
-                                'href': '/nuevo-proyecto',
-                                'icon': 'note_add'
-                            },
-                            'Documentos': {
-                                'href': '/documentos',
-                                'icon': 'description'
-                            }
+                        'Nuevo proyecto': {
+                            'href': '/nuevo-proyecto',
+                            'icon': 'note_add'
                         },
-                        'secondary': {
-                            'Cerrar sesión': {
-                                'href': '/logout',
-                                'icon': 'exit_to_app'
-                            }
+                        'Documentos': {
+                            'href': '/documentos',
+                            'icon': 'description'
                         }
-                    }; break;
+                    },
+                    'secondary': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
+                        }
+                    }
+                }; break;
 
-                    case 2: menu = {
-                        'main': {
-                            'Inicio': {
-                                'href': '/home',
-                                'icon': 'home'
-                            },
-                            'Carta de Aceptación': {
-                                'href': '/residentes/subir-carta-aceptacion',
-                                'icon': 'thumb_up'
-                            },
-                            'Progreso actual': {
-                                'href': '/avance-proyecto',
-                                'icon': 'flag'
-                            },
-                            'Documentos': {
-                                'href': '/documentos',
-                                'icon': 'description'
-                            },
+                case 2: menu = {
+                    'main': {
+                        'Inicio': {
+                            'href': '/home',
+                            'icon': 'home'
                         },
-                        'secondary': {
-                            'Cerrar sesión': {
-                                'href': '/logout',
-                                'icon': 'exit_to_app'
-                            }
+                        'Carta de Aceptación': {
+                            'href': '/residentes/subir-carta-aceptacion',
+                            'icon': 'thumb_up'
+                        },
+                        'Progreso actual': {
+                            'href': '/avance-proyecto',
+                            'icon': 'flag'
+                        },
+                        'Documentos': {
+                            'href': '/documentos',
+                            'icon': 'description'
+                        },
+                    },
+                    'secondary': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
                         }
-                    }; break;
+                    }
+                }; break;
 
-                    case 3: menu = {
-                        'main': {
-                            'Inicio': {
-                                'href': '/home',
-                                'icon': 'home'
-                            },
-                            'Progreso actual': {
-                                'href': '/avance-proyecto',
-                                'icon': 'flag'
-                            },
-                            'Documentos': {
-                                'href': '/documentos',
-                                'icon': 'description'
-                            },
-                            'Chat': {
-                                'href': '/#',
-                                'icon': 'chat'
-                            }
+                case 3: menu = {
+                    'main': {
+                        'Inicio': {
+                            'href': '/home',
+                            'icon': 'home'
                         },
-                        'secondary': {
-                            'Cerrar sesión': {
-                                'href': '/logout',
-                                'icon': 'exit_to_app'
-                            }
+                        'Progreso actual': {
+                            'href': '/avance-proyecto',
+                            'icon': 'flag'
+                        },
+                        'Documentos': {
+                            'href': '/documentos',
+                            'icon': 'description'
+                        },
+                        'Chat': {
+                            'href': '/#',
+                            'icon': 'chat'
                         }
-                    }; break;
-                }
-                
-                onDone(menu);
+                    },
+                    'secondary': {
+                        'Cerrar sesión': {
+                            'href': '/logout',
+                            'icon': 'exit_to_app'
+                        }
+                    }
+                }; break;
             }
-        );
-    };
+            
+            resolve(menu);
+        }).catch(error => reject(error));
+    });    
 
     
 /**
@@ -2728,6 +2694,33 @@ const getResidentState: (residentEmail: string) => Promise<number>
                 resolve(rows[0]['estado']);
             }
         )
+    });
+
+
+/**
+ * Consigue el ID de la residencia en curso de un residente.
+ * 
+ * @param email Correo del residente autor de la residencia.
+ */
+const getResidenciaIDDeResidente = (email: string) => 
+    new Promise<number>((resolve, reject) => {
+        con.query(
+            `select idResidenciaDeAlumno(?) as 'id';`,
+            email,
+            (e, rows, f) => {
+                if (e) {
+                    reject(e.toString());
+                    return;
+                }
+
+                if (rows[0]['id'] == null) {
+                    reject("No tiene residencias aprobadas");
+                    return;
+                }
+
+                resolve(rows[0]['id']);
+            }
+        );
     });
 
 
