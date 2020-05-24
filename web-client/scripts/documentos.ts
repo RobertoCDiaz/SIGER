@@ -19,7 +19,7 @@ class Documentos {
     ) {
         this.preliminar = {id: Number(idRes), fecha: new Date(Number(fechaRes)).toDateString()};
 
-        this.carta_aceptacion = {id: Number(idCartaAceptacion), fecha: new Date(Number(fechaCartaAceptacion)).toDateString()}
+        this.carta_aceptacion = {id: idCartaAceptacion, fecha: new Date(Number(fechaCartaAceptacion)).toDateString()}
 
         this.anexos_29 = anexos_29?.split(',').map((id, index) => {
             let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a29.split(',')[index])).toDateString()};
@@ -93,7 +93,11 @@ const populateDocuments = () => {
         }
 
         if (docs.carta_aceptacion) {
-            
+            misDocumentosContainer.innerHTML += documentView(
+                'Carta de Aceptación', 
+                docs.carta_aceptacion.fecha,
+                `/siger-cloud/files/${docs.carta_aceptacion.id}`
+            );
         }
 
         if (docs.anexos_29) {

@@ -2296,7 +2296,7 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 			-- Carta de Aceptación
 			IF (
 				residenciaAprobada(v_id) = 2
-			, (SELECT c.`id` FROM cartas_aceptacion AS c WHERE c.id_residencia = v_id), NULL) as 'carta_aceptacion',
+			, (SELECT c.`ruta` FROM cartas_aceptacion AS c WHERE c.id_residencia = v_id), NULL) as 'carta_aceptacion',
 			IF (
 				residenciaAprobada(v_id) = 2
 			, (SELECT c.`timestamp` FROM cartas_aceptacion AS c WHERE c.id_residencia = v_id), NULL) as 'fecha_carta_aceptacion',
