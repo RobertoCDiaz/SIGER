@@ -2376,7 +2376,7 @@ END;;
 
 /*
 	Registra en la base de datos la existencia de una 
-	carta de aceptación en para la residencia con id
+	carta de aceptación para la residencia con id
 	[v_id_residencia]. 
 
 	[v_ruta] es la ruta dentro del servidor que hay
