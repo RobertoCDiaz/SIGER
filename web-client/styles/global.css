@@ -36,6 +36,7 @@
     --amarillo-tec: #FFED38;
 
     --page-background: #EAEAEA;
+    --light-gray-background: #DADADA;
     --content-background: white;
     --footer-background: #272727;
 
@@ -44,6 +45,8 @@
 
     --primary-text: #212121;
     --secondary-text: #616161;
+
+    --menu-background: rgb(29, 34, 59);
 
     --animation-duration: 150ms;
 }

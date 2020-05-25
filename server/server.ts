@@ -2267,6 +2267,15 @@ server.get('/documentos/reporte-preliminar',(req,res)=>
     res.sendFile('repreliminar.html', { root: '../web-client/' });
 });
 
+server.get('/chat', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
+});
+
 
 /**
  * Regresa al cliente el ID de la residencia aprobada del residente
@@ -2618,7 +2627,7 @@ const getResidentMenu = (email: string) =>
                             'icon': 'description'
                         },
                         'Chat': {
-                            'href': '/#',
+                            'href': '/chat',
                             'icon': 'chat'
                         }
                     },

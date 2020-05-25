@@ -29,7 +29,7 @@ const menuView = (o) => {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --menu-color: rgb(29, 34, 59);
+            --menu-color: var(--menu-background);
             /*--menu-color: var(--footer-background);*/
             /*--menu-color: var(--azul-tec);*/
             --slide-duration: 150ms;
@@ -42,6 +42,7 @@ const menuView = (o) => {
             transform: translateX(-6em);
             position: fixed;
             height: 100%;
+            z-index: 100;
             transition-duration: var(--slide-duration);
             transition-timing-function: ease;
         }
