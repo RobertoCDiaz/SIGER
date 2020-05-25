@@ -414,6 +414,42 @@ CREATE TABLE IF NOT EXISTS `siger`.`cartas_aceptacion` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `siger`.`mensajes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`mensajes` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`mensajes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `contenido` VARCHAR(512) NOT NULL,
+  `timestamp` VARCHAR(14) NOT NULL,
+  `remitente_email` VARCHAR(64) NOT NULL,
+  `destinatario_email` VARCHAR(64) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `siger`.`archivos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `siger`.`archivos` ;
+
+CREATE TABLE IF NOT EXISTS `siger`.`archivos` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ruta` VARCHAR(256) NOT NULL,
+  `nombre` VARCHAR(128) NOT NULL,
+  `tipo` INT NOT NULL,
+  `id_mensaje` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_archivos_mensajes1_idx` (`id_mensaje` ASC), -- VISIBLE,
+  CONSTRAINT `fk_archivos_mensajes1`
+    FOREIGN KEY (`id_mensaje`)
+    REFERENCES `siger`.`mensajes` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
