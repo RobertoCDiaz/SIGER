@@ -21,8 +21,8 @@
                         <input type="text" placeholder="Buscar...">
                     </div>
                 </div>
-                <div class="contacts-list prevent-selection">
-                    <div class="contact">
+                <div id="conversationsListView" class="contacts-list prevent-selection">
+                    <!-- <div class="contact">
                         <p class="name">Alonso Sánchez Sotomayor</p>
                         <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
                             <i class="material-icons seen">visibility</i>
@@ -47,19 +47,21 @@
                         <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
                             izan.mm@piedrasnegras.tecnm.mx
                         </p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="messages-side">
                 <div class="top-bar prevent-selection">
-                    <p class="name">Martín Rodríguez Pozos</p>
+                    <p id="contactNameView" class="name">
+                        <!-- Nombre del otro usuario. -->
+                    </p>
                     <div class="options">
                         <i class="material-icons" title="Copiar correo electrónico al portapapeles">email</i>
                     </div>
                 </div>
                 <div class="chat">
                     <div id="messagesContainer" class="messages-container">
-                        <p class="date prevent-selection">12/05/2020</p>
+                        <!-- <p class="date prevent-selection">12/05/2020</p>
                         <div class="message mine">
                             <p class="content">Como los "aquí vamos" que hacíamos con Arlín</p>
                             <p class="hour prevent-selection">19:53</p>
@@ -100,7 +102,7 @@
                                 Ya revisé y no dejé el reload().
                             </p>
                             <p class="hour prevent-selection">19:53</p>
-                        </div>
+                        </div> -->
                     </div>
                     <script>
                         const messages = Array.from(document.getElementsByClassName('message')).filter(m => m.parentNode.id == 'messagesContainer');
@@ -127,5 +129,6 @@
     </div>
 
     <script src="/scripts/menu.js"></script>
+    <script src="/chat-pages/chat.js"></script>
 </body>
 </html>

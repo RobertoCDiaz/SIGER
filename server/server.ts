@@ -2382,6 +2382,88 @@ server.post('/anexarCartaAceptacion', async (req, res) => {
 });
 
 
+/**
+ * Regresa al cliente una conversación entre el usuario
+ * con sesión abierta en el navegador y el usuario con
+ * correo [req.query.with].
+ * 
+ * Una conversación consiste en el conjunto de mensajes
+ * intercambiados entre dos usuarios, ordenados de manera
+ * cronológica. Este será el primer elemento del arreglo 
+ * enviado al cliente.
+ * 
+ * El segundo es un arreglo con los nombres completos de 
+ * los involucrados en la conversación.
+ */
+server.get('/getChatConversation', async (req, res) => {
+    if (
+        !req.session.loggedin ||
+        (
+            (await getResidentState(req.session.user.info.email)) < 3 &&
+            (await getDocenteState(req.session.user.info.email)) < 1
+        )
+    ) {
+        res.send(Response.authError());
+        return;
+    }
+
+    const withEmail: string = req.query.with;
+    if (!withEmail) {
+        res.send(Response.notEnoughParams());
+        return;
+    }
+
+    con.query(
+        `call SP_GetConversacion(?, ?);`,
+        [req.session.user.info.email, withEmail],
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success([
+                rows[0],        // Arreglo con los mensajes.
+                rows[1][0]      // Nombres de los involucrados.
+            ]));
+        }
+    );
+});
+
+
+/**
+ * Regresa al cliente una lista con información relevante
+ * de cada conversación abierta por el usuario logeado.
+ * 
+ * Por cada conversación regresará el último mensaje enviado.
+ */
+server.get('/getListaDeConversaciones', async (req, res) => {
+    if (
+        !req.session.loggedin ||
+        (
+            (await getResidentState(req.session.user.info.email)) < 3 &&
+            (await getDocenteState(req.session.user.info.email)) < 1
+        )
+    ) {
+        res.send(Response.authError());
+        return;
+    }
+
+    con.query(
+        `call SP_ListaConversaciones(?);`,
+        req.session.user.info.email,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+
 /* ================================================================================================
 
     Endpoints.
@@ -2460,34 +2542,31 @@ server.get('/residentes/subir-carta-aceptacion', async (req, res) => {
  * Redirije al chat del SIGER, solo si el usuario tiene un estado
  * apropiado para acceder.
  */
-server.get('/chat', (req, res) => {
-    if (!req.session.loggedin) {
+server.get('/chat', async (req, res) => {
+    if (
+        !req.session.loggedin || (
+            (await getResidentState(req.session.user.info.email)) < 3 &&
+            (await getDocenteState(req.session.user.info.email)) < 1
+        )
+    ) {
         res.redirect('/login');
         return;
     }
-
-    if (UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
-
-        getResidentState(req.session.user.info.emal).then(state => {
-            if (state < 3) {
-                res.redirect('/home')
-                return;
-            }
-            res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
-        }).catch(error => res.redirect('/home'));
-
-    } else {
-
-        getDocenteState(req.session.user.infom.email).then(state => {
-            if (state < 1) {
-                res.redirect('/home');
-                return;
-            }
-            res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
-        }).catch(error => res.redirect('/home'));
-
-    }
+        
+    res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
 });
+/*
+const getPetition = (url) => new Promise<Object>((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open('get', url, true);
+    
+    xhr.onload = () => {
+        resolve(xhr.response);
+    };
+    
+    xhr.send();
+})
+*/
 
 
 /**

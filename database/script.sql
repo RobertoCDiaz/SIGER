@@ -2654,6 +2654,10 @@ CREATE PROCEDURE SP_GetConversacion(
 	ORDER BY 
 		m.`timestamp`,
 		m.`id`;
+
+	SELECT 
+		nombreCompleto(v_email1) AS `nombre_email1`,
+		nombreCompleto(v_email2) AS `nombre_email2`;
 END;;
 
 
@@ -2668,7 +2672,6 @@ END;;
 	de chat (Nombre y correo de la otra persona, último mensaje,
 	y fecha de este).
 */
-DELIMITER ;;
 DROP PROCEDURE IF EXISTS SP_ListaConversaciones;;
 CREATE PROCEDURE SP_ListaConversaciones(
 	v_email VARCHAR(64)
@@ -2677,7 +2680,16 @@ CREATE PROCEDURE SP_ListaConversaciones(
 	SELECT * FROM (
 		SELECT 
 			DISTINCT idConversacion(m.`remitente_email`, m.`destinatario_email`) AS `id_conv`, 
-			`m`.* 
+			`m`.*,
+			nombreCompleto(
+				IF (
+					`m`.`remitente_email` = v_email
+				, `m`.`destinatario_email`, `m`.`remitente_email`)
+			) AS `contacto_nombre`,
+			IF (
+				`m`.`remitente_email` = v_email
+				, `m`.`destinatario_email`, `m`.`remitente_email`
+			) AS `contacto_email`
 		FROM 
 			`mensajes` AS `m` 
 		WHERE 
@@ -2688,7 +2700,6 @@ CREATE PROCEDURE SP_ListaConversaciones(
 	) AS `t`
 	GROUP BY 
 		`t`.`id_conv`;
-	
 END;;
 
 
