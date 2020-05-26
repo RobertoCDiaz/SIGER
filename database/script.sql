@@ -1095,6 +1095,97 @@ CREATE FUNCTION idResidenciaDeAlumno(
 END;;
 
 
+/*
+	Comprueba que tanto el usuario con email
+	[v_email1] y como aquel con email [v_email2]
+	cumplan con el estado mínimo para usar el chat
+	del SIGER. En caso de que por lo menos uno no
+	pueda usar el chat, la función regresará 0.
+	Regresará 1 si ambos pueden mantener una 
+	conversación.
+*/
+DROP FUNCTION IF EXISTS puedenUsarChat;;
+CREATE FUNCTION puedenUsarChat(
+	v_email1 VARCHAR(64), 
+	v_email2 VARCHAR(64)
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (SELECT IF ((
+		(estadoResidente(v_email1) < 3 &&
+		estadoDocente(v_email1) < 1) ||
+		(estadoResidente(v_email2) < 3 &&
+		estadoDocente(v_email2) < 1)
+	), 0, 1));
+END;;
+
+
+/*
+	Concatena todos los IDs de los archivos asociados
+	al mensaje con id [v_id]. Regresa un solo VARCHAR
+	con todos los IDs de los archivos separados por una
+	coma. Por ejemplo:
+		"3,6,23,24,25,30,31"
+
+	En caso de no tener ningún archivo asociado,
+	regresará [NULL].
+*/
+DROP FUNCTION IF EXISTS archivosDeMensaje;;
+CREATE FUNCTION archivosDeMensaje(
+	v_id INT
+) RETURNS VARCHAR(128) DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			GROUP_CONCAT(t.id SEPARATOR ',')
+		FROM (
+			SELECT 
+				id as 'id'
+			FROM 
+				`archivos` AS a
+			WHERE 
+				a.id_mensaje = v_id
+			ORDER BY
+				a.id
+		) AS t
+	);
+END;;
+
+
+/*
+	Partiendo de los correos de dos personas
+	involucradas en una conversación, genera un
+	nuevo VARCHAR que servirá para identificar 
+	la conversación.
+
+	El "ID" simplemente será otro VARCHAR, el
+	cual resultará de concatenar ambos correos
+	electrónicos en orden alfabético descendente.
+	Como los correos no se pueden repetir entre
+	docentes ni residentes, el ID generado para cada
+	conversación será único. Y como se ordenarán antes
+	de concatenarse, da igual el orden de los correos
+	pasados como parámetros, estos siempre arrojarán
+	el mismo ID.
+*/
+DROP FUNCTION IF EXISTS idConversacion;;
+CREATE FUNCTION idConversacion(
+	v_email1 VARCHAR(64),
+	v_email2 VARCHAR(64)
+) RETURNS VARCHAR(128) DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			GROUP_CONCAT(t.email SEPARATOR "")
+		FROM (
+				SELECT
+					v_email1 AS email
+			UNION ALL
+				SELECT
+					v_email2 AS email
+			ORDER BY
+				email
+		) AS t
+	);	
+END;;
+
+
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
@@ -2451,6 +2542,153 @@ CREATE PROCEDURE SP_AgregarCartaDeAceptacion(
 
 		END; END IF;
 	COMMIT;
+END;;
+
+
+/*
+	Crea un nuevo registro en la tabla de mensajes.
+
+	Regresa en una segunda consulta (la primera es la 
+	de confirmación) el ID del mensaje creado.
+*/
+DROP PROCEDURE IF EXISTS SP_NuevoMensaje;;
+CREATE PROCEDURE SP_NuevoMensaje(
+	v_contenido VARCHAR(512),
+	v_remitente VARCHAR(64),
+	v_destinatario VARCHAR(64)
+) BEGIN
+
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	
+	START TRANSACTION;
+		IF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN 
+			SELECT "0" AS output, "Uno de los involucrados en este chat no tiene permiso de usarlo" AS message;
+		END; ELSE BEGIN
+
+			INSERT INTO `siger`.`mensajes` 
+				(`contenido`, `timestamp`, `remitente_email`, `destinatario_email`)
+			VALUES
+				(v_contenido, UNIX_TIMESTAMP() * 1000, v_remitente, v_destinatario);
+	
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+			SELECT LAST_INSERT_ID() AS id_mensaje;
+
+		END; END IF;
+	COMMIT;
+	
+END;;
+
+
+/*
+	Asocia un archivo de la nube del SIGER
+	al mensaje con ID [v_id_mensaje].
+*/
+DROP PROCEDURE IF EXISTS SP_NuevoArchivo;;
+CREATE PROCEDURE SP_NuevoArchivo(
+	v_id_mensaje INT,
+	v_ruta VARCHAR(256),
+	v_nombre VARCHAR(256),
+	v_tipo INT
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	
+	START TRANSACTION;
+		-- IF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN 
+		-- 	SELECT "0" AS output, "Uno de los involucrados en este chat no tiene permiso de usarlo" AS message;
+		-- END; ELSE BEGIN
+
+			INSERT INTO `siger`.`archivos` (`ruta`, `nombre`, `tipo`, `id_mensaje`)
+			VALUES (v_ruta, v_nombre, v_tipo, v_id_mensaje);
+
+			SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		-- END; END IF;
+	COMMIT;
+END;;
+
+
+/*
+	Regresa todos los mensajes de la conversación
+	entre los usuarios con email [v_email1] y [v_email2].
+	Incluye, además, los IDs de los archivos asociados
+	a cada mensaje en la columna [ids_archivos], si
+	es que el mensaje tiene anexado por lo menos un
+	archivo.
+*/
+DROP PROCEDURE IF EXISTS SP_GetConversacion;;
+CREATE PROCEDURE SP_GetConversacion(
+	v_email1 VARCHAR(64),
+	v_email2 VARCHAR(64)
+) BEGIN
+	SELECT
+		m.*,
+		archivosDeMensaje(m.id) AS `ids_archivos`
+	FROM
+		`mensajes` AS m
+	WHERE
+		(
+			m.`remitente_email` = v_email1 &&
+			m.`destinatario_email` = v_email2
+		) ||
+		(
+			m.`remitente_email` = v_email2 &&
+			m.`destinatario_email` = v_email1
+		)
+	ORDER BY 
+		m.`timestamp`,
+		m.`id`;
+END;;
+
+
+/*
+	Regresa una lista de las conversaciones en las 
+	que el usuario con email [v_email] participa,
+	ordenadas por fecha del último mensaje, de manera
+	descendente.
+
+	Cada fila tendrá solo la información necesaria
+	para mostrarse en el panel lateral de la pantalla
+	de chat (Nombre y correo de la otra persona, último mensaje,
+	y fecha de este).
+*/
+DELIMITER ;;
+DROP PROCEDURE IF EXISTS SP_ListaConversaciones;;
+CREATE PROCEDURE SP_ListaConversaciones(
+	v_email VARCHAR(64)
+) BEGIN
+
+	SELECT * FROM (
+		SELECT 
+			DISTINCT idConversacion(m.`remitente_email`, m.`destinatario_email`) AS `id_conv`, 
+			`m`.* 
+		FROM 
+			`mensajes` AS `m` 
+		WHERE 
+			`m`.`remitente_email` = v_email || 
+			`m`.`destinatario_email` = v_email 
+		ORDER BY 
+			timestamp DESC
+	) AS `t`
+	GROUP BY 
+		`t`.`id_conv`;
+	
 END;;
 
 

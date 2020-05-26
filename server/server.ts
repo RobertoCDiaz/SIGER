@@ -629,7 +629,7 @@ server.get('/avance-proyecto', (req, res) => {
     }
 
     getResidentState(req.session.user.info.email).then(state => {
-        if (state != 2) {
+        if (state < 2) {
             res.redirect('/home');
             return;
         }
@@ -942,7 +942,7 @@ server.get('/documentos', (req, res) => {
     }
 
     getResidentState(req.session.user.info.email).then(state => {
-        if (state <= 0) {
+        if (state < 1) {
             res.redirect('/home');
             return;
         }
@@ -2267,15 +2267,6 @@ server.get('/documentos/reporte-preliminar',(req,res)=>
     res.sendFile('repreliminar.html', { root: '../web-client/' });
 });
 
-server.get('/chat', (req, res) => {
-    if (!req.session.loggedin) {
-        res.redirect('/login');
-        return;
-    }
-
-    res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
-});
-
 
 /**
  * Regresa al cliente el ID de la residencia aprobada del residente
@@ -2465,6 +2456,58 @@ server.get('/residentes/subir-carta-aceptacion', async (req, res) => {
 });
 
 
+/**
+ * Redirije al chat del SIGER, solo si el usuario tiene un estado
+ * apropiado para acceder.
+ */
+server.get('/chat', (req, res) => {
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+
+        getResidentState(req.session.user.info.emal).then(state => {
+            if (state < 3) {
+                res.redirect('/home')
+                return;
+            }
+            res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
+        }).catch(error => res.redirect('/home'));
+
+    } else {
+
+        getDocenteState(req.session.user.infom.email).then(state => {
+            if (state < 1) {
+                res.redirect('/home');
+                return;
+            }
+            res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
+        }).catch(error => res.redirect('/home'));
+
+    }
+});
+
+
+/**
+ * Redirige al panel de búsqueda de asesorías disponible
+ * para residentes.
+ */
+server.get('/asesorias', async (req, res) => {
+    try {
+        if (!req.session.loggedin || UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE) || (await getResidentState(req.session.user.info.email)) < 3) {
+            throw new Error("No tiene acceso a esta sección del sistema");
+        }
+    
+        // TODO: Enlazar a .html de panel de asesorías.
+        res.res.sendFile('file', { root: '../web-client/'});    
+    } catch (error) {
+        res.redirect('/home');
+    }
+}); 
+
+
 /* ================================================================================================
 
     Misc.
@@ -2629,6 +2672,10 @@ const getResidentMenu = (email: string) =>
                         'Chat': {
                             'href': '/chat',
                             'icon': 'chat'
+                        },
+                        'Buscar asesorías': {
+                            'href': '/asesorias',
+                            'icon': 'live_help'
                         }
                     },
                     'secondary': {
@@ -2700,7 +2747,11 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
                             'Lista de residentes': {
                                 'href': '/mis-residentes',
                                 'icon': 'menu_open'
-                            }
+                            },
+                            'Chat': {
+                                'href': '/chat',
+                                'icon': 'chat'
+                            },    
                         },
                         'secondary': {
                             'Cerrar sesión': {
@@ -2755,6 +2806,36 @@ const getResidentState: (residentEmail: string) => Promise<number>
             }
         )
     });
+
+
+/**
+ * Consigue de manera asíncrona el estado actual de un docente
+ * en el sistema.
+ * 
+ * Regresa un valor numérico indicando el estado, acorde a
+ * los siguientes estados:
+ * 
+ *      0: Sin confirmar.
+ * 
+ *      1: Confirmado.
+ * 
+ * @param email Correo electrónico del docente.
+ */
+
+const getDocenteState = (docenteEmail: string) => new Promise<number>((resolve, reject) => {
+    con.query(
+        `select estadoDocente(?) as estado;`,
+        docenteEmail,
+        (e, rows, f) => {
+            if (e) {
+                reject(e.toString());
+                return;
+            }
+
+            resolve(rows[0]['estado']);
+        }
+    )
+});
 
 
 /**
