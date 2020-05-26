@@ -56,7 +56,8 @@
                         <!-- Nombre del otro usuario. -->
                     </p>
                     <div class="options">
-                        <i class="material-icons" title="Copiar correo electrónico al portapapeles">email</i>
+                        <i onclick="copyEmail();" class="material-icons" title="Copiar correo electrónico al portapapeles">email</i>
+                        <input style="position: absolute; left: -5000em;" id="emailInputView" value="..." type="text">
                     </div>
                 </div>
                 <div class="chat">
@@ -111,14 +112,21 @@
                     <div class="writer-container">
                         <div class="writer">
                             <textarea id="messageView" rows="1" type="text" placeholder="Mensaje..."></textarea>
-                            <i class="material-icons" title="Enviar mensaje">send</i>
+                            <i onclick="sendMessage();" class="material-icons" title="Enviar mensaje">send</i>
                             <script>
-                                // Altura de textarea dinámica.
                                 const messageView = document.getElementById('messageView');
                                 messageView.oninput = (e) => {
+                                    // Altura de textarea dinámica.
                                     const lines = messageView.value.split('\n').length;
                                     const maxLines = 5;
                                     messageView.rows = lines <= maxLines ? lines : maxLines;
+                                }
+
+                                messageView.onkeydown = (e) => {
+                                    if (e.keyCode == 13 && !e.shiftKey) {
+                                        e.preventDefault();
+                                        sendMessage();
+                                    }
                                 }
                             </script>
                         </div>

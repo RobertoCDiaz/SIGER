@@ -2438,29 +2438,90 @@ server.get('/getChatConversation', async (req, res) => {
  * Por cada conversación regresará el último mensaje enviado.
  */
 server.get('/getListaDeConversaciones', async (req, res) => {
-    if (
-        !req.session.loggedin ||
-        (
-            (await getResidentState(req.session.user.info.email)) < 3 &&
-            (await getDocenteState(req.session.user.info.email)) < 1
-        )
-    ) {
-        res.send(Response.authError());
-        return;
-    }
-
-    con.query(
-        `call SP_ListaConversaciones(?);`,
-        req.session.user.info.email,
-        (e, rows, f) => {
-            if (e) {
-                res.send(Response.unknownError(e.toString()));
-                return;
-            }
-
-            res.send(Response.success(rows[0]));
+    try {
+        if (
+            !req.session.loggedin ||
+            (
+                (await getResidentState(req.session.user.info.email)) < 3 &&
+                (await getDocenteState(req.session.user.info.email)) < 1
+            )
+        ) {
+            res.send(Response.authError());
+            return;
         }
-    );
+    
+        con.query(
+            `call SP_ListaConversaciones(?);`,
+            req.session.user.info.email,
+            (e, rows, f) => {
+                if (e) {
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+    
+                res.send(Response.success(rows[0]));
+            }
+        );    
+    } catch (error) {
+        res.send(Response.unknownError(error.toString()));
+    }
+});
+
+
+/**
+ * Crea un nuevo mensaje en la base de datos, enviado
+ * por el usuario con sesión abierta en el SIGER.
+ * 
+ * @param req.body.content Contenido del mensaje.
+ * 
+ * @param req.body.toEmail Correo electrónico del destinatario.
+ */
+server.post('/sendMessage', async (req, res) => {
+    try {
+        if (
+            !req.session.loggedin ||
+            (
+                (await getResidentState(req.session.user.info.email)) < 3 &&
+                (await getDocenteState(req.session.user.info.email)) < 1
+            )
+        ) {
+            res.send(Response.authError());
+            return;
+        }
+
+        const msg: string = req.body.content;
+        const dEmail: string = req.body.toEmail;
+        const rEmail: string = req.session.user.info.email;
+        if (!msg || !dEmail) {
+            res.send(Response.notEnoughParams());
+            return;
+        }
+
+        con.query(
+            `call SP_NuevoMensaje(?, ?, ?);`,
+            [msg, rEmail, dEmail], 
+            (e, rows, f) => {
+                if (e) {
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+
+                if (rows[0][0]['output'] < 1) {
+                    res.send(Response.sqlError(rows[0][0]['message']));
+                    return;
+                }
+
+                const newMessageID = rows[1][0]['id_mensaje'];
+
+                res.send(Response.success({
+                    new_id: newMessageID
+                }));
+            }
+        );
+    
+    } catch (error) {
+        res.send(Response.unknownError(error.toString()));
+    }
 });
 
 

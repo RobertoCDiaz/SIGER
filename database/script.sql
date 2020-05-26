@@ -2657,7 +2657,8 @@ CREATE PROCEDURE SP_GetConversacion(
 
 	SELECT 
 		nombreCompleto(v_email1) AS `nombre_email1`,
-		nombreCompleto(v_email2) AS `nombre_email2`;
+		nombreCompleto(v_email2) AS `nombre_email2`,
+		v_email2 AS 'email2';
 END;;
 
 
@@ -2689,7 +2690,10 @@ CREATE PROCEDURE SP_ListaConversaciones(
 			IF (
 				`m`.`remitente_email` = v_email
 				, `m`.`destinatario_email`, `m`.`remitente_email`
-			) AS `contacto_email`
+			) AS `contacto_email`,
+			IF (
+				v_email = `m`.`remitente_email`
+			, 1, 0) AS `enviado`
 		FROM 
 			`mensajes` AS `m` 
 		WHERE 
@@ -2699,7 +2703,9 @@ CREATE PROCEDURE SP_ListaConversaciones(
 			timestamp DESC
 	) AS `t`
 	GROUP BY 
-		`t`.`id_conv`;
+		`t`.`id_conv`
+	ORDER BY 
+		`timestamp` DESC;
 END;;
 
 
