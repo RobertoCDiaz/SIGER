@@ -68,6 +68,48 @@ html, body {
   background-color: var(--light-gray-background);
   overflow-y: auto;
 }
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .message {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5em 2em;
+  border-bottom: 1px solid var(--gray-border-color);
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .message * {
+  color: var(--secondary-text);
+  text-align: center;
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .message > i {
+  font-size: 32px;
+  margin-bottom: 0.5em;
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .contactSearchResult {
+  background-color: white;
+  border-bottom: 1px solid var(--gray-border-color);
+  padding: 0.5em;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .contactSearchResult:hover {
+  border-left: 5px solid var(--azul-tec);
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .contactSearchResult > i {
+  margin-right: 0.5em;
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .contactSearchResult > .info-container {
+  display: flex;
+  flex-direction: column;
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .contactSearchResult > .info-container > .name {
+  font-weight: bold;
+}
+.chat-window-container > .chat-window > .contacts-side > .contacts-list > .contactSearchResult > .info-container > .email {
+  color: var(--secondary-text);
+}
 .chat-window-container > .chat-window > .contacts-side > .contacts-list > .contact {
   background-color: white;
   border-bottom: 1px solid var(--gray-border-color);
@@ -212,4 +254,8 @@ html, body {
   padding: 0 0.5em;
   cursor: pointer;
   align-items: center;
+}
+
+.hidden-container {
+  display: none !important;
 }

@@ -18,8 +18,31 @@
                 <div class="search-widget">
                     <div class="search-bar">
                         <i class="material-icons">search</i>
-                        <input type="text" placeholder="Buscar...">
+                        <input id="searchUserInputView" type="text" placeholder="Buscar usuario en el SIGER...">
                     </div>
+                </div>
+                <div id="searchResultsContainer" class="contacts-list prevent-selection hidden-container">
+                    <!-- 
+                    <div class="contactSearchResult">
+                        <p class="name">Daniel Hernández Sánchez</p>
+                        <p class="email">daniel.hs@piedrasnegras.tecnm.mx</p>
+                    </div>
+                    <div class="contactSearchResult">
+                        <p class="name">Roberto Carlos Díaz Sánchez</p>
+                        <p class="email">roberto.ds@piedrasnegras.tecnm.mx</p>
+                    </div>
+                    <div class="contactSearchResult">
+                        <p class="name">Izan Malillos</p>
+                        <p class="email">izan.mm@piedrasnegras.tecnm.mx</p>
+                    </div> 
+                    -->
+
+                    <!-- 
+                    <div class="message">
+                        <i class="material-icons">person_add_disabled</i>
+                        <p>Su búsqueda no arrojó ningún resultado</p>
+                    </div> 
+                    -->
                 </div>
                 <div id="conversationsListView" class="contacts-list prevent-selection">
                     <!-- <div class="contact">
@@ -123,6 +146,8 @@
                                 }
 
                                 messageView.onkeydown = (e) => {
+                                    // Mensajes se envían con presionar Enter (keyCode = 13).
+                                    // Para un salto de línea, hay que presionar Shift+Enter.
                                     if (e.keyCode == 13 && !e.shiftKey) {
                                         e.preventDefault();
                                         sendMessage();

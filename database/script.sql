@@ -2569,8 +2569,12 @@ CREATE PROCEDURE SP_NuevoMensaje(
 	END;
 	
 	START TRANSACTION;
-		IF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN 
+		IF v_remitente = v_destinatario THEN BEGIN
+			SELECT "0" AS output, "Una persona no puede mantener una conversación consigo misma" AS message;
+
+		END; ELSEIF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN 
 			SELECT "0" AS output, "Uno de los involucrados en este chat no tiene permiso de usarlo" AS message;
+
 		END; ELSE BEGIN
 
 			INSERT INTO `siger`.`mensajes` 
@@ -2706,6 +2710,48 @@ CREATE PROCEDURE SP_ListaConversaciones(
 		`t`.`id_conv`
 	ORDER BY 
 		`timestamp` DESC;
+END;;
+
+
+/*
+	Regresa una lista de usuarios que tienen acceso al chat del SIGER
+	(ya sean residentes en estado 3+ o docentes en estado 1+) que se
+	asemejen al criterio de búsqueda [v_query].
+*/
+delimiter ;;
+DROP PROCEDURE IF EXISTS SP_BusquedaChat;;
+CREATE PROCEDURE SP_BusquedaChat(
+	v_email VARCHAR(64),
+	v_query VARCHAR(256)
+) BEGIN
+	
+	(
+		SELECT
+			r.email AS email,
+			nombreCompleto(r.email) AS nombre
+		FROM
+			residentes AS r
+		WHERE
+			estadoResidente(r.email) >= 3 AND 
+			r.email != v_email AND (
+				SUBSTRING_INDEX(r.email, '@', 1) LIKE CONCAT('%', v_query, '%') OR
+				nombreCompleto(r.email) LIKE CONCAT('%', v_query, '%')
+			)
+	) UNION ALL	(
+		SELECT
+			d.email AS email,
+			nombreCompleto(d.email) AS nombre
+		FROM
+			docentes AS d
+		WHERE
+			estadoDocente(d.email) >= 1 AND 
+			d.email != v_email AND (
+				SUBSTRING_INDEX(d.email, '@', 1) LIKE CONCAT('%', v_query, '%') OR
+				nombreCompleto(d.email) LIKE CONCAT('%', v_query, '%')
+			)
+	) ORDER BY 
+		nombre;
+
 END;;
 
 

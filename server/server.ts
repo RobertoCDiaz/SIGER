@@ -2525,6 +2525,55 @@ server.post('/sendMessage', async (req, res) => {
 });
 
 
+/**
+ * Regresa al cliente una lista de usuarios del SIGER
+ * con acceso al chat que cumplan con un cierto
+ * criterio de búsqueada.
+ * 
+ * 
+ */
+server.get('/buscarEnChat', async (req, res) => {
+    try {
+        if (
+            !req.session.loggedin ||
+            (
+                (await getResidentState(req.session.user.info.email)) < 3 &&
+                (await getDocenteState(req.session.user.info.email)) < 1
+            )
+        ) {
+            res.send(Response.authError());
+            return;
+        }
+
+        const query: string = req.query.q;
+        if (!query) {
+            res.send(Response.notEnoughParams());
+            return;
+        }
+
+        con.query(
+            `call SP_BusquedaChat(?, ?);`,
+            [req.session.user.info.email, query],
+            (e, rows, f) => {
+                if (e) {
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+
+                if (rows[0].length == 0) {
+                    res.send(Response.userError("Su búsqueda no arrojó ningún resultado"));
+                    return;
+                }
+
+                res.send(Response.success(rows[0]));
+            }
+        );
+    } catch (error) {
+        res.send(Response.unknownError(error.toString()));
+    }
+});
+
+
 /* ================================================================================================
 
     Endpoints.
@@ -2611,6 +2660,15 @@ server.get('/chat', async (req, res) => {
         )
     ) {
         res.redirect('/login');
+        return;
+    }
+
+    if (req.query.open && (
+        req.query.open == req.session.user.info.email ||
+        !/(L[0-9]{8})|([A-z]+\.[A-z]{1,2})@piedrasnegras\.tecnm\.mx/.test(req.query.open) || (
+            (await getResidentState(req.query.open)) < 3 && (await getDocenteState(req.query.open)) < 1
+    ))) {
+        res.redirect('/chat');
         return;
     }
         
@@ -2884,7 +2942,7 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
                                 'href': '/home',
                                 'icon': 'home'
                             },
-                            'Lista de residentes': {
+                            'Mis residentes': {
                                 'href': '/mis-residentes',
                                 'icon': 'menu_open'
                             },

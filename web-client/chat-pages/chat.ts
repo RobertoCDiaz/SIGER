@@ -12,22 +12,6 @@ populateUrlGetParametersObject();
 let openedConversationEmail = urlGetParameters['open'] ?? 'noOpenedChat';
 
 
-const copyEmail = () => {
-    const emailInputView: HTMLInputElement = document.getElementById('emailInputView') as HTMLInputElement;
-
-    emailInputView.focus();
-    emailInputView.select();
-    emailInputView.setSelectionRange(0, 99999);
-
-    try {
-        document.execCommand('copy');
-        alert('Correo copiado al portapapeles');
-    } catch (e) {
-        alert(`Ocurrió un error: ${e.toString()}`);
-    }
-}
-
-
 /* ================================================================================================
 
     Clases.
@@ -236,7 +220,7 @@ const displayConversationsList = (list) => {
 const contactView = (convObj: Object) => {
 
     return `
-    <div onclick="changeChat('${convObj['contacto_email']}')" class="contact">
+    <div onclick="changeChat('${convObj['contacto_email']}')" class="contact ${convObj['contacto_email'] == openedConversationEmail ? "active" : ""}">
         <p class="name">${convObj['contacto_nombre']}</p>
         <p class="message" title="${convObj['contenido']}">
             <i class="material-icons">call_${convObj['enviado'] == 1 ? "made" : "received"}</i>
@@ -280,9 +264,93 @@ const sendMessage = () => {
 
 /* ================================================================================================
 
+    Búsqueda de usuarios
+
+================================================================================================ */
+const searchMessageView = (msg: string) => `
+    <div class="message">
+        <i class="material-icons">person_add_disabled</i>
+        <p>${msg}</p>
+    </div> `;
+
+const searchResultView = (resObj: Object) => `
+    <div class="contactSearchResult" onclick="changeChat('${resObj['email']}');" title="Abrir conversación con ${resObj['nombre']}">
+        <i class="material-icons">add_comment</i>
+        <div class="info-container">
+            <p class="name">${resObj['nombre']}</p>
+            <p class="email">${resObj['email']}</p>
+        </div>
+    </div>`;
+
+const clearSearchInput = () => {
+    const searchResultsContainer = document.querySelector('#searchResultsContainer');
+    const conversationsListView = document.querySelector('#conversationsListView');
+    const inputView = document.querySelector('#searchUserInputView') as HTMLInputElement
+
+    conversationsListView.classList.remove('hidden-container');
+    searchResultsContainer.classList.add('hidden-container');
+    inputView.value = '';
+}
+
+(document.querySelector('#searchUserInputView') as HTMLInputElement).oninput = () => {
+    const searchResultsContainer = document.querySelector('#searchResultsContainer');
+    const conversationsListView = document.querySelector('#conversationsListView');
+
+    const query = (document.querySelector('#searchUserInputView') as HTMLInputElement).value.trim();
+    
+    if (query == '') {
+        conversationsListView.classList.remove('hidden-container');
+        searchResultsContainer.classList.add('hidden-container');
+        return;
+    }
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('get', `/buscarEnChat?q=${encodeURI(query)}`, true);
+    
+    xhr.onload = () => {
+        const response = JSON.parse(xhr.response);
+        
+        searchResultsContainer.innerHTML = '';
+        if (response['code'] < 1) {
+            searchResultsContainer.innerHTML = searchMessageView(response['message']);
+        } else {
+            (response['object'] as Object[]).forEach(o => {
+                searchResultsContainer.innerHTML += searchResultView(o);
+            })
+        }
+
+        conversationsListView.classList.add('hidden-container');
+        searchResultsContainer.classList.remove('hidden-container');
+    };
+    
+    xhr.send();
+};
+
+
+/* ================================================================================================
+
     Misceláneo.
 
 ================================================================================================ */
+/**
+ * Copia al portapapeles el correo electrónico del chat abierto.
+ */
+const copyEmail = () => {
+    const emailInputView: HTMLInputElement = document.getElementById('emailInputView') as HTMLInputElement;
+
+    emailInputView.focus();
+    emailInputView.select();
+    emailInputView.setSelectionRange(0, 99999);
+
+    try {
+        document.execCommand('copy');
+        alert('Correo copiado al portapapeles');
+    } catch (e) {
+        alert(`Ocurrió un error: ${e.toString()}`);
+    }
+}
+
+
 /**
  * Abre una conversación.
  * 
@@ -294,6 +362,7 @@ const changeChat = (contactEmail: string) => {
 
     openedConversationEmail = contactEmail;
     triggerChatRetrieval();
+    clearSearchInput();
 }
 
 
@@ -317,6 +386,7 @@ const triggerChatRetrieval = async () => {
         displayConversationsList(listObject);
     } catch (error) {
         alert(error);
+        window.open('/home', '_self');
     }
 }
 
