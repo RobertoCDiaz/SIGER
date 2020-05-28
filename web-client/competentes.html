@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="styles/panelresidencias.css">
+    <title>Asesorías SIGER</title>
+    <style>
+        #seleccionMaterias {
+        counter-reset: li; 
+        list-style: none; 
+        *list-style: decimal; 
+        /*font: 15px 'trebuchet MS', 'lucida sans';*/
+        padding: 0;
+        margin-bottom: 4em;
+        text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    }
+
+    #seleccionMaterias ol {
+        margin: 0 0 0 2em; 
+    }
+
+    #seleccionMaterias li{
+        position: relative;
+        display: block;
+        padding: .4em .4em .4em .8em;
+        *padding: .4em;
+        margin: .5em 0 .5em 2.5em;
+        background: gray;
+        color: white;
+        text-decoration: none;
+        transition: all .3s ease-out;   
+    }
+
+    #seleccionMaterias li:hover{
+        background: navy;
+        cursor: pointer;
+    }   
+
+    #seleccionMaterias li:before{
+        content: counter(li);
+        counter-increment: li;
+        position: absolute; 
+        left: -2.5em;
+        top: 50%;
+        margin-top: -1em;
+        background: navy;
+        height: 2em;
+        width: 2em;
+        line-height: 2em;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    #seleccionMaterias li:after{
+        position: absolute; 
+        content: '';
+        border: .5em solid transparent;
+        left: -1em;
+        top: 50%;
+        margin-top: -.5em;
+        transition: all .3s ease-out;               
+    }
+
+    #seleccionMaterias li:hover:after{
+        left: -.5em;
+        border-left-color: navy;             
+    }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="bar">
+            <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
+                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                <h1 style="margin-left: .5em;">SIGER</h1>
+            </a>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="title">
+            <h1>Contacto con docentes</h1>
+            
+            <p>Por favor, selecciona la materia para la cual necesitas asesoría en tu residencia profesional.</p>
+            <div style="display: flex; flex-direction: row;">
+                <input type="text" id="txtMateria">
+                <br>
+                <div class="button-container">
+                    <button type="button" id="searchButton" class="primary-button">BUSCAR</button>
+                </div>
+            </div>
+            <ol id="seleccionMaterias"></ol>
+        </div>
+        <hr>
+        <div id="container">
+            
+        </div>
+    </div>
+
+    <script src="scripts/menu.js"></script>
+    <script src="scripts/competentes.js"></script>
+
+    <footer>
+        <div class="sections-container">
+        <section>
+            <h2>Integrantes</h2>
+            <div class="section-item">
+                <p>Daniel Hernández Sánchez</p>
+                <p><u>L17430048@piedrasnegras.tecnm.mx</u></p>
+            </div>
+            <div class="section-item">
+                <p>Roberto Carlos Díaz Sánchez</p>
+                <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
+                
+            </div>
+        </section>
+        <section>
+            <h2>Materias</h2>
+            <div class="section-item">
+                <p>Administración de Bases de Datos</p>
+                <p>M. A. y L. Hilda Patricia Beltrán Hernández</p>
+                <p>SCB-1001</p>
+            </div>
+            <div class="section-item">
+                <p>Ingeniería de Software</p>
+                <p>M. C. Flor de María Rivera Sánchez</p>
+                <p>SCD-1011</p>
+            </div>
+            <div class="section-item">
+                <p>Programación Web</p>
+                <p>Ing. Antonio Chávez Soto</p><p>AEB-1055</p>
+            </div>
+        </section>
+        <section>
+            <h2>Enlaces de interés</h2>
+            <div class="section-item">
+                <p><a href="https://github.com/RobertoCDiaz/SIGER">Repositorio en GitHub</a></p>
+                <p><a href="https://piedrasnegrastecnm-my.sharepoint.com/personal/l17430048_piedrasnegras_tecnm_mx/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fl17430048%5Fpiedrasnegras%5Ftecnm%5Fmx%2FDocuments%2FSIGER&ct=1584840570611&or=OWA-NT&cid=e859c527-8ba0-dede-716d-3772606a50e4&originalPath=aHR0cHM6Ly9waWVkcmFzbmVncmFzdGVjbm0tbXkuc2hhcmVwb2ludC5jb20vOmY6L2cvcGVyc29uYWwvbDE3NDMwMDQ4X3BpZWRyYXNuZWdyYXNfdGVjbm1fbXgvRXVYOUhKWktkM3BEbWZaZ1o0bkMxVmtCejlvODY1TVpqWFdJU3BYd0liNWZlQT9ydGltZT1mc3F4ZUFETzEwZw">
+                    Documentación y evidencias
+                </a></p>
+            </div>
+        </section>
+        </div>
+        <p>Instituto Tecnológico de Piedras Negras</p>
+        <p>Ingeniería en Sistemas Computacionales</p>
+    </footer>
+</body>
+</html>
