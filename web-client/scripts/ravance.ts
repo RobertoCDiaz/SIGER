@@ -185,6 +185,41 @@ const getRevisoresA=()=>
 }
 getRevisoresA();
 
+
+let route;
+const getCartaAceptacionA = () =>
+        {
+            let ca = new XMLHttpRequest();
+            ca.open('get',`/muestra-carta-aceptacion-a`, false);
+            ca.onload = () =>
+            {
+                let response = JSON.parse(ca.responseText);
+                if(response['message']==1)
+                {
+                    route = response['ruta'];
+                    let ts=Number.parseInt(String(response['fecha']));
+                    const fecha = timemstampString(ts);
+                    let tl = document.getElementById('timelinedef');
+                    let contright = document.createElement('div');
+                    contright.className='container left';
+                    let cont = document.createElement('div');
+                    cont.className='contentt';
+                    let title = document.createElement('h2');
+                    title.style.cursor='pointer';
+                    title.innerText='Carta de aceptación subida al sistema';
+                    title.id = 'linkCartaAceptacion';
+                    let inf = document.createElement('p');
+                    inf.innerText = 'Fecha: '+ fecha;
+                    cont.appendChild(title);
+                    cont.appendChild(inf);
+                    contright.appendChild(cont);
+                    tl.appendChild(contright);
+                }
+            }
+            ca.send();
+        };
+        getCartaAceptacionA();
+
 const getCal1A=()=>
 {
     let d = new XMLHttpRequest();d.open('get',`/asesor-cal1`,false);
@@ -212,7 +247,7 @@ const getCal1A=()=>
 
             let tl = document.getElementById('timelinedef');
             let contright = document.createElement('div');
-            contright.className='container left';
+            contright.className='container right';
             let cont = document.createElement('div');
             cont.className='contentt';
             let title = document.createElement('h2');
@@ -393,6 +428,7 @@ const createLinksA = (id: number) => {
     const linkA29_1 = document.getElementById('linkAnexo29_1');
     const linkA29_2 = document.getElementById('linkAnexo29_2');
     const linkA30 = document.getElementById('linkAnexo30');
+    const linkCarta = document.getElementById('linkCartaAceptacion');
 
     getDocumentosA(id).then(docs => {
 
@@ -431,6 +467,15 @@ const createLinksA = (id: number) => {
                 });
             }
                 
+        }
+
+        if(docs.carta_aceptacion)
+        {
+            if(linkCarta)
+                linkCarta.addEventListener('click',()=>
+                {
+                    location.href=`siger-cloud/files/`+String(route);
+                });
         }
         
 

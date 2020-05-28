@@ -2453,6 +2453,68 @@ CREATE PROCEDURE SP_AgregarCartaDeAceptacion(
 	COMMIT;
 END;;
 
+DROP PROCEDURE IF EXISTS SP_AgregarCartaDeAceptacion;;
+CREATE PROCEDURE SP_AgregarCartaDeAceptacion(
+	v_id_residencia INT,
+	v_ruta VARCHAR(128)
+) BEGIN
+	DECLARE exit handler for SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1
+		@p2 = MESSAGE_TEXT;
+		
+		SELECT "-1" AS output, @p2 AS message;
+		
+		ROLLBACK;
+	END;
+	
+	START TRANSACTION;
+
+		IF residenciaAprobada(v_id_residencia) != 1 THEN BEGIN
+
+			SELECT "0" AS output, "No se puede anexar una carta de aceptación a esta residencia" AS message;
+
+		END; ELSE BEGIN
+
+			INSERT INTO
+				cartas_aceptacion (`ruta`, `timestamp`, `id_residencia`)
+			VALUES
+				(v_ruta, UNIX_TIMESTAMP() * 1000, v_id_residencia);
+
+				SELECT "1" AS output, "Transaction committed successfully" AS message;
+
+		END; END IF;
+	COMMIT;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_MostrarMaterias;;
+CREATE PROCEDURE SP_MostrarMaterias()
+BEGIN
+	select nombre, clave from materias order by nombre;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_ListaCompetentes;;
+CREATE PROCEDURE SP_ListaCompetentes(
+v_materia VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    docentes.email, nombreCompleto(docentes.email) as nombre from docentes join competente
+	on docentes.email = competente.email_docente join materias
+	on competente.clave_materia = materias.clave where materias.nombre = v_materia
+    and docenteConfirmado(docentes.email) = 1;
+END;;
+
+DROP PROCEDURE IF EXISTS SP_MostrarCartaAceptacion(
+v_email VARCHAR(64)
+)
+BEGIN
+	select "1" as output, "Transaction commited successfully" AS message,
+    ruta, timestamp as fecha from residencias join cartas_aceptacion
+	on residencias.idresidencia = cartas_aceptacion.id_residencia
+	where residencias.email_residente =v_email;
+END
+
 
 DELIMITER ;
 

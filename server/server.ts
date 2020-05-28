@@ -629,7 +629,7 @@ server.get('/avance-proyecto', (req, res) => {
     }
 
     getResidentState(req.session.user.info.email).then(state => {
-        if (state != 2) {
+        if (state < 2) {
             res.redirect('/home');
             return;
         }
@@ -776,6 +776,80 @@ server.get('/revisores',(req,res)=>
             const am2 = String(rows[0][1]['am']);
 
             res.json({message:message,n1:n1,ap1:ap1,am1:am1,n2:n2,ap2:ap2,am2:am2});
+        } catch (e) {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/muestra-carta-aceptacion',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarCartaAceptacion(?);',
+    [
+        req.session.user.info.email
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try {
+            const message = 1;
+            const ruta = String(rows[0][0]['ruta']);
+            const fecha = String(rows[0][0]['fecha']);
+            res.json({message:message,ruta:ruta,fecha:fecha});
+        } catch (e) {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
+});
+
+server.get('/muestra-carta-aceptacion-a',(req,res)=>
+{
+    if (!req.session.loggedin) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (!UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.DOCENTE)) {
+        res.redirect('/home');
+        return;
+    }
+    con.query('call SP_MostrarCartaAceptacion(?);',
+    [
+        req.session.user.info.residente
+    ],
+    (er,rows,fields)=>
+    {
+        if(er)
+        {
+            console.log(er);
+            return;
+        }
+        try {
+            const message = 1;
+            const ruta = String(rows[0][0]['ruta']);
+            const fecha = String(rows[0][0]['fecha']);
+            res.json({message:message,ruta:ruta,fecha:fecha});
         } catch (e) {
             if(e instanceof TypeError)
             {
@@ -3261,6 +3335,80 @@ server.get('/getReportePreliminar', (req, res) => {
     }).catch(errorMsg => 
         res.send(Response.unknownError(errorMsg))
     );
+});
+
+server.get('/docentes-competentes',(req,res)=> {
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.send(Response.authError());
+        return;
+    }
+
+    res.sendFile("competentes.html", { root: "../web-client/" });
+    return;  
+});
+
+/**
+ * Regresa al cliente una lista de las materias en la base de datos. 
+ * 
+ * Si ocurre algún error, regresará un objeto de error al cliente.
+ */
+server.get('/listaSimpleMaterias', (req, res) => {
+    con.query(
+        `call SP_MostrarMaterias()`,
+        (e, rows, f) => {
+            if (e) {
+                res.send(Response.unknownError(e.toString()));
+                return;
+            }
+
+            res.send(Response.success(rows[0]));
+        }
+    );
+});
+
+/**
+ * Regresa al cliente la lista de docentes capacitados para dar
+ * asesoría con la materia especificada.
+ * 
+ * @param id ID de la materia en la que se requiere asesoría.
+ */
+server.get('/lista-competentes',(req,res)=>
+{
+    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
+        res.send(Response.authError());
+        return;
+    }
+    con.query('call SP_ListaCompetentes(?);',
+    [
+        req.query.materia
+    ],
+    (e,rows,f)=>
+    {
+        if(e)
+        {
+            console.log(e);
+            return;
+        }
+        try
+        {
+            let competentes=[{}];
+            competentes.pop();
+            for(let i = 0; i < rows[0].length; i++)
+            {
+                competentes.push(rows[0][i]);
+            }
+            competentes.push({length:rows[0].length});
+            res.json(competentes);
+        }
+        catch(e)
+        {
+            if(e instanceof TypeError)
+            {
+                const message = 0;
+                res.json({message:message});
+            }
+        }
+    });
 });
 
 /* ================================================================================================
