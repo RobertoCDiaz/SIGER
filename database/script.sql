@@ -2622,7 +2622,8 @@ BEGIN
     and docenteConfirmado(docentes.email) = 1;
 END;;
 
-DROP PROCEDURE IF EXISTS SP_MostrarCartaAceptacion(
+DROP PROCEDURE IF EXISTS SP_MostrarCartaAceptacion;;
+CREATE PROCEDURE SP_MostrarCartaAceptacion(
 v_email VARCHAR(64)
 )
 BEGIN
@@ -2630,7 +2631,7 @@ BEGIN
     ruta, timestamp as fecha from residencias join cartas_aceptacion
 	on residencias.idresidencia = cartas_aceptacion.id_residencia
 	where residencias.email_residente =v_email;
-END
+END;;
 
 
 /*
