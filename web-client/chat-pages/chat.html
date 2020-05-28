@@ -133,9 +133,32 @@
                         const messagesContainer = document.getElementById('messagesContainer');
                     </script>
                     <div class="writer-container">
+                        <div id="attachedFilesContainer" class="attachedFiles hidden-container">
+                            <p class="title">Archivos anexados:</p>
+                            <div id="attachedFilesListView" class="list">
+                                <div class="file">
+                                    <i class="material-icons">close</i>
+                                    <p class="name">p6.5.pdf</p>
+                                </div>
+                                <div class="file">
+                                    <i class="material-icons">close</i>
+                                    <p class="name">p6.5.pdf</p>
+                                </div>
+                                <div class="file">
+                                    <i class="material-icons">close</i>
+                                    <p class="name">p6.5.pdf</p>
+                                </div>
+                                <div class="file">
+                                    <i class="material-icons">close</i>
+                                    <p class="name">p6.5.pdf</p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="writer">
+                            <i onclick="openFilePicker();" class="material-icons" title="Anexar un archivo">attach_file</i>
+                            <input id="fileInput" type="file" hidden multiple>
                             <textarea id="messageView" rows="1" type="text" placeholder="Mensaje..."></textarea>
-                            <i onclick="sendMessage();" class="material-icons" title="Enviar mensaje">send</i>
+                            <i onclick="sendMessage();" class="primary material-icons" title="Enviar mensaje">send</i>
                             <script>
                                 const messageView = document.getElementById('messageView');
                                 messageView.oninput = (e) => {

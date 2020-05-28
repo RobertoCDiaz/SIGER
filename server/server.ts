@@ -85,11 +85,27 @@ server.use('/siger-cloud/files/residencias/:id', (req, res, next) => {
                 res.redirect('/home');
                 return;
             }
-
+            
             next();
         }
-    )
+    );
 });
+   
+
+/**
+ * Solo aquellos participantes de una conversación tiene acceso a los
+ * archivos anexados en algún mensaje de dicha conversación.
+ */
+server.use('/siger-cloud/files/conversaciones/:convID', (req, res, next) => {
+    if (!(req.params.convID as string).includes(req.session.user.info.email)) {
+        // TODO: Agregar pantalla de acceso no autorizado.
+        res.redirect('/home')
+        return;
+    }
+
+    next();
+});
+
 server.use('/siger-cloud/files', express.static("files/"));
 
 
@@ -2512,10 +2528,25 @@ server.post('/sendMessage', async (req, res) => {
                 }
 
                 const newMessageID = rows[1][0]['id_mensaje'];
+                const conversationID = rows[1][0]['id_conversacion'];
 
-                res.send(Response.success({
-                    new_id: newMessageID
-                }));
+                const filesArr: any[] = Object.keys(req.files).map(key => req.files[key]);
+
+                if (filesArr.length == 0) {
+                    res.send(Response.success());
+                    return;
+                }
+
+                let errorList: string[] = [];
+                anexarArchivosAMensaje(
+                    newMessageID, conversationID, filesArr, filesArr.length,
+                    () => {
+                        res.send(Response.success({'errorList': errorList}));
+                    }, (errorMsg) => {
+                        errorList.push(errorMsg);
+                        console.log(errorMsg);
+                    }
+                )
             }
         );
     
@@ -2572,6 +2603,46 @@ server.get('/buscarEnChat', async (req, res) => {
         res.send(Response.unknownError(error.toString()));
     }
 });
+
+
+const anexarArchivosAMensaje = (msgID: number, convID: string, filesArr: any[], filesCount: number, onDone: () => void, onError: (error: string) => void) => {
+    const actualFile = filesArr[filesCount - 1];
+    const d = new Date();
+    const dateString: string = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`;
+    const fileRoute = `conversaciones/${convID}/${dateString}-${actualFile.name}`;
+
+    actualFile.mv(`files/${fileRoute}`, mvError => {
+        if (mvError) {
+            onError(mvError.toString());
+
+            if (filesCount > 1) {
+                anexarArchivosAMensaje(msgID, convID, filesArr,filesCount - 1, onDone, onError);
+                return;
+            }
+
+            onDone();
+        } else {
+            con.query(
+                `call SP_NuevoArchivo(?, ?, ?);`,
+                [msgID, fileRoute, actualFile.name],
+                (e, rows, f) => {
+                    if (e) {
+                        onError(e.toString());
+                    } else if (rows[0][0]['output'] < 1) {
+                        onError(rows[0][0]['message']);
+                    }
+        
+                    if (filesCount > 1) {
+                        anexarArchivosAMensaje(msgID, convID, filesArr,filesCount - 1, onDone, onError);
+                        return;
+                    }
+        
+                    onDone();
+                }
+            )    
+        }
+    });
+};
 
 
 /* ================================================================================================

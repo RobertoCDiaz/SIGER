@@ -9,7 +9,7 @@ populateUrlGetParametersObject();
 /**
  * Email del contacto cuyo chat está actualmente abierto.
  */
-let openedConversationEmail = urlGetParameters['open'] ?? 'noOpenedChat';
+let openedConversationEmail = urlGetParameters['open'];
 
 
 /* ================================================================================================
@@ -17,7 +17,9 @@ let openedConversationEmail = urlGetParameters['open'] ?? 'noOpenedChat';
     Clases.
 
 ================================================================================================ */
-
+/**
+ * Modelo de un mensaje recibido desde el servidor.
+ */
 class Message {
     id: number;
     content: string;
@@ -73,7 +75,7 @@ const getConversationWith = (withEmail: string) => new Promise<Object>((resolve,
         const conversation = {};
         (response['object'][0] as Object[]).map(o => new Message(o, withEmail)).forEach(msg => {
             const d = msg.date;
-            const displayDate = `${d.getDate()} / ${d.getMonth()} / ${d.getFullYear()}`;
+            const displayDate = `${d.getDate()} / ${d.getMonth() + 1} / ${d.getFullYear()}`;
 
             if (!conversation[displayDate])
                 conversation[displayDate] = [];
@@ -232,19 +234,102 @@ const contactView = (convObj: Object) => {
 
 /* ================================================================================================
 
+    Anexar archivos.
+
+================================================================================================ */
+/**
+ * Contienen todos los archivos actualmente anexados al mensaje en marcha.
+ */
+let attachedFiles: Object = {};
+
+
+/**
+ * Función que acciona el selector de archivos del navegador.
+ */
+const openFilePicker = () => {
+    const fileInput: HTMLInputElement = document.querySelector('#fileInput');
+    fileInput.click();
+}
+
+
+/**
+ * Estructura HTML de una archivo anexado.
+ * 
+ * @param file Archivo a mapear.
+ */
+const attachedFileView = (file: File) => `
+    <div class="file">
+        <i class="material-icons" onclick="unattachFile('${file.name}');">close</i>
+        <p class="name">${file.name}</p>
+    </div>`;
+
+
+/**
+ * Al seleccionar uno o más archivos desde el selector del navegador,
+ * estos archivos son agregados al objeto que mantiene un control de todos
+ * los archivos anexados al mensaje actual.
+ */
+(document.querySelector('#fileInput') as HTMLInputElement).oninput = () => {
+    const fileInput: HTMLInputElement = document.querySelector('#fileInput');
+
+    Array.from(fileInput.files).forEach(f => attachedFiles[f.name] = f);
+
+    updateAttachedFilesUI();
+};
+
+
+/**
+ * Actualiza la parte de la UI encargada de mostrar los archivos
+ * anexados al mensaje actual.
+ */
+const updateAttachedFilesUI = () => {
+    const attachedFilesContainer = document.querySelector('#attachedFilesContainer');
+    const attachedFilesListView = document.querySelector('#attachedFilesListView');
+
+    if (Object.keys(attachedFiles).length == 0)  {
+        attachedFilesContainer.classList.add('hidden-container');
+        return;
+    }
+    
+    attachedFilesContainer.classList.remove('hidden-container');
+    
+    attachedFilesListView.innerHTML = '';
+    Object.keys(attachedFiles).forEach(k => {
+        attachedFilesListView.innerHTML += attachedFileView(attachedFiles[k]);
+    });
+}
+
+
+/**
+ * Quita de la lista de archivos anexados un archivo.
+ * 
+ * @param fileNameKey Nombre del archivo a eliminar.
+ */
+const unattachFile = (fileNameKey: string) => {
+    if (delete attachedFiles[fileNameKey]) {
+        console.log(`unattaching ${fileNameKey}`);
+        updateAttachedFilesUI();
+    }
+}
+
+/* ================================================================================================
+
     Enviar mensajes.
 
 ================================================================================================ */
+/**
+ * Desencadena el proceso que envía un mensaje, además de anexarle
+ * los archivos necesarios (si es que lo requiere)/
+ */
 const sendMessage = () => {
     const messageView: HTMLTextAreaElement = document.querySelector('#messageView') as HTMLTextAreaElement;
     const msg: string = messageView.value.trim();
 
-    if (msg == '')
+    if (msg == '' || !openedConversationEmail)
         return;
     
     let xhr = new XMLHttpRequest();
     xhr.open('post', `/sendMessage`, true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
@@ -254,11 +339,26 @@ const sendMessage = () => {
             return;
         }
 
+        // Limpiar escritor.
         messageView.value = '';
+        Object.keys(attachedFiles).forEach(k => delete attachedFiles[k]);
+        updateAttachedFilesUI();
+
         triggerChatRetrieval();
     };
 
-    xhr.send(`content=${encodeURI(msg)}&toEmail=${encodeURI(openedConversationEmail)}`);
+    let data: FormData = new FormData();
+    data.append('content', msg);
+    data.append('toEmail', openedConversationEmail);
+
+    let fileIdx: number = 0;
+    Object.keys(attachedFiles).forEach(key => {
+        data.append(`file${fileIdx}`, attachedFiles[key]);
+
+        ++fileIdx;
+    });
+
+    xhr.send(data);
 }
 
 
@@ -267,21 +367,35 @@ const sendMessage = () => {
     Búsqueda de usuarios
 
 ================================================================================================ */
+/**
+ * Estructura HTML para mostrar mensajes, sobre todo, de error.
+ * @param msg Mensaje a mostrar.
+ */
 const searchMessageView = (msg: string) => `
     <div class="message">
         <i class="material-icons">person_add_disabled</i>
         <p>${msg}</p>
     </div> `;
 
-const searchResultView = (resObj: Object) => `
-    <div class="contactSearchResult" onclick="changeChat('${resObj['email']}');" title="Abrir conversación con ${resObj['nombre']}">
+
+/**
+ * Representa en HTML un resultado de búsqueda.
+ * 
+ * @param resultObject Objeto a mapear.
+ */
+const searchResultView = (resultObject: Object) => `
+    <div class="contactSearchResult" onclick="changeChat('${resultObject['email']}');" title="Abrir conversación con ${resultObject['nombre']}">
         <i class="material-icons">add_comment</i>
         <div class="info-container">
-            <p class="name">${resObj['nombre']}</p>
-            <p class="email">${resObj['email']}</p>
+            <p class="name">${resultObject['nombre']}</p>
+            <p class="email">${resultObject['email']}</p>
         </div>
     </div>`;
 
+
+/**
+ * Limpia el buscador, además de esconder el panel de resultados.
+ */
 const clearSearchInput = () => {
     const searchResultsContainer = document.querySelector('#searchResultsContainer');
     const conversationsListView = document.querySelector('#conversationsListView');
@@ -292,6 +406,11 @@ const clearSearchInput = () => {
     inputView.value = '';
 }
 
+
+/**
+ * Se encarga de hace la búsqueda de usuarios del SIGER cada vez
+ * que el input de búsqueda es editado.
+ */
 (document.querySelector('#searchUserInputView') as HTMLInputElement).oninput = () => {
     const searchResultsContainer = document.querySelector('#searchResultsContainer');
     const conversationsListView = document.querySelector('#conversationsListView');
@@ -359,6 +478,8 @@ const copyEmail = () => {
 const changeChat = (contactEmail: string) => {
     // Limpia el cuadro de escritura.
     (document.querySelector('#messageView') as HTMLTextAreaElement).value = '';
+    Object.keys(attachedFiles).forEach(k => delete attachedFiles[k]);
+    updateAttachedFilesUI();
 
     openedConversationEmail = contactEmail;
     triggerChatRetrieval();
@@ -370,19 +491,14 @@ const changeChat = (contactEmail: string) => {
  * Desencadena todo el proceso para cargar un chat en 
  * pantalla, además de encargarse de hacer la petición
  * para actualizar dicho chat cada cierto tiempo.
- * 
- * @param email Correo del otro usuario.
  */
 const triggerChatRetrieval = async () => {
-    const email = openedConversationEmail;
-    if (!email)
-        return;
-
     try {
-        const conversationObject = await getConversationWith(email);
+        if (openedConversationEmail) {
+            const conversationObject = await getConversationWith(openedConversationEmail);
+            displayConversation(conversationObject);
+        }
         const listObject = await getConversationsList();
-
-        displayConversation(conversationObject);
         displayConversationsList(listObject);
     } catch (error) {
         alert(error);

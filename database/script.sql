@@ -438,10 +438,11 @@ CREATE TABLE IF NOT EXISTS `siger`.`archivos` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `ruta` VARCHAR(256) NOT NULL,
   `nombre` VARCHAR(128) NOT NULL,
-  `tipo` INT NOT NULL,
+  `tipo` INT NOT NULL DEFAULT 0,
   `id_mensaje` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_archivos_mensajes1_idx` (`id_mensaje` ASC), -- VISIBLE,
+  UNIQUE INDEX `ruta_UNIQUE` (`ruta` ASC), -- VISIBLE,
   CONSTRAINT `fk_archivos_mensajes1`
     FOREIGN KEY (`id_mensaje`)
     REFERENCES `siger`.`mensajes` (`id`)
@@ -2584,7 +2585,9 @@ CREATE PROCEDURE SP_NuevoMensaje(
 	
 			SELECT "1" AS output, "Transaction committed successfully" AS message;
 
-			SELECT LAST_INSERT_ID() AS id_mensaje;
+			SELECT 
+				LAST_INSERT_ID() AS `id_mensaje`, 
+				idConversacion(v_remitente, v_destinatario) AS `id_conversacion`;
 
 		END; END IF;
 	COMMIT;
@@ -2600,8 +2603,7 @@ DROP PROCEDURE IF EXISTS SP_NuevoArchivo;;
 CREATE PROCEDURE SP_NuevoArchivo(
 	v_id_mensaje INT,
 	v_ruta VARCHAR(256),
-	v_nombre VARCHAR(256),
-	v_tipo INT
+	v_nombre VARCHAR(256)
 ) BEGIN
 	DECLARE exit handler for SQLEXCEPTION
 	BEGIN
@@ -2619,7 +2621,7 @@ CREATE PROCEDURE SP_NuevoArchivo(
 		-- END; ELSE BEGIN
 
 			INSERT INTO `siger`.`archivos` (`ruta`, `nombre`, `tipo`, `id_mensaje`)
-			VALUES (v_ruta, v_nombre, v_tipo, v_id_mensaje);
+			VALUES (v_ruta, v_nombre, DEFAULT, v_id_mensaje);
 
 			SELECT "1" AS output, "Transaction committed successfully" AS message;
 
@@ -2718,7 +2720,6 @@ END;;
 	(ya sean residentes en estado 3+ o docentes en estado 1+) que se
 	asemejen al criterio de búsqueda [v_query].
 */
-delimiter ;;
 DROP PROCEDURE IF EXISTS SP_BusquedaChat;;
 CREATE PROCEDURE SP_BusquedaChat(
 	v_email VARCHAR(64),
