@@ -2565,15 +2565,15 @@ server.post('/sendMessage', async (req, res) => {
                     return;
                 }
 
+                if (!req.files) {
+                    res.send(Response.success());
+                    return;
+                }
+
                 const newMessageID = rows[1][0]['id_mensaje'];
                 const conversationID = rows[1][0]['id_conversacion'];
 
                 const filesArr: any[] = Object.keys(req.files).map(key => req.files[key]);
-
-                if (filesArr.length == 0) {
-                    res.send(Response.success());
-                    return;
-                }
 
                 let errorList: string[] = [];
                 anexarArchivosAMensaje(
