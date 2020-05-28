@@ -2887,12 +2887,11 @@ const getPetition = (url) => new Promise<Object>((resolve, reject) => {
  */
 server.get('/asesorias', async (req, res) => {
     try {
-        if (!req.session.loggedin || UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE) || (await getResidentState(req.session.user.info.email)) < 3) {
+        if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE) || (await getResidentState(req.session.user.info.email)) < 3) {
             throw new Error("No tiene acceso a esta sección del sistema");
         }
     
-        // TODO: Enlazar a .html de panel de asesorías.
-        res.res.sendFile('file', { root: '../web-client/'});    
+        res.sendFile("competentes.html", { root: "../web-client/" });
     } catch (error) {
         res.redirect('/home');
     }
@@ -3735,15 +3734,6 @@ server.get('/getReportePreliminar', (req, res) => {
     );
 });
 
-server.get('/docentes-competentes',(req,res)=> {
-    if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
-        res.send(Response.authError());
-        return;
-    }
-
-    res.sendFile("competentes.html", { root: "../web-client/" });
-    return;  
-});
 
 /**
  * Regresa al cliente una lista de las materias en la base de datos. 
