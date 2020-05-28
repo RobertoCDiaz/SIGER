@@ -229,6 +229,41 @@ html, body {
 .chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .hour {
   font-size: 12px;
 }
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles {
+  border: 1px solid var(--gray-border-color);
+  border-radius: 4px;
+  align-self: center;
+  overflow: hidden;
+  width: 100%;
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > p {
+  padding: 0.5em;
+  background-color: var(--gray-border-color);
+  color: white;
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > .list {
+  background-color: white;
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > .list > .file {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.25em;
+  background-color: white;
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > .list > .file * {
+  color: var(--primary-text);
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > .list > .file > i {
+  margin-right: 0.5em;
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > .list > .file:hover {
+  background-color: gray;
+}
+.chat-window-container > .chat-window > .messages-side > .chat > .messages-container > .message > .attachedFiles > .list > .file:hover * {
+  color: white;
+}
 .chat-window-container > .chat-window > .messages-side > .chat > .writer-container {
   padding: 0.5em;
   border-top: 1px solid var(--gray-border-color);

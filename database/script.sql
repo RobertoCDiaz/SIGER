@@ -1187,6 +1187,31 @@ CREATE FUNCTION idConversacion(
 END;;
 
 
+/*
+	Determina si el usuario con email [v_email]
+	tiene o no acceso al mensaje con id [v_msg_id]. En
+	caso de tener acceso, la función regresará 1.
+	De otra forma, regresará 0.
+*/
+DROP FUNCTION IF EXISTS accesoAlMensaje;;
+CREATE FUNCTION accesoAlMensaje(
+	v_email VARCHAR(64),
+	v_msg_id INT
+) RETURNS INT DETERMINISTIC BEGIN
+	RETURN (
+		SELECT 
+			COUNT(*) 
+		FROM 
+			`siger`.`mensajes` AS `m` 
+		WHERE 
+			`m`.`id` = v_msg_id AND (
+				`m`.`remitente_email` = v_email OR 
+				`m`.`destinatario_email` = v_email
+			)
+	);
+END;;
+
+
 /* --------------------------------------------------------
 
 	STORED PROCEDURES.
@@ -2752,6 +2777,39 @@ CREATE PROCEDURE SP_BusquedaChat(
 			)
 	) ORDER BY 
 		nombre;
+
+END;;
+
+
+/*
+	Regresa una tabla con los archivos adjuntos al
+	mensaje con id [v_id], siempre y cuando
+	el usuario con email [v_email] tenga acceso
+	al mensaje.
+
+	La estructura de la tabla resultado es exactamente
+	la misma que la tabla [siger.archivos].
+*/
+DROP PROCEDURE IF EXISTS SP_ArchivosDeMensaje;;
+CREATE PROCEDURE SP_ArchivosDeMensaje(
+	v_id INT,
+	v_email VARCHAR(64)
+) BEGIN
+
+	IF accesoAlMensaje(v_email, v_id) < 1 THEN BEGIN
+		SELECT "0" AS output, "No tiene acceso a este mensaje" AS message;
+
+	END; ELSE BEGIN 
+		SELECT "1" AS output, "Sí tiene acceso al mensaje" AS message;
+
+		-- Segunda tabla, con los archivos.
+		SELECT 
+			*
+		FROM
+			`siger`.`archivos` AS `a`
+		WHERE
+			`a`.`id_mensaje` = v_id;
+	END; END IF;
 
 END;;
 

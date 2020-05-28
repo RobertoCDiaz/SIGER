@@ -29,6 +29,7 @@ class Message {
     receiver_email: string;
     receiver_fullname: string;
     isMine: boolean;
+    attachedFiles: AttachedFile[];
 
     constructor(obj: Object, receiverEmail: string) {
         this.id = obj['id'];
@@ -38,8 +39,25 @@ class Message {
         this.remitent_fullname = obj['nombre_email1'];
         this.receiver_email = obj['destinatario_email'];
         this.receiver_fullname = obj['nombre_email2'];
+        this.attachedFiles = obj['archivos'].map(o => new AttachedFile(o));
 
         this.isMine = this.receiver_email == receiverEmail;
+    }
+}
+
+
+/**
+ * Modelo que representa a un archivo de la base de datos.
+ */
+class AttachedFile {
+    id: number;
+    route: string;
+    name: string;
+
+    constructor(obj: Object) {
+        this.id = obj['id'];
+        this.route = obj['ruta'];
+        this.name = obj['nombre'];
     }
 }
 
@@ -113,12 +131,26 @@ const daySeparatorView = (displayDate: string) =>
  */
 const msgView = (msg: Message) => `
 <div class="message ${msg.isMine ? "mine" : ""}">
+<div class="attachedFiles ${msg.attachedFiles.length == 0 ? "hidden-container" : ""}">
+    <p>Archivos anexados</p>
+    <div class="list">
+        ${msg.attachedFiles.map(f => `
+            <div class="file" onclick="openAttachedFile('${f.route}');">
+                <i class="material-icons">attachment</i>
+                <p class="name">${f.name}</p>
+            </div>
+        `).join("")}
+    </div>
+    </div>
     <p class="content">
         ${msg.content}
     </p>
     <p class="hour prevent-selection">${twoDigits(msg.date.getHours())}:${twoDigits(msg.date.getMinutes())}</p>
-</div>
-`
+</div>`;
+
+const openAttachedFile = (route: string) => window.open(`/siger-cloud/files/${route}`);
+
+// const attachedFilesViews = (files: AttachedFile[]) => 
 
 /**
  * Regresa un string de dos caracteres representando un número
@@ -482,8 +514,11 @@ const changeChat = (contactEmail: string) => {
     updateAttachedFilesUI();
 
     openedConversationEmail = contactEmail;
-    triggerChatRetrieval();
     clearSearchInput();
+    triggerChatRetrieval(() => {
+        const messagesContainer = document.querySelector('#messagesContainer');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
 }
 
 
@@ -492,7 +527,7 @@ const changeChat = (contactEmail: string) => {
  * pantalla, además de encargarse de hacer la petición
  * para actualizar dicho chat cada cierto tiempo.
  */
-const triggerChatRetrieval = async () => {
+const triggerChatRetrieval = async (onDone: () => void = () => {}) => {
     try {
         if (openedConversationEmail) {
             const conversationObject = await getConversationWith(openedConversationEmail);
@@ -500,6 +535,8 @@ const triggerChatRetrieval = async () => {
         }
         const listObject = await getConversationsList();
         displayConversationsList(listObject);
+
+        onDone();
     } catch (error) {
         alert(error);
         window.open('/home', '_self');

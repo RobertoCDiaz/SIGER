@@ -2405,43 +2405,81 @@ server.post('/anexarCartaAceptacion', async (req, res) => {
  * 
  * Una conversación consiste en el conjunto de mensajes
  * intercambiados entre dos usuarios, ordenados de manera
- * cronológica. Este será el primer elemento del arreglo 
+ * cronológica, además de los archivos adjuntos a cada 
+ * mensaje. Este será el primer elemento del arreglo 
  * enviado al cliente.
  * 
  * El segundo es un arreglo con los nombres completos de 
  * los involucrados en la conversación.
  */
 server.get('/getChatConversation', async (req, res) => {
-    if (
-        !req.session.loggedin ||
-        (
-            (await getResidentState(req.session.user.info.email)) < 3 &&
-            (await getDocenteState(req.session.user.info.email)) < 1
-        )
-    ) {
-        res.send(Response.authError());
-        return;
-    }
+    try {
+        if (
+            !req.session.loggedin ||
+            (
+                (await getResidentState(req.session.user.info.email)) < 3 &&
+                (await getDocenteState(req.session.user.info.email)) < 1
+            )
+        ) {
+            res.send(Response.authError());
+            return;
+        }
+    
+        const withEmail: string = req.query.with;
+        if (!withEmail) {
+            res.send(Response.notEnoughParams());
+            return;
+        }
+    
+        con.query(
+            `call SP_GetConversacion(?, ?);`,
+            [req.session.user.info.email, withEmail],
+            async (e, rows, f) => {
+                if (e) {
+                    res.send(Response.unknownError(e.toString()));
+                    return;
+                }
+    
+                for (let i = 0; i < rows[0].length; ++i) {
+                    rows[0][i]['archivos'] = await getArchivosDeUnMensaje(rows[0][i]['id'], req.session.user.info.email);
+                }
 
-    const withEmail: string = req.query.with;
-    if (!withEmail) {
-        res.send(Response.notEnoughParams());
-        return;
+                res.send(Response.success([
+                    // Arreglo con los mensajes.
+                    rows[0],
+                    // Nombres de los involucrados.    
+                    rows[1][0]
+                ]));
+            }
+        );
+    } catch (error) {
+        res.send(Response.unknownError(error.toString()));
     }
+});
 
+
+/**
+ * Regresa los archivos anexados a un mensaje.
+ * 
+ * @param msgId ID del mensaje.
+ * @param email Email de solicitante.
+ */
+const getArchivosDeUnMensaje = (msgId: number, email: string) => new Promise((resolve, reject) => {
     con.query(
-        `call SP_GetConversacion(?, ?);`,
-        [req.session.user.info.email, withEmail],
+        `call SP_ArchivosDeMensaje(?, ?);`,
+        [msgId, email],
         (e, rows, f) => {
             if (e) {
-                res.send(Response.unknownError(e.toString()));
+                reject(e.toString());
                 return;
             }
 
-            res.send(Response.success([
-                rows[0],        // Arreglo con los mensajes.
-                rows[1][0]      // Nombres de los involucrados.
-            ]));
+            if (rows[0][0]['output'] < 1) {
+                reject(rows[0][0]['message']);
+                return;
+            }
+
+            resolve(rows[1]);
         }
     );
 });
@@ -2561,7 +2599,7 @@ server.post('/sendMessage', async (req, res) => {
  * con acceso al chat que cumplan con un cierto
  * criterio de búsqueada.
  * 
- * 
+ * @param req.query.q Criterio de búsqueda.
  */
 server.get('/buscarEnChat', async (req, res) => {
     try {
@@ -2605,7 +2643,17 @@ server.get('/buscarEnChat', async (req, res) => {
 });
 
 
-const anexarArchivosAMensaje = (msgID: number, convID: string, filesArr: any[], filesCount: number, onDone: () => void, onError: (error: string) => void) => {
+/**
+ * Rutina recursiva que anexa a un mensaje un conjunto de archivos.
+ * 
+ * @param msgID ID del mensaje al cual anexar los archivos.
+ * @param convID ID de la conversación del mensaje, para comprobar acceso.
+ * @param filesArr Arreglo de archivos a asociar.
+ * @param filesCount Largo del arreglo de archivos.
+ * @param onDone Qué hacer cuando termine la asociación de todos los archivos.
+ * @param onError Si ocurriese algún error en alguna asociación, esto se ejecutará.
+ */
+const anexarArchivosAMensaje = (msgID: number, convID: string, filesArr: any[], filesCount: number, onDone: () => void, onError: (errorMsg: string) => void) => {
     const actualFile = filesArr[filesCount - 1];
     const d = new Date();
     const dateString: string = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`;
