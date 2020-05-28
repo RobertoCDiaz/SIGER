@@ -142,6 +142,25 @@ html, body {
 .chat-window-container > .chat-window > .contacts-side > .contacts-list > .contact:last-child {
   margin-bottom: 1em;
 }
+.chat-window-container > .chat-window > .no-open-conversation-container {
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light-gray-background);
+}
+.chat-window-container > .chat-window > .no-open-conversation-container * {
+  color: var(--secondary-text);
+}
+.chat-window-container > .chat-window > .no-open-conversation-container > i {
+  font-size: 96px;
+  margin-bottom: 0.5em;
+}
+.chat-window-container > .chat-window > .no-open-conversation-container > h3 {
+  margin: 0 20%;
+  text-align: center;
+}
 .chat-window-container > .chat-window > .messages-side {
   flex: 7;
   display: flex;

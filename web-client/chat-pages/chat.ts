@@ -503,6 +503,21 @@ const copyEmail = () => {
 
 
 /**
+ * Quita el mensaje por defecto y muestra la ventana
+ * de conversación.
+ */
+const toggleConversationDisplay = () => {
+    if (openedConversationEmail) {
+        const noOpenConversationView = document.querySelector('#noOpenConversationView');
+        const messagesSideView = document.querySelector('#messagesSideView');
+
+        noOpenConversationView.classList.add('hidden-container');
+        messagesSideView.classList.remove('hidden-container');
+    }
+}
+
+
+/**
  * Abre una conversación.
  * 
  * @param contactEmail Correo electrónico del contacto cuyo chat se abrirá.
@@ -518,6 +533,8 @@ const changeChat = (contactEmail: string) => {
     triggerChatRetrieval(() => {
         const messagesContainer = document.querySelector('#messagesContainer');
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        toggleConversationDisplay();
     });
 }
 
@@ -560,4 +577,4 @@ updateChat();
 /**
  * Se encarga de cargar el chat abierto a través de la URL.
  */
-triggerChatRetrieval();
+triggerChatRetrieval(() => toggleConversationDisplay());
