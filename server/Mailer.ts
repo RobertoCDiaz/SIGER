@@ -13,10 +13,10 @@ export interface Mail {
 
 /**
  * Clase capaz de enviar correos electrónicos.
- * 
- * Como constructor, se le tienen que pasar el correo y 
+ *
+ * Como constructor, se le tienen que pasar el correo y
  * contraseña de la cuenta remitente de correos.
- * 
+ *
  * Para enviar un email, se usará el método
  * [sendEmail], pasándole el correo a enviar y
  * una función para ejecutar una vez haya concluido el proceso.

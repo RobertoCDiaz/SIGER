@@ -4,7 +4,7 @@ const fillUserEmail = () => {
     const adminEmailView = document.getElementById('adminEmailView');
 
     let xhr = new XMLHttpRequest();
-    xhr.open('get', '/user-info', true);   
+    xhr.open('get', '/user-info', true);
     xhr.onload = () => {
         let response = JSON.parse(xhr.response);
 
@@ -35,22 +35,22 @@ const residenciaView = (r) => `
         <p class="projectName">${r['proyecto']}</p>
         <p>${r['empresa']}</p>
     </div>
-    
+
     <div class="period">
         <p>${r['periodo'] == 1 ? 'Enero - Junio' : 'Agosto - Diciembre'}</p>
-        <p>${r['ano']}</p>        
+        <p>${r['ano']}</p>
     </div>
 </div>
 <p>${r['carrera']}</p>
-<p>${r['residente']}</p>   
-<p>${tsToString(Number(r['fecha']))}</p> 
+<p>${r['residente']}</p>
+<p>${tsToString(Number(r['fecha']))}</p>
 </div>
 `
 
 const getList: (string) => Promise<Object> = (query: string) => new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', '/listaResidenciasSinDocentes', true);
-    
+
     xhr.onload = () => {
         let response = JSON.parse(xhr.response);
 
@@ -59,9 +59,9 @@ const getList: (string) => Promise<Object> = (query: string) => new Promise((res
             return;
         }
 
-        resolve(response.object);        
+        resolve(response.object);
     };
-    
+
     xhr.send(`q=${query}`);
 });
 

@@ -8,9 +8,9 @@
     <title>Asesorías SIGER</title>
     <style>
         #seleccionMaterias {
-        counter-reset: li; 
-        list-style: none; 
-        *list-style: decimal; 
+        counter-reset: li;
+        list-style: none;
+        *list-style: decimal;
         /*font: 15px 'trebuchet MS', 'lucida sans';*/
         padding: 0;
         margin-bottom: 4em;
@@ -18,7 +18,7 @@
     }
 
     #seleccionMaterias ol {
-        margin: 0 0 0 2em; 
+        margin: 0 0 0 2em;
     }
 
     #seleccionMaterias li{
@@ -30,18 +30,18 @@
         background: gray;
         color: white;
         text-decoration: none;
-        transition: all .3s ease-out;   
+        transition: all .3s ease-out;
     }
 
     #seleccionMaterias li:hover{
         background: navy;
         cursor: pointer;
-    }   
+    }
 
     #seleccionMaterias li:before{
         content: counter(li);
         counter-increment: li;
-        position: absolute; 
+        position: absolute;
         left: -2.5em;
         top: 50%;
         margin-top: -1em;
@@ -54,18 +54,18 @@
     }
 
     #seleccionMaterias li:after{
-        position: absolute; 
+        position: absolute;
         content: '';
         border: .5em solid transparent;
         left: -1em;
         top: 50%;
         margin-top: -.5em;
-        transition: all .3s ease-out;               
+        transition: all .3s ease-out;
     }
 
     #seleccionMaterias li:hover:after{
         left: -.5em;
-        border-left-color: navy;             
+        border-left-color: navy;
     }
     </style>
 </head>
@@ -82,8 +82,10 @@
     <div class="content">
         <div class="title">
             <h1>Contacto con docentes</h1>
-            
-            <p>Por favor, selecciona la materia para la cual necesitas asesoría en tu residencia profesional.</p>
+
+            <p>Para buscar una materia, escribe un indicio de su nombre en la caja de texto y presiona buscar.</p>
+            <p>A continuación, aparecerá una lista con las materias que contienen el indicio proporcionado, bastará con hacer click en la que sea tu selección para ver a los maestros disponibles y capacitados en el área que deseas.</p>
+            <br>
             <div style="display: flex; flex-direction: row;">
                 <input type="text" id="txtMateria">
                 <br>
@@ -95,7 +97,7 @@
         </div>
         <hr>
         <div id="container">
-            
+
         </div>
     </div>
 
@@ -113,7 +115,7 @@
             <div class="section-item">
                 <p>Roberto Carlos Díaz Sánchez</p>
                 <p><u>L17430057@piedrasnegras.tecnm.mx</u></p>
-                
+
             </div>
         </section>
         <section>

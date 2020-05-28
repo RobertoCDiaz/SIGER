@@ -15,7 +15,7 @@ const getSubjects = () => {
     xhr.open('get', `/buscarMateria?q=`+materia.value, true);
     xhr.onload = () => {
         let response = JSON.parse(xhr.responseText).object;
-        
+
         for (let i = 0; i < response.length; ++i) {
             let c = response[i];
             selMaterias.innerHTML += selView(c['nombre']);
@@ -28,17 +28,17 @@ searchBtn.addEventListener('click',getSubjects);
 const materiaSeleccionadaView = (name) => `<h1>${name}</h1>`;
 let resu;
 let count;
-const listaCompetentes = (materiaSeleccionada : string) => 
+const listaCompetentes = (materiaSeleccionada : string) =>
 {
     while(selMaterias.firstChild)
         selMaterias.removeChild(selMaterias.lastChild);
-    
+
 
     while(conta.firstChild)
         conta.removeChild(conta.lastChild);
-        
+
     conta.innerHTML+=materiaSeleccionadaView(materiaSeleccionada);
-    
+
     let xhr = new XMLHttpRequest();
     xhr.open('get', '/lista-competentes?materia='+materiaSeleccionada, true);
     xhr.onload = () =>
@@ -71,12 +71,12 @@ const listaCompetentes = (materiaSeleccionada : string) =>
 const competentesView = (r) => `
 <div class="residencia">
 <div class="title">
-    
+
     <div class="projectNameContainer">
     <p class="projectName"><a href="/chat?open=${r['email']}">${r['nombre']}</a></p>
 </div>
-    
-    
+
+
 </div>
 <p>Correo: <b>${r['email']}</b></p>
 </div>

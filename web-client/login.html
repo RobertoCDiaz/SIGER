@@ -12,7 +12,6 @@
 <body>
     <header class="header-extension">
         <div class="bar">
-            <!-- <h1><a href="/home">SIGER</a></h1> -->
             <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
                 <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
@@ -20,7 +19,7 @@
             <h2>Login</h2>
         </div>
     </header>
-    
+
         <div class="content">
             <form id="form">
                 <div id="mainform">
@@ -44,19 +43,8 @@
                             id="passView"/>
                     </div>
                 </div>
-                
+
                 <br>
-                <!-- <div id="maindiv">
-                    <div class="divs">
-                        <input type="radio" name="clase" id="res" value="Residente" checked>
-                        <label for="res">Residente</label>
-                    </div>
-                    
-                    <div class="divs">
-                        <input type="radio" name="clase" id="doce" value="Docente">
-                        <label for="doce">Docente</label>
-                    </div>
-                </div> -->
                 <br>
                 </div>
                 <div class="button-container" id="bot" style="margin-top: 1em;">
@@ -67,7 +55,7 @@
                     <a href="/nuevo-docente">Crear cuenta de docente</a>
                 </div>
             </form>
-            
+
         </div>
         <footer>
             <div class="sections-container">
@@ -144,7 +132,7 @@
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST','/auth',true);
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                
+
                 xhr.onreadystatechange = () => {
                     if(xhr.readyState==4 && xhr.status==200){
                         const response = JSON.parse(xhr.responseText);

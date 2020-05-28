@@ -1,6 +1,6 @@
 const urlGetParameters = {};
 const populateUrlGetParametersObject = () => {
-    location.search.substring(1).split('&').forEach(pair => 
+    location.search.substring(1).split('&').forEach(pair =>
         urlGetParameters[decodeURI(pair.split('=')[0])] = decodeURI(pair.split('=')[1])
     );
 }
@@ -69,27 +69,27 @@ class AttachedFile {
 ================================================================================================ */
 /**
  * Pide al servidor una conversación con otro usuario.
- * 
+ *
  * @param withEmail Correo del otro usuario.
- * 
- * @returns conversationObject  Un objecto conteniendo todos 
+ *
+ * @returns conversationObject  Un objecto conteniendo todos
  *                              los mensajes de la conversación,
  *                              ordenados por fecha. Cada entrada
  *                              de este JSON tiene como clave
- *                              la fecha del día, y como valor un 
+ *                              la fecha del día, y como valor un
  *                              arreglo de mensajes de dicho día.
  */
 const getConversationWith = (withEmail: string) => new Promise<Object>((resolve, reject) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/getChatConversation?with=${withEmail}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
 
         if (response['code'] < 1) {
             reject(response['message']);
         }
-        
+
         const conversation = {};
         (response['object'][0] as Object[]).map(o => new Message(o, withEmail)).forEach(msg => {
             const d = msg.date;
@@ -97,19 +97,19 @@ const getConversationWith = (withEmail: string) => new Promise<Object>((resolve,
 
             if (!conversation[displayDate])
                 conversation[displayDate] = [];
-            
+
             (conversation[displayDate] as Message[]).push(msg);
         });
 
-        Object.keys(conversation).forEach(key => 
-            (conversation[key] as Message[]).sort((m1, m2) => 
+        Object.keys(conversation).forEach(key =>
+            (conversation[key] as Message[]).sort((m1, m2) =>
                 m1.date.getTime > m2.date.getTime ? 1 : -1
             )
         );
 
         resolve([conversation, response['object'][1]]);
     };
-    
+
     xhr.send();
 });
 
@@ -117,7 +117,7 @@ const getConversationWith = (withEmail: string) => new Promise<Object>((resolve,
 /**
  * Regresa un string con el código HTML para generar un separador
  * de fechas en el chat.
- * 
+ *
  * @param displayDate Fecha a mostrar en el separador.
  */
 const daySeparatorView = (displayDate: string) =>
@@ -126,7 +126,7 @@ const daySeparatorView = (displayDate: string) =>
 
 /**
  * Regresa la estructura HTML de un nuevo mensaje.
- * 
+ *
  * @param msg Objeto a partir del cuál se creará el mensaje.
  */
 const msgView = (msg: Message) => `
@@ -150,26 +150,26 @@ const msgView = (msg: Message) => `
 
 const openAttachedFile = (route: string) => window.open(`/siger-cloud/files/${route}`);
 
-// const attachedFilesViews = (files: AttachedFile[]) => 
+// const attachedFilesViews = (files: AttachedFile[]) =>
 
 /**
  * Regresa un string de dos caracteres representando un número
  * con dos dígitos.
- * 
+ *
  * Por ejemplo:
- * 
+ *
  *      $ twoDigits(1)
  *          -> "01"
- * 
+ *
  *      $ twoDigits(8)
  *          -> "08"
- * 
+ *
  *      $ twoDigits(14)
  *          -> "14"
- * 
+ *
  *      $ twoDigits(256)
  *          -> "56"
- * 
+ *
  * @param n Número a formatear.
  */
 const twoDigits = (n: number) => ("0" + n).slice(-2);
@@ -177,8 +177,8 @@ const twoDigits = (n: number) => ("0" + n).slice(-2);
 
 /**
  * Muestra en la UI una conversación.
- * 
- * @param conversation Objeto a mostrar. Este objeto debe 
+ *
+ * @param conversation Objeto a mostrar. Este objeto debe
  * resultado del promise [getConversationWith()].
  */
 const displayConversation = (conversation) => {
@@ -212,10 +212,10 @@ const displayConversation = (conversation) => {
 const getConversationsList = () => new Promise<Object>((resolve, reject) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/getListaDeConversaciones`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         if (response['code'] < 1) {
             reject(response['message']);
             return;
@@ -223,20 +223,20 @@ const getConversationsList = () => new Promise<Object>((resolve, reject) => {
 
         resolve(response['object']);
     };
-    
+
     xhr.send();
 });
 
 
 /**
  * Muestra las conversaciones en el panel lateral.
- * 
+ *
  * @param list Objeto con las conversaciones. Este objeto debe ser
  * resultado de la promise [getConversationsList()].
  */
 const displayConversationsList = (list) => {
     const conversationsListView = document.querySelector('#conversationsListView');
-    
+
     conversationsListView.innerHTML = '';
 
     list.forEach(msg => {
@@ -248,7 +248,7 @@ const displayConversationsList = (list) => {
 /**
  * Estructura HTML de una conversación individual a mostrar en el
  * panel lateral.
- * 
+ *
  * @param convObj Objeto de conversación individual.
  */
 const contactView = (convObj: Object) => {
@@ -286,7 +286,7 @@ const openFilePicker = () => {
 
 /**
  * Estructura HTML de una archivo anexado.
- * 
+ *
  * @param file Archivo a mapear.
  */
 const attachedFileView = (file: File) => `
@@ -322,9 +322,9 @@ const updateAttachedFilesUI = () => {
         attachedFilesContainer.classList.add('hidden-container');
         return;
     }
-    
+
     attachedFilesContainer.classList.remove('hidden-container');
-    
+
     attachedFilesListView.innerHTML = '';
     Object.keys(attachedFiles).forEach(k => {
         attachedFilesListView.innerHTML += attachedFileView(attachedFiles[k]);
@@ -334,7 +334,7 @@ const updateAttachedFilesUI = () => {
 
 /**
  * Quita de la lista de archivos anexados un archivo.
- * 
+ *
  * @param fileNameKey Nombre del archivo a eliminar.
  */
 const unattachFile = (fileNameKey: string) => {
@@ -359,13 +359,13 @@ const sendMessage = () => {
 
     if (msg == '' || !openedConversationEmail)
         return;
-    
+
     let xhr = new XMLHttpRequest();
     xhr.open('post', `/sendMessage`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         if (response['code'] < 1) {
             alert(response['message']);
             return;
@@ -412,7 +412,7 @@ const searchMessageView = (msg: string) => `
 
 /**
  * Representa en HTML un resultado de búsqueda.
- * 
+ *
  * @param resultObject Objeto a mapear.
  */
 const searchResultView = (resultObject: Object) => `
@@ -448,7 +448,7 @@ const clearSearchInput = () => {
     const conversationsListView = document.querySelector('#conversationsListView');
 
     const query = (document.querySelector('#searchUserInputView') as HTMLInputElement).value.trim();
-    
+
     if (query == '') {
         conversationsListView.classList.remove('hidden-container');
         searchResultsContainer.classList.add('hidden-container');
@@ -457,10 +457,10 @@ const clearSearchInput = () => {
 
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/buscarEnChat?q=${encodeURI(query)}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         searchResultsContainer.innerHTML = '';
         if (response['code'] < 1) {
             searchResultsContainer.innerHTML = searchMessageView(response['message']);
@@ -473,7 +473,7 @@ const clearSearchInput = () => {
         conversationsListView.classList.add('hidden-container');
         searchResultsContainer.classList.remove('hidden-container');
     };
-    
+
     xhr.send();
 };
 
@@ -519,7 +519,7 @@ const toggleConversationDisplay = () => {
 
 /**
  * Abre una conversación.
- * 
+ *
  * @param contactEmail Correo electrónico del contacto cuyo chat se abrirá.
  */
 const changeChat = (contactEmail: string) => {
@@ -540,7 +540,7 @@ const changeChat = (contactEmail: string) => {
 
 
 /**
- * Desencadena todo el proceso para cargar un chat en 
+ * Desencadena todo el proceso para cargar un chat en
  * pantalla, además de encargarse de hacer la petición
  * para actualizar dicho chat cada cierto tiempo.
  */
@@ -564,7 +564,7 @@ const triggerChatRetrieval = async (onDone: () => void = () => {}) => {
 /**
  * Se encarga de actualizar la conversación abierta cada
  * cierto tiempo.
- * 
+ *
  * TODO: Mejorar esto.
  */
 const updateChat = () => {

@@ -55,7 +55,7 @@ const timestampToString = (ts: number) => {
 const getReport: () => Promise<Object> = () => new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/getInformacionReportePreliminar${location.search ?? ''}`, true);
-    
+
     xhr.onload = () => {
         let response = JSON.parse(xhr.response);
         if (response.code <= 0) {
@@ -65,7 +65,7 @@ const getReport: () => Promise<Object> = () => new Promise((resolve, reject) => 
 
         resolve(response.object);
     };
-    
+
     xhr.send();
 })
 
@@ -111,11 +111,11 @@ fillReport();
     Búsqueda de docentes.
 
 ================================================================================================ */
-const searchTeachersPromise: (string) => Promise<Object> = 
+const searchTeachersPromise: (string) => Promise<Object> =
     (query: string) => new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open('get', `/buscarDocente?q=${query}`, true);
-        
+
         xhr.onload = () => {
             let response = JSON.parse(xhr.response);
 
@@ -124,9 +124,9 @@ const searchTeachersPromise: (string) => Promise<Object> =
                 return;
             }
 
-            resolve(response.object);          
+            resolve(response.object);
         };
-        
+
         xhr.send();
     });
 
@@ -166,7 +166,7 @@ const residenciaId: number = Number(location.search.substring(4));
 
 const docentesArr: string[] = [];
 
-const asignar: (email: string, name: string) => void = 
+const asignar: (email: string, name: string) => void =
     (email: string, name: string) => {
         const identifier: string = `${email},${name}`;
 
@@ -184,7 +184,7 @@ const asignar: (email: string, name: string) => void =
         updateUI();
     }
 
-const desasignar: (index: number) => void = 
+const desasignar: (index: number) => void =
     (idx: number) => {
         docentesArr.splice(idx, 1);
 
@@ -199,7 +199,7 @@ const updateUI = () => {
         const teacherContainer = document.getElementById(`teacher${o}`);
         teacherContainer.innerHTML = `
         <i class="material-icons" onclick="desasignar(${o});">close</i> ${name} (${email})
-        `;        
+        `;
     }
 
     for (let i = 3; i > docentesArr.length; --i) {
@@ -213,7 +213,7 @@ const asignarDocentesPromise: (aiEmail: string, r1Email: string, r2Email: string
         let xhr = new XMLHttpRequest();
         xhr.open('post', '/asignar-docentes', true);
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        
+
         xhr.onload = () => {
             let response = JSON.parse(xhr.response);
             if (response.code <= 0) {
@@ -223,7 +223,7 @@ const asignarDocentesPromise: (aiEmail: string, r1Email: string, r2Email: string
 
             resolve("Se han asignado los docentes");
         };
-        
+
         xhr.send(
             `residencia_id=${residenciaId}&` +
             `ai=${ai}&` +

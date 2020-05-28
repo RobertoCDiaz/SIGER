@@ -16,14 +16,14 @@ const populateDocument = () => {
     }
 
     const anexoId = searchJSON['id'];
-    
+
     // Calificaciones
     const aePlaceholders = Array.from(document.getElementsByClassName('ae-cal'));
     const aiPlaceholders = Array.from(document.getElementsByClassName('ai-cal'));
 
     let infoXHR = new XMLHttpRequest();
     infoXHR.open('get', `/getAnexo30Info?id=${encodeURI(anexoId)}`, true);
-    
+
     infoXHR.onload = () => {
         const response = JSON.parse(infoXHR.response);
 
@@ -44,12 +44,12 @@ const populateDocument = () => {
             aiPlaceholders[idx].innerHTML = a[`ai-${idx + 1}`];
             delete a[`ai-${idx + 1}`];
         }
-        
+
         Object.keys(a).forEach(key => {
             document.getElementById(`${key}View`).innerHTML = a[key];
         });
     };
-    
+
     infoXHR.send();
 }
 populateDocument();

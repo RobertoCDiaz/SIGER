@@ -17,24 +17,14 @@
 
                 let btnDel = document.getElementById('btnElimina');
                 btnDel.onclick=eliminaHorario;
-            } 
+            }
         </script>
     <link rel="stylesheet" href="styles/repreliminar.css">
 </head>
 <body>
-    <!-- <button id="fixedbutton"><img src="assets/images/menu.png" onclick="openNav()"></button>
-    
-        <div id="mySidenav" class="sidenav">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-            <a href="#"><img src="assets/images/reporte.png"> Reporte preliminar</a>
-            <a href="#"><img src="assets/images/progreso.png"> Progreso actual</a>
-            <a href="#"><img src="assets/images/brief.png"> Documentos</a>
-            <a href="#"><img src="assets/images/chat.png"> Contacto con docentes</a>
-        </div> -->
 
     <header class="header-extension">
         <div class="bar">
-            <!-- <h1><a href="/home">SIGER</a></h1> -->
             <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
                 <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
@@ -42,7 +32,7 @@
             <h2>Reporte preliminar</h2>
         </div>
     </header>
-    
+
     <div class="content">
         <form>
                 <br>
@@ -79,7 +69,7 @@
                         <option value="2029">2029</option>
                     </select>
                 </div>
-            
+
             <!-------------------------------------------------------------------------->
             <div class="form-input">
                 <label for="">Descripción de actividades:</label>
@@ -89,7 +79,7 @@
                 <h3>Información sobre la empresa, organismo o dependencia donde se desarrollará el proyecto.</h3>
                 <div class="form-input">
                     <label for="">Nombre de la empresa: </label>
-                    <input type="text" name="txtEmpresa" id="txtEmpresa" required>  
+                    <input type="text" name="txtEmpresa" id="txtEmpresa" required>
                 </div>
                 <div class="form-input">
                     <label for="">Representante legal de la empesa</label>
@@ -98,12 +88,12 @@
                 <div class="form-input">
                     <label for="">Dirección: </label>
                     <input type="text" name="txtDirección" id="txtDireccion" required>
-                    
+
                         <label for="">Teléfono:</label>
                         <input type="tel" name="txtTel" id="txtTel" required>
                         <label for="">Ciudad: </label>
                         <input type="text" name="txtCiudad" id="txtCiudad" required>
-                    
+
                 </div>
                 <div class="form-input">
                     <label for="">Correo electrónico: </label>
@@ -112,7 +102,7 @@
                         placeholder="empresa@dominio.com"
                         name="emailEmpresa"
                         id="emailEmpresa"
-                        
+
                     />
                 </div>
                 <div class="form-input">
@@ -120,7 +110,7 @@
                     <input type="text" name="txtDepto" id="txtDepto" required>
                 </div>
                 <br>
-            
+
             <!-------------------------------------------------------------------------->
             <h3>Datos del asesor externo.</h3>
             <div class="form-input">
@@ -150,11 +140,11 @@
                         placeholder="correo@dominio.com"
                         name="emailView"
                         id="emailAE"
-                        
+
                     />
             </div>
             <!-------------------------------------------------------------------------->
-            
+
             <div>
                 <h3>Horarios</h3>
                 <label>Pulsa "+" para agregar un horario. En caso de equivocación, presiona "-" para eliminar el último horario ingresado.</label>
@@ -171,8 +161,8 @@
 
             </div>
             <br>
-            
-            
+
+
             <div class="button-container">
                 <input id="subm" class="primary-button" type="button" value="TERMINAR">
             </div>
@@ -229,7 +219,7 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
-    
+
     <script>
         let contadorHorarios = 0;
 
@@ -381,7 +371,7 @@
                     }
                 }
             }
-            
+
             if(!salidas[0])
             {
                 alert('Ingresa un horario de salida válido');
@@ -403,9 +393,9 @@
 
             xhr.onreadystatechange = () => {
                     if(xhr.readyState==4 && xhr.status==200){
-                        
+
                         let response = JSON.parse(xhr.responseText);
-                        
+
                         if (response.code < 0) {
                             alert(response['message']);
                             return;
@@ -439,7 +429,7 @@
                 `emailAE=${encodeURI(emailAE.value)}&` +
                 `entradas=${encodeURI(JSON.stringify(entradas))}&` +
                 `salidas=${encodeURI(JSON.stringify(salidas))}&` +
-                `counter=${encodeURI(contadorHorarios)}` 
+                `counter=${encodeURI(contadorHorarios)}`
             );
         };
 

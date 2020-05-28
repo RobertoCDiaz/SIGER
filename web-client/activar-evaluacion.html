@@ -11,7 +11,6 @@
 <body>
     <header>
         <div class="bar">
-            <!-- <h1><a href="/home">SIGER</a></h1> -->
             <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
                 <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
@@ -33,7 +32,7 @@
                 const adminEmailView = document.getElementById('adminEmailView');
 
                 let xhr = new XMLHttpRequest();
-                xhr.open('get', '/user-info', true);   
+                xhr.open('get', '/user-info', true);
                 xhr.onload = () => {
                     let response = JSON.parse(xhr.response);
 
@@ -57,15 +56,6 @@
                 <p>Anexos 29</p>
             </div>
             <div id="residenciasContainerView">
-                <!-- 
-                <div class="residencia list-row">
-                    <input type="checkbox">
-                    <p>Sistema Gestor de Residencias</p>
-                    <p>Daniel Hernández Sánchez</p>
-                    <p>Rassini Inc.</p>
-                    <p>2</p>
-                </div>
-                -->
                 <p>No hay ninguna residencia apta para iniciar una evaluación</p>
             </div>
             <div class="options-container">
@@ -93,18 +83,6 @@
                 <p>Tipo de evaluación</p>
             </div>
             <div id="residenciasEvaluacionContainer">
-                
-                <!-- 
-                <div class="residencia list-row">
-                    <p>Sistema Gestor de Residencias</p>
-                    <p>Daniel Hernández Sánchez</p>
-                    <p>Rassini Inc.</p>
-                    <p>Izán Martín Malillos (izan.mm@piedrasnegras.tecnm.mx)</p>
-                    <p>Izán Martín Malillos (izan.mm@piedrasnegras.tecnm.mx)</p>
-                    <p>Anexo 30</p>
-                </div> 
-                -->
-               
                 <p>Por el momento no hay ninguna residencia en periodo de evaluación</p>
             </div>
         </div>
@@ -156,6 +134,6 @@
         <p>Instituto Tecnológico de Piedras Negras</p>
         <p>Ingeniería en Sistemas Computacionales</p>
     </footer>
-    
+
 </body>
 </html>

@@ -1,8 +1,8 @@
-const getMenu: () => Promise<Object> = 
+const getMenu: () => Promise<Object> =
     () => new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open('get', '/getMenu', true);
-        
+
         xhr.onload = () => {
             let response= JSON.parse(xhr.response);
 
@@ -13,7 +13,7 @@ const getMenu: () => Promise<Object> =
 
             resolve(response.object);
         };
-        
+
         xhr.send();
     });
 
@@ -34,7 +34,7 @@ const menuView = (o) => {
             /*--menu-color: var(--azul-tec);*/
             --slide-duration: 150ms;
         }
-    
+
         .menu-container {
             display: flex;
             flex-direction: row;
@@ -46,7 +46,7 @@ const menuView = (o) => {
             transition-duration: var(--slide-duration);
             transition-timing-function: ease;
         }
-    
+
         .menu-bar {
             background-color: var(--menu-color);
             margin: 0;
@@ -54,7 +54,7 @@ const menuView = (o) => {
             display: flex;
             flex-direction: column;
         }
-    
+
         .menu-bar * {
             color: white;
             margin: 0;
@@ -63,11 +63,11 @@ const menuView = (o) => {
             box-sizing: border-box;
             word-wrap: break-word;
         }
-    
+
         .menu-bar * a {
             text-decoration: none;
         }
-    
+
         .menu-item {
             display: flex;
             flex-direction: column;
@@ -76,11 +76,11 @@ const menuView = (o) => {
             padding: .5em;
             cursor: pointer;
             border-left: 2px solid transparent;
-    
+
             width: 6em;
             height: 5em;
         }
-    
+
         .menu-item > i {
             margin-bottom: .25em;
             font-size: 1.3em;
@@ -89,23 +89,23 @@ const menuView = (o) => {
         .menu-item > p {
             font-size: 12px;
         }
-    
+
         .menu-item:hover {
             border-left: 2px solid white;
             background-color: rgba(255, 255, 255, 0.25);
         }
-    
+
         .main-options {
             flex: 1;
         }
-    
+
         .toggle-menu-button {
             /* content: '<i class="material-icons">burger</i>'; */
             /* content: '>>'; */
             display: flex;
             align-items: center;
         }
-    
+
         /*.toggle-menu-button i {*/
         #toggleMenuButton {
             cursor: pointer;
@@ -128,7 +128,7 @@ const menuView = (o) => {
             <div class="secondary-options">
                 ${
                     Object.keys(o['secondary']).map(key => menuItem(key, o['secondary'][key])).join('')
-                }           
+                }
             </div>
         </div>
         <div class="toggle-menu-button"><div id="toggleMenuButton"><i class="material-icons">double_arrow</i></div></div>
@@ -149,17 +149,17 @@ const putMenuOnDOM = async () => {
     toggleMenuButton = document.getElementById('toggleMenuButton');
     menuContainer = document.getElementById('menuContainer');
 
-    
+
     toggleMenuButton.onclick = () => {
         const menuWidth = document.getElementById('menuBar').offsetWidth;
         console.log(menuWidth * -1);
         menuContainer.style.transform = `translateX(${ !menuActive ? '0' : /*'-6em'*/ (menuWidth * -1).toString()}px)`;
         menuActive = !menuActive;
-    
+
         (toggleMenuButton.children[0] as HTMLElement).style.transition = 'var(--slide-duration)';
         (toggleMenuButton.children[0] as HTMLElement).style.transform = `rotate(${ !menuActive ? '0deg' : '180deg'})`;
     }
 }
-    
+
 putMenuOnDOM();
 

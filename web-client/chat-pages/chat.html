@@ -22,67 +22,22 @@
                     </div>
                 </div>
                 <div id="searchResultsContainer" class="contacts-list prevent-selection hidden-container">
-                    <!-- 
-                    <div class="contactSearchResult">
-                        <p class="name">Daniel Hernández Sánchez</p>
-                        <p class="email">daniel.hs@piedrasnegras.tecnm.mx</p>
-                    </div>
-                    <div class="contactSearchResult">
-                        <p class="name">Roberto Carlos Díaz Sánchez</p>
-                        <p class="email">roberto.ds@piedrasnegras.tecnm.mx</p>
-                    </div>
-                    <div class="contactSearchResult">
-                        <p class="name">Izan Malillos</p>
-                        <p class="email">izan.mm@piedrasnegras.tecnm.mx</p>
-                    </div> 
-                    -->
 
-                    <!-- 
-                    <div class="message">
-                        <i class="material-icons">person_add_disabled</i>
-                        <p>Su búsqueda no arrojó ningún resultado</p>
-                    </div> 
-                    -->
                 </div>
                 <div id="conversationsListView" class="contacts-list prevent-selection">
-                    <!-- <div class="contact">
-                        <p class="name">Alonso Sánchez Sotomayor</p>
-                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
-                            <i class="material-icons seen">visibility</i>
-                            Me vale verga, puñetón, me val...
-                        </p>
-                    </div>
-                    <div class="contact">
-                        <p class="name">Celia Pastor Domínguez</p>
-                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
-                            No seas meco, mijo
-                        </p>
-                    </div>
-                    <div class="contact active">
-                        <p class="name">Martín Rodríguez Pozos</p>
-                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
-                            <i class="material-icons">visibility</i>
-                            Ya revisé y no dejé el reload().
-                        </p>
-                    </div>
-                    <div class="contact">
-                        <p class="name">Izan Martín Malillos</p>
-                        <p class="message" title="MENSAJE ORIGINAL SIN CORTAR">
-                            izan.mm@piedrasnegras.tecnm.mx
-                        </p>
-                    </div> -->
+
                 </div>
             </div>
             <div id="noOpenConversationView" class="no-open-conversation-container">
                 <i class="material-icons">chat</i>
-                <h3>Seleccione una conversación en el panel de la derecha para abrirla.</h3>
+                <h3>Seleccione una conversación en el panel de la izquierda para abrirla.</h3>
                 <br>
                 <h3>También puede usar el buscador para comenzar una nueva conversación con otro usuario del SIGER</h3>
             </div>
             <div id="messagesSideView" class="messages-side hidden-container">
                 <div class="top-bar prevent-selection">
                     <p id="contactNameView" class="name">
-                        <!-- Nombre del otro usuario. -->
+
                     </p>
                     <div class="options">
                         <i onclick="copyEmail();" class="material-icons" title="Copiar correo electrónico al portapapeles">email</i>
@@ -91,48 +46,7 @@
                 </div>
                 <div class="chat">
                     <div id="messagesContainer" class="messages-container">
-                        <!-- <p class="date prevent-selection">12/05/2020</p>
-                        <div class="message mine">
-                            <p class="content">Como los "aquí vamos" que hacíamos con Arlín</p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div>
-                        <div class="message">
-                            <p class="content">
-                                Esto ya me está preocupando, corregí esto, ahora al entrar a la vista web del reporte se hacen un chingo de peticiones seguidas y no se detienen.
-                            </p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div>
-                        <p class="date prevent-selection">13/05/2020</p>
-                        <div class="message mine">
-                            <p class="content">
-                                Aber.
-                            </p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div> 
-                        <div class="message">
-                            <p class="content">
-                                Aber, me perdí en este aspecto ayer, ¿de dónde tomo el ID si la página está, por así decirlo, estática?
-                            </p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div>
-                        <div class="message mine">
-                            <p class="content">
-                                Ah cabrón. Es como si se estuviese recargando la página hasta el infinito.
-                            </p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div>
-                        <div class="message mine">
-                            <p class="content">
-                                Me suena que en lo que hice hay un sitio donde recargo la pantalla, ¿Lo pusiste? Si sí, intenta comentándolo.
-                            </p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div>
-                        <div class="message mine">
-                            <p class="content">
-                                Ya revisé y no dejé el reload().
-                            </p>
-                            <p class="hour prevent-selection">19:53</p>
-                        </div> -->
+
                     </div>
                     <script>
                         const messages = Array.from(document.getElementsByClassName('message')).filter(m => m.parentNode.id == 'messagesContainer');
@@ -184,7 +98,7 @@
                                 }
                             </script>
                         </div>
-                    </div>    
+                    </div>
                 </div>
             </div>
         </div>

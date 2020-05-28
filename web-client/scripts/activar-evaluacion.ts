@@ -21,7 +21,7 @@ interface SuitableResidence {
 const fetchSuitableResidences = () => new Promise<SuitableResidence[]>((resolve, reject) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', '/residenciasAptasParaEvaluacion', true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
 
@@ -32,7 +32,7 @@ const fetchSuitableResidences = () => new Promise<SuitableResidence[]>((resolve,
 
         resolve(response.object.map(o => o as SuitableResidence));
     };
-    
+
     xhr.send();
 });
 
@@ -85,13 +85,13 @@ const notSuitableResidenceView = (r: NotSuitableResidence) => `
         <p>${r.ae_nombre} (${r.ae_email}) (${r.ae_pendiente == 0 ? "Evaluación enviada" : "Pendiente de evaluar"})</p>
         <p>${r.ai_nombre} (${r.ai_email}) (${r.ai_pendiente == 0 ? "Evaluación enviada" : "Pendiente de evaluar"})</p>
         <p>Anexo ${r.anexo_pendiente}</p>
-    </div> 
+    </div>
 `;
 
 const fetchNotSuitableResidences = () => new Promise<NotSuitableResidence[]>((resolve, reject) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', '/residenciasEnEvaluacion', true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
 
@@ -102,7 +102,7 @@ const fetchNotSuitableResidences = () => new Promise<NotSuitableResidence[]>((re
 
         resolve(response.object.map(o => o as NotSuitableResidence));
     };
-    
+
     xhr.send();
 });
 
@@ -170,10 +170,10 @@ const activarAnexo29 = () => {
 
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/activarAnexo29?resArr=${JSON.stringify(selectedResidences)}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         if (response.code != 1) {
             alert(response.message);
             return;
@@ -188,7 +188,7 @@ const activarAnexo29 = () => {
         }
         location.reload();
     };
-    
+
     xhr.send();
 }
 anexo29Button.onclick = activarAnexo29;
@@ -201,10 +201,10 @@ const activarAnexo30 = () => {
 
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/activarAnexo30?resArr=${JSON.stringify(selectedResidences)}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         if (response.code != 1) {
             alert(response.message);
             return;
@@ -219,7 +219,7 @@ const activarAnexo30 = () => {
         }
         location.reload();
     };
-    
+
     xhr.send();
 }
 anexo30Button.onclick = activarAnexo30;

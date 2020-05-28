@@ -4,7 +4,7 @@ const fillTeacherEmail = () => {
     const teacherEmailView = document.getElementById('teacherEmailView');
 
     let xhr = new XMLHttpRequest();
-    xhr.open('get', '/user-info', true);   
+    xhr.open('get', '/user-info', true);
     xhr.onload = () => {
         let response = JSON.parse(xhr.response);
 
@@ -17,7 +17,7 @@ fillTeacherEmail();
 
 let res;
 let cantidad;
-const listaAsesorados = () => 
+const listaAsesorados = () =>
 {
     let xhr = new XMLHttpRequest();
     xhr.open('get', '/asesorados', true);
@@ -53,14 +53,14 @@ const asesoradosView = (r) => `
     <div class="projectNameContainer">
         <p class="projectName">${r['nombre']+' '+r['ap']}</p>
     </div>
-    
+
     <div class="period">
         <p>${r['periodo'] == 1 ? 'Enero - Junio' : 'Agosto - Diciembre'}</p>
-        <p>${r['ano']}</p>        
+        <p>${r['ano']}</p>
     </div>
 </div>
 <p>Proyecto: <b>${r['proyecto']}</b></p>
-<p>${r['carrera']}</p>   
+<p>${r['carrera']}</p>
 </div>
 `
 

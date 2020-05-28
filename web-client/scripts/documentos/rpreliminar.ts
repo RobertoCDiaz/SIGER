@@ -14,7 +14,7 @@ const populateDocumentr = () => {
         window.open('/documentos/reporte-preliminar', '_self');
         return;
     }
-    
+
     // Views
     const projectView = document.getElementById('projectView');
     const fechaView = document.getElementById('fechaView');
@@ -50,7 +50,7 @@ const populateDocumentr = () => {
 
     let infoXHR = new XMLHttpRequest();
     infoXHR.open('get', `/getReportePreliminarInfo?id=${encodeURI(idResidencia)}`, true);
-    
+
     infoXHR.onload = () => {
         const response = JSON.parse(infoXHR.response);
 

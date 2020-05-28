@@ -14,7 +14,7 @@ const populateDocument = () => {
         window.open('/documents/anexo-29', '_self');
         return;
     }
-    
+
     // Views
     const residenteView = document.getElementById('residenteView');
     const noControlView = document.getElementById('noControlView');
@@ -35,7 +35,7 @@ const populateDocument = () => {
 
     let infoXHR = new XMLHttpRequest();
     infoXHR.open('get', `/getAnexo29Info?id=${encodeURI(anexoId)}`, true);
-    
+
     infoXHR.onload = () => {
         const response = JSON.parse(infoXHR.response);
 
@@ -70,7 +70,7 @@ const populateDocument = () => {
 
 
     };
-    
+
     infoXHR.send();
 
 }

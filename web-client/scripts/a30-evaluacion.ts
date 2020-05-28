@@ -16,10 +16,10 @@ const urlId = location.search.substring('?id='.length);
 const fillInfo = (uid: string) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', `/infoAnexo30DesdeURL?id=${uid}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         if (response.code != 1) {
             alert(response.message);
             window.open('/', '_self');
@@ -30,7 +30,7 @@ const fillInfo = (uid: string) => {
         residentePlaceholderView.innerHTML = response.object[0]['residente'];
         numCPlaceholderView.innerHTML = response.object[0]['correo_residente'].substring(1, 9);
     };
-    
+
     xhr.send();
 }
 fillInfo(urlId);
@@ -42,7 +42,7 @@ fillInfo(urlId);
 ================================================================================================ */
 const sendEvaluation = () => {
     const inputs: HTMLInputElement[] = Array.from(document.getElementsByClassName('evaluation-input')).map(e => e as HTMLInputElement);
-    
+
     let evaluations: number[] = [];
     for (const idx in inputs) {
         const i = inputs[idx];
@@ -71,7 +71,7 @@ const sendEvaluation = () => {
     let xhr = new XMLHttpRequest();
     xhr.open('post', `/registrarEvaluacionA30`, true);
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
 
@@ -83,11 +83,11 @@ const sendEvaluation = () => {
         alert('Residencia evaluada con éxito');
         window.open('/', '_self');
     };
-    
+
     xhr.send(
         `id=${encodeURI(urlId)}&` +
         `evaluacion=${encodeURI(evaluationString)}&` +
-        `observaciones=${encodeURI(observations)}&` 
+        `observaciones=${encodeURI(observations)}&`
     );
 }
 sendInfoButton.onclick = sendEvaluation;

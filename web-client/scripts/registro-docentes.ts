@@ -26,11 +26,11 @@ let subjects: Array<Materia> = [];
     Asociación de materias al docente.
 
 ================================================================================================ */
-const fetchSubjects: (query: string) => Promise<Object> = 
+const fetchSubjects: (query: string) => Promise<Object> =
     (query) => new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open('get', `/buscarMateria?q=${encodeURI(query)}`, true);
-        
+
         xhr.onload = () => {
             const response = JSON.parse(xhr.response);
 
@@ -41,11 +41,11 @@ const fetchSubjects: (query: string) => Promise<Object> =
 
             resolve(response.object);
         };
-        
+
         xhr.send();
     });
 
-const resultsView = (s) => 
+const resultsView = (s) =>
     `<div class="subject" onclick="addSubject('${s['clave']}', '${s['nombre']}');"><p class="name">${s['nombre']}</p><p class="id">${s['clave'].toUpperCase()}</p></div>`;
 
 const search = () => {
@@ -53,7 +53,7 @@ const search = () => {
 
     fetchSubjects(query).then(subjects => {
         searchResultsContainer.innerHTML = '';
-        (subjects as Array<Object>).forEach(s => 
+        (subjects as Array<Object>).forEach(s =>
             searchResultsContainer.innerHTML += resultsView(s)
         );
     }).catch(error => {
@@ -140,7 +140,7 @@ const register = () => {
     let xhr = new XMLHttpRequest();
     xhr.open('post', '/registrarDocente', true);
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
 
@@ -150,7 +150,7 @@ const register = () => {
             window.open('/home', '_self');
         }
     };
-    
+
     xhr.send(
         `email=${encodeURI(emailDView.value.trim())}&` +
         `pass=${encodeURI(passView.value)}&` +

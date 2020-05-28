@@ -13,7 +13,7 @@ const anexar = (file) => new Promise((resolve, reject) => {
 
     let postData = new FormData();
     postData.append('file', file);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
 
@@ -21,10 +21,10 @@ const anexar = (file) => new Promise((resolve, reject) => {
             reject(response['message']);
             return;
         }
-        
+
         resolve(response['object']);
     };
-    
+
     xhr.send(postData);
 });
 
