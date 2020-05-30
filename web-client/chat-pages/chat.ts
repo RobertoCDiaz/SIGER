@@ -193,7 +193,7 @@ const displayConversation = (conversation) => {
 
     Object.keys(conversation[0]).forEach(date => {
         messagesContainer.innerHTML += daySeparatorView(date);
-        (conversation[0][date] as Message[]).forEach(msg => {
+        (conversation[0][date] as Message[]).sort((msg1, msg2) => msg1['id'] > msg2['id'] ? 1 : -1).forEach(msg => {
             messagesContainer.innerHTML += msgView(msg);
         })
     })
