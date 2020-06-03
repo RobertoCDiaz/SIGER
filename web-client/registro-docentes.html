@@ -4,138 +4,16 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Registro de Docentes :: SIGER</title>
-        <link rel="stylesheet" href="styles/global.css" />
-        <link rel="stylesheet" href="styles/forms.css">
+        <link rel="stylesheet" href="/styles/global.css" />
+        <link rel="stylesheet" href="/styles/forms.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <style>
-            .form-input {
-                display: flex;
-                padding: 1em;
-                align-items: center;
-            }
-
-            .form-input > * {
-                flex: 3;
-            }
-
-            .form-input > label {
-                flex: 1;
-            }
-
-            .subject-picker {
-                display: flex;
-                flex-direction: row;
-                border: 1px solid var(--gray-border-color);
-                overflow: hidden;
-                border-radius: 4px;
-                margin: 2em 5%;
-                background-color: rgb(226, 226, 226);
-                min-height: 20em;
-                max-height: 20em;
-            }
-
-            .subject-picker > div {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                flex: 1;
-            }
-
-            .subject-picker > .picker-container {
-                border-left: 1px solid var(--gray-border-color);
-            }
-
-            .picker-container > .searchWidget {
-                display: flex;
-                flex-direction: row;
-                align-items: stretch;
-                align-content: center;
-            }
-
-            .picker-container > .searchWidget > input {
-                flex: 1;
-                }
-            .picker-container > .searchWidget > i {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                padding: .25em;
-                cursor: pointer;
-                background-color: var(--azul-tec);
-                color: white;
-            }
-
-            .picker-container > .resultsContainer {
-                flex: 1;
-                overflow-y: scroll;
-            }
-
-            .picker-container > .resultsContainer > .subject {
-                background-color: white;
-                display: flex;
-                flex-direction: column;
-                padding: .5em 1em;
-                cursor: pointer;
-                border-bottom: 1px solid var(--gray-border-color);
-            }
-
-            .picker-container > .resultsContainer > .subject:hover {
-                background-color: var(--azul-tec-light);
-            }
-
-            .picker-container > .resultsContainer > .subject:hover > p {
-                color: white;
-            }
-
-            .subject-container > p {
-                background-color: white;
-                padding: .5em;
-                border-bottom: 1px solid var(--gray-border-color);
-                }
-
-            .subject-container > #subjectContainer  {
-                overflow-y: scroll;
-                flex: 1;
-            }
-
-            .subject-container > #subjectContainer > .subject {
-                background-color: white;
-                padding: .5em;
-                margin: .5em;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-            }
-
-            .subject-container > #subjectContainer > .subject > .name {
-                flex: 1;
-            }
-
-            .subject-container > #subjectContainer > .subject > i {
-                cursor: pointer;
-            }
-
-            .subject-container > #subjectContainer > .subject > i:hover {
-                color: red;
-            }
-
-
-            .button-container {
-                display: flex;
-                justify-content: center;
-                margin-top: 2em;
-            }
-
-            form > p {
-                margin: .5em 0;
-            }
-        </style>
+        <link rel="stylesheet" href="/styles/registro-docentes.css">
     </head>
     <body>
         <header class="header-extension">
             <div class="bar">
                 <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
-                <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
+                <img src="/assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
             </a>
                 <h2>Registro de Docentes</h2>
@@ -286,6 +164,6 @@
             <p>Ingeniería en Sistemas Computacionales</p>
         </footer>
 
-        <script src="scripts/registro-docentes.js"></script>
+        <script src="/scripts/registro-docentes.js"></script>
     </body>
 </html>
