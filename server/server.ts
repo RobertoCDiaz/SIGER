@@ -3004,10 +3004,6 @@ const getResidentMenu = (email: string) =>
                         'Nuevo proyecto': {
                             'href': '/nuevo-proyecto',
                             'icon': 'note_add'
-                        },
-                        'Documentos': {
-                            'href': '/documentos',
-                            'icon': 'description'
                         }
                     },
                     'secondary': {

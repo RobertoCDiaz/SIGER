@@ -250,7 +250,7 @@
 
                     let tl = document.getElementById('timelinedef');
                     let contright = document.createElement('div');
-                    contright.className='container left';
+                    contright.className='container right';
                     let cont = document.createElement('div');
                     cont.className='contentt';
                     let title = document.createElement('h2');

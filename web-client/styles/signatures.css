@@ -1,0 +1,12 @@
+            .signatures
+            {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+            }
+
+            .signatures div
+            {
+                width: 20%;
+                text-align: center;
+            }
