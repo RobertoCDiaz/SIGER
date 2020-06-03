@@ -77,7 +77,7 @@ const getPetition = (petition: string, callback: (response: JSON) => void) => {
 const documentView = (name: string, fecha: string, href: string) => `
     <div class="column">
         <div class="contentt">
-        <a href="${href}"><img src="assets/images/word.png" style="width:50%"></a>
+        <a href="${href}"><img src="/assets/images/word.png" style="width:50%"></a>
         <h3>${name}</h3>
         <p>Fecha de creación: ${fecha}</p>
         </div>
