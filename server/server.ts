@@ -693,6 +693,7 @@ server.get('/aprobado',(req,res)=>
                     const idRes = String(rows[0][0]['id_residencia']);
 
                     res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: idRes});
+                    return;
                 }
                 const message = 1;
                 const a = String(rows[0][0]['aprobado']);
@@ -705,6 +706,7 @@ server.get('/aprobado',(req,res)=>
                 const idRes = String(rows[0][0]['id_residencia']);
 
                 res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: idRes});
+                return;
                 }
                 catch(e)
                 {
@@ -716,6 +718,7 @@ server.get('/aprobado',(req,res)=>
                         const am = String(req.session.user.info.apellido_materno);
                         const em = String(req.session.user.info.email);
                         res.json({message:message,n:n,ap:ap,am:am,em:em});
+                        return;
                     }
                 }
         });
@@ -750,11 +753,13 @@ server.get('/asesor',(req,res)=>
             const amasesor = String(rows[0][0]['am']);
 
             res.json({message:message,nombre:nasesor,paternoasesor:apasesor,maternoasesor:amasesor});
+            return;
         } catch (e) {
             if(e instanceof TypeError)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -792,11 +797,13 @@ server.get('/revisores',(req,res)=>
             const am2 = String(rows[0][1]['am']);
 
             res.json({message:message,n1:n1,ap1:ap1,am1:am1,n2:n2,ap2:ap2,am2:am2});
+            return;
         } catch (e) {
             if(e instanceof TypeError)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -829,11 +836,13 @@ server.get('/muestra-carta-aceptacion',(req,res)=>
             const ruta = String(rows[0][0]['ruta']);
             const fecha = String(rows[0][0]['fecha']);
             res.json({message:message,ruta:ruta,fecha:fecha});
+            return;
         } catch (e) {
             if(e instanceof TypeError)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -866,11 +875,13 @@ server.get('/muestra-carta-aceptacion-a',(req,res)=>
             const ruta = String(rows[0][0]['ruta']);
             const fecha = String(rows[0][0]['fecha']);
             res.json({message:message,ruta:ruta,fecha:fecha});
+            return;
         } catch (e) {
             if(e instanceof TypeError)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -905,6 +916,7 @@ server.get('/cal1',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
@@ -912,6 +924,7 @@ server.get('/cal1',(req,res)=>
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+            return;
         }
         catch (e)
         {
@@ -919,6 +932,7 @@ server.get('/cal1',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -953,6 +967,7 @@ server.get('/cal1_2',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
             const message = 1;
             const ee = String(rows[0][1]['ee']);
@@ -960,6 +975,7 @@ server.get('/cal1_2',(req,res)=>
             const ei = String(rows[0][1]['ei']);
             const oi = String(rows[0][1]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+            return;
         }
         catch (e)
         {
@@ -967,6 +983,7 @@ server.get('/cal1_2',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -1000,6 +1017,7 @@ server.get('/cal2',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
@@ -1007,6 +1025,7 @@ server.get('/cal2',(req,res)=>
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+            return;
         }
         catch (e)
         {
@@ -1014,6 +1033,7 @@ server.get('/cal2',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
 
@@ -1331,6 +1351,7 @@ server.get('/asesor-aprobado',(req,res)=>
                     const fecha = String(rows[0][0]['fecha']);
 
                     res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: rows[0][0]['id_residencia']});
+                    return;
                 }
                 const message = 1;
                 const a = String(rows[0][0]['aprobado']);
@@ -1343,6 +1364,7 @@ server.get('/asesor-aprobado',(req,res)=>
 
 
                 res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: rows[0][0]['id_residencia']});
+                return;
                 }
                 catch(e)
                 {
@@ -1354,6 +1376,7 @@ server.get('/asesor-aprobado',(req,res)=>
                         const am = String(rows[0][0]['am']);
                         const em = String(req.session.user.info.email);
                         res.json({message:message,n:n,ap:ap,am:am,em:em});
+                        return;
                     }
                 }
         });
@@ -1389,11 +1412,13 @@ server.get('/asesor-asesor',(req,res)=>
             const amasesor = String(rows[0][0]['am']);
 
             res.json({message:message,nombre:nasesor,paternoasesor:apasesor,maternoasesor:amasesor});
+            return;
         } catch (e) {
             if(e instanceof TypeError)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -1432,11 +1457,13 @@ server.get('/asesor-revisores',(req,res)=>
             const am2 = String(rows[0][1]['am']);
 
             res.json({message:message,n1:n1,ap1:ap1,am1:am1,n2:n2,ap2:ap2,am2:am2});
+            return;
         } catch (e) {
             if(e instanceof TypeError)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -1468,12 +1495,19 @@ server.get('/asesor-cal1',(req,res)=>
         }
         try
         {
+            if(rows[0][0]['ee']==null)
+            {
+                const message = 0;
+                res.json({message:message});
+                return;
+            }
             const message = 1;
             const ee = String(rows[0][0]['ee']);
             const oe = String(rows[0][0]['oe']);
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+            return;
         }
         catch (e)
         {
@@ -1481,6 +1515,7 @@ server.get('/asesor-cal1',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -1511,10 +1546,11 @@ server.get('/asesor_cal1_2',(req,res)=>
         }
         try
         {
-            if(rows[0][0]['ee']==null)
+            if(rows[0][1]['ee']==null)
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
             const message = 1;
             const ee = String(rows[0][1]['ee']);
@@ -1522,6 +1558,7 @@ server.get('/asesor_cal1_2',(req,res)=>
             const ei = String(rows[0][1]['ei']);
             const oi = String(rows[0][1]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+            return;
         }
         catch (e)
         {
@@ -1529,6 +1566,7 @@ server.get('/asesor_cal1_2',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
     });
@@ -1565,6 +1603,7 @@ server.get('/asesor-cal2',(req,res)=>
             const ei = String(rows[0][0]['ei']);
             const oi = String(rows[0][0]['oi']);
             res.json({message:message,ee:ee,oe:oe,ei:ei,oi:oi});
+            return;
         }
         catch (e)
         {
@@ -1572,6 +1611,7 @@ server.get('/asesor-cal2',(req,res)=>
             {
                 const message = 0;
                 res.json({message:message});
+                return;
             }
         }
 
