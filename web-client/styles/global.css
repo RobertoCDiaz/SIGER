@@ -139,7 +139,7 @@ header a {
 
     BOTONES.
 
-=============================================  */  
+=============================================  */
 .primary-button {
     color: white;
     border: 1px solid var(--azul-tec);
@@ -221,20 +221,20 @@ input[type="number"] {
 
 
 .sidenav {
-    height: 100%; 
-    width: 0; 
+    height: 100%;
+    width: 0;
     position: fixed;
     z-index: 1;
-    top: 0; 
+    top: 0;
     left: 0;
-    background-color: var(--azul-tec); 
-    overflow-x: hidden; 
-    padding-top: 60px; 
-    transition: 0.5s; 
-    
+    background-color: var(--azul-tec);
+    overflow-x: hidden;
+    padding-top: 60px;
+    transition: 0.5s;
+
     }
 
-    
+
     .sidenav a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
@@ -245,12 +245,12 @@ input[type="number"] {
     margin-bottom: 1.5em;
     }
 
-    
+
     .sidenav a:hover {
     color: #f1f1f1;
     }
 
-    
+
     .sidenav .closebtn {
     position: absolute;
     top: 0;
@@ -265,7 +265,7 @@ input[type="number"] {
     padding: 20px;
     }*/
 
-    
+
     @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}

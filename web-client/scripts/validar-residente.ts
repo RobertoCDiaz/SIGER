@@ -104,6 +104,6 @@ const validar = (email: string) => {
 
         location.reload();
     };
-    
+
     xhr.send(`email_residente=${email}`);
 }

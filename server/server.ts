@@ -85,12 +85,12 @@ server.use('/siger-cloud/files/residencias/:id', (req, res, next) => {
                 res.redirect('/home');
                 return;
             }
-            
+
             next();
         }
     );
 });
-   
+
 
 /**
  * Solo aquellos participantes de una conversación tiene acceso a los
@@ -124,47 +124,47 @@ class UserUtils {
     /**
      * Comprueba si un tipo de usuario forma parte de algún grupo de usuarios específico.
      * Regresa [true] o [false] dependiendo del resultado.
-     * 
+     *
      * @param actualClass Valor binario a comprobar.
-     * 
+     *
      * @param desiredClass Valor del grupo de usuarios con el cual hacer la comparación.
-     * 
+     *
      * Ejemplos de uso:
-     * 
+     *
      * $ belongsToClass(001, USER_CLASSES.RESIDENTE);
      *      -> true
-     * 
+     *
      * $ belongsToClass(110, USER_CLASSES.ADMIN);
      *      -> true
-     * 
+     *
      * $ belongsToClass(010, USER_CLASSES.DOCENTE);
      *      -> true
-     * 
+     *
      * $ belongsToClass(010, USER_CLASSES.ADMIN);
      *      -> false
-     * 
+     *
      */
     static belongsToClass = (actualClass: number, desiredClass: number) =>
         ((actualClass & (desiredClass)) == (desiredClass));
 
     /**
-     * Junta distintos grupos de usuario y arroja el valor 
+     * Junta distintos grupos de usuario y arroja el valor
      * numérico (Tomado como binario) que representaría el conjunto
      * de todos los grupos de usuario introducidos.
-     * 
+     *
      * @params Lista de grupos de usuarios a concatenar.
-     * 
+     *
      * Ejemplos de uso:
-     * 
+     *
      * $ concatenateClasses(USER_CLASSES.DOCENTE, USER_CLASSES.ADMIN);
      *      -> 110
-     * 
+     *
      * $ concatenateClasses(USER_CLASSES.DOCENTE, USER_CLASSES.ADMIN, USER_CLASSES.RESIDENTE);
      *      -> 111
      */
     static concatenateClasses = (...classes: number[]) => {
         let res = 0;
-        classes.forEach(c => 
+        classes.forEach(c =>
             res = res | c
         );
 
@@ -178,9 +178,9 @@ class UserUtils {
 
 ================================================================================================ */
 /**
- * Regresa al cliente una lista simplificada de las carreras en la base de datos. Esta lista 
+ * Regresa al cliente una lista simplificada de las carreras en la base de datos. Esta lista
  * contendrá únicamente la clave de la carrera, así como el nombre de esta.
- * 
+ *
  * Si ocurre algún error, regresará un objeto de error al cliente.
  */
 server.get('/listaSimpleDeCarreras', (req, res) => {
@@ -198,7 +198,7 @@ server.get('/listaSimpleDeCarreras', (req, res) => {
 });
 
 /**
- * Regresa al cliente una lista de los residentes sin confirmar de las 
+ * Regresa al cliente una lista de los residentes sin confirmar de las
  * carreras que el administrador actual maneja.
  */
 server.get('/residentesNoValidados', (req, res) => {
@@ -276,8 +276,8 @@ server.post('/registrarResidente', (req, res) => {
         'call SP_RegistroResidente(?, ?, ?, ?, ?, ?, ?, ?, ?);',
         [
             req.body.email, encrypt(req.body.pass), req.body.name, req.body.patSurname,
-            (req.body.matSurname || "null"), new Date().getTime().toString(), req.body.career, req.body.cellNumber, 
-            req.body.phoneNumber    
+            (req.body.matSurname || "null"), new Date().getTime().toString(), req.body.career, req.body.cellNumber,
+            req.body.phoneNumber
         ],
         (e, rows, f) => {
 
@@ -300,7 +300,7 @@ server.post('/registrarResidente', (req, res) => {
 
 /**
  * Login simple
- * 
+ *
  * Si ocurre algún error, regresará un objeto de error al cliente.
  */
 server.get('/login', (req, res) => {
@@ -309,20 +309,20 @@ server.get('/login', (req, res) => {
         return;
     }
 
-    res.sendFile("login.html", { root: "../web-client/" }); 
+    res.sendFile("login.html", { root: "../web-client/" });
 });
-    
+
 
 /**
  * Intenta autenticar una cuenta de usuario del sistema.
- * 
- * Dependiendo del tipo de usuario que intenta logearse (adminstradores, 
+ *
+ * Dependiendo del tipo de usuario que intenta logearse (adminstradores,
  * docentes, o residentes) se ejecutará la lógica apropiada.
- * 
+ *
  * En caso de que el login tenga éxito, se registrará la información
  * básica del usuario que podría usarse en el server en [req.session.user].
  * Actualmente, el objeto [req.session.user] tiene esta estructura:
- * 
+ *
  * {
  *      'class': Tipo de usuario identificado. Ver enum [USER_CLASSES].
  *      'info': { Información del usuario
@@ -338,7 +338,7 @@ server.post('/auth', (req,res) =>{
     const pass = req.body.pass;
     const userClass = req.body.class;
 
-    if (!email || !pass || !userClass) { 
+    if (!email || !pass || !userClass) {
         res.send(Response.notEnoughParams());
         return;
     }
@@ -350,17 +350,17 @@ server.post('/auth', (req,res) =>{
                     res.send(Response.unknownError(e.toString()));
                     return;
                 }
-                
+
                 if (results.length == 0) {
                     res.send(Response.userError("El correo electrónico ingresado no está registrado."));
                     return;
                 }
-        
+
                 if (pass != decrypt(results[0]['contrasena'])) {
                     res.send(Response.userError("La contraseña no es correcta, verifique."));
                     return;
                 }
-        
+
                 req.session.user = {
                     class: USER_CLASSES.RESIDENTE,
                     info: {
@@ -370,13 +370,13 @@ server.post('/auth', (req,res) =>{
                         apellido_materno: results[0]['apellido_materno']
                     }
                 };
-        
+
                 req.session.loggedin = true;
-        
+
                 res.send(Response.success());
-            });  
-            break;  
-        }     
+            });
+            break;
+        }
 
         case 2:
         {
@@ -387,12 +387,12 @@ server.post('/auth', (req,res) =>{
                     res.send(Response.unknownError(e.toString()));
                     return;
                 }
-                    
+
                 if (results.length == 0) {
                     res.send(Response.userError("El correo electrónico ingresado no está registrado."));
                     return;
                 }
-            
+
                 if (pass != decrypt(results[0]['contrasena'])) {
                     res.send(Response.userError("La contraseña no es correcta, verifique."));
                     return;
@@ -413,7 +413,7 @@ server.post('/auth', (req,res) =>{
                         residente:''
                     }
                 };
-                    
+
                 req.session.loggedin = true;
 
                 res.send(Response.success());
@@ -440,7 +440,7 @@ server.get('/home',(req,res)=> {
         res.sendFile("menu-docentes.html", { root: "../web-client/" });
         return;
     }
-    res.redirect('/login');    
+    res.redirect('/login');
 });
 
 server.get('/validar-residentes', (req, res) => {
@@ -492,7 +492,7 @@ server.get('/nuevo-proyecto', (req, res) => {
 //Registro de residencia
 server.post('/registro-residencia',(req,res)=>
 {
-    
+
     if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE)) {
         res.send(Response.authError());
         return;
@@ -544,7 +544,7 @@ server.post('/registro-residencia',(req,res)=>
             idres=Number(rows[0][0]['idresidencia']);
 
             registrarHorarios(
-                idres, entradas, salidas, counter, 
+                idres, entradas, salidas, counter,
                 () => { // onDone
                     res.send(Response.success());
                 },
@@ -559,7 +559,7 @@ server.post('/registro-residencia',(req,res)=>
 
 /**
  * Función recursiva que asocia un conjunto de horarios a una residencia.
- * 
+ *
  * @param idResidencia ID de la residencia a la cual asociar horarios.
  * @param entradas Arreglo de horas de entrada. La correspondencia entre horas de entrada - salida será "entradas[i] - salidas[i]".
  * @param salidas Arreglo de horas de salida. La correspondencia entre horas de entrada - salida será "entradas[i] - salidas[i]".
@@ -568,14 +568,14 @@ server.post('/registro-residencia',(req,res)=>
  * @param onError Qué hacer si ocurre un error en alguna inserción, siendo [error] el mensaje de error, y [númeroHorario] el número del índice de horario en el cual ocurrió el error.
  */
 const registrarHorarios = (
-    idResidencia: number, entradas: string[], salidas: string[], 
+    idResidencia: number, entradas: string[], salidas: string[],
     horarios: number, onDone: () => void, onError: (error, numeroHorario) => void
 ) => {
     con.query(
         `call SP_RegistraHorarios(?,?,?);`,
         [entradas[horarios - 1], salidas[horarios - 1], idResidencia],
         (err, rows, f) => {
-            
+
             if (err) {
                 onError(err, horarios - 1);
                 return;
@@ -587,7 +587,7 @@ const registrarHorarios = (
 
             if (horarios - 1 > 0)
                 registrarHorarios(idResidencia, entradas, salidas, horarios - 1, onDone, onError);
-            else 
+            else
                 onDone();
         }
     );
@@ -598,9 +598,9 @@ const registrarHorarios = (
  * Regresa al cliente una lista de residencias que aún no han sido confirmadas
  * (No se han asignado docentes como asesores internos o revisores) de las carreras
  * que administra el usuario actual.
- * 
- * Opcionalmente, se puede pasar una consulta en el parámetro [q] que se usará para 
- * buscar residencias basándose en el nombre del proyecto, nombre de la empresa, 
+ *
+ * Opcionalmente, se puede pasar una consulta en el parámetro [q] que se usará para
+ * buscar residencias basándose en el nombre del proyecto, nombre de la empresa,
  * nombre del residente, o correo electrónico del residente (y por extensión, su
  * número de control).
  */
@@ -611,7 +611,7 @@ server.get('/listaResidenciasSinDocentes', (req, res) => {
     }
 
     const query = req.query.q ?? '';
-    const adminEmail = req.session.user.info.email; 
+    const adminEmail = req.session.user.info.email;
 
     con.query(
         `call SP_ListaResidenciasSinDocentes(?, ?);`,
@@ -718,7 +718,7 @@ server.get('/aprobado',(req,res)=>
                         res.json({message:message,n:n,ap:ap,am:am,em:em});
                     }
                 }
-        });          
+        });
 });
 
 server.get('/asesor',(req,res)=>
@@ -899,7 +899,7 @@ server.get('/cal1',(req,res)=>
             console.log(er);
             return;
         }
-        try 
+        try
         {
             if(rows[0][0]['ee']==null)
             {
@@ -947,7 +947,7 @@ server.get('/cal1_2',(req,res)=>
             console.log(er);
             return;
         }
-        try 
+        try
         {
             if(rows[0][0]['ee']==null)
             {
@@ -994,7 +994,7 @@ server.get('/cal2',(req,res)=>
             console.log(er);
             return;
         }
-        try 
+        try
         {
             if(rows[0][0]['ee']==null)
             {
@@ -1016,7 +1016,7 @@ server.get('/cal2',(req,res)=>
                 res.json({message:message});
             }
         }
-        
+
     });
 });
 
@@ -1116,7 +1116,7 @@ server.get('/activar-evaluacion', (req, res) => {
 
 /**
  * Dado un id de residencia [id], regresa al cliente la información
- * necesaria para llenar el formato de reporte preliminar, siempre 
+ * necesaria para llenar el formato de reporte preliminar, siempre
  * y cuando el adminsitrador esté a cargo de la carrera del residente.
  */
 server.get('/getInformacionReportePreliminar', (req, res) => {
@@ -1134,13 +1134,13 @@ server.get('/getInformacionReportePreliminar', (req, res) => {
 
     con.query(
         'call SP_FormatoPreliminar(?, ?);',
-        [idResidencia, adminEmail], 
+        [idResidencia, adminEmail],
         (e, rows, f) => {
             if (e) {
                 res.send(Response.unknownError(e.toString()));
                 return;
             }
-            
+
             if (rows[0].length == 0) {
                 res.send(Response.userError(`No se encontró esta residencia`));
                 return;
@@ -1340,7 +1340,7 @@ server.get('/asesor-aprobado',(req,res)=>
                 const am = String(rows[0][0]['am']);
                 const em = String(req.session.user.info.residente);
                 const fecha = String(rows[0][0]['fecha']);
-                
+
 
                 res.json({message:message,proyecto:p,n:n,ap:ap,am:am,em:em,fecha:fecha, id_residencia: rows[0][0]['id_residencia']});
                 }
@@ -1356,7 +1356,7 @@ server.get('/asesor-aprobado',(req,res)=>
                         res.json({message:message,n:n,ap:ap,am:am,em:em});
                     }
                 }
-        });          
+        });
 });
 
 server.get('/asesor-asesor',(req,res)=>
@@ -1466,7 +1466,7 @@ server.get('/asesor-cal1',(req,res)=>
             console.log(er);
             return;
         }
-        try 
+        try
         {
             const message = 1;
             const ee = String(rows[0][0]['ee']);
@@ -1509,7 +1509,7 @@ server.get('/asesor_cal1_2',(req,res)=>
             console.log(er);
             return;
         }
-        try 
+        try
         {
             if(rows[0][0]['ee']==null)
             {
@@ -1557,7 +1557,7 @@ server.get('/asesor-cal2',(req,res)=>
             console.log(er);
             return;
         }
-        try 
+        try
         {
             const message = 1;
             const ee = String(rows[0][0]['ee']);
@@ -1574,7 +1574,7 @@ server.get('/asesor-cal2',(req,res)=>
                 res.json({message:message});
             }
         }
-        
+
     });
 });
 
@@ -1582,11 +1582,11 @@ server.get('/asesor-cal2',(req,res)=>
 /**
  * Dependiendo del tipo de usuario, regresa un menú
  * personalizado indicando las acciones que puede
- * realizar dentro del sistema. 
- * 
+ * realizar dentro del sistema.
+ *
  * Un menú, para funcionar y mostrarse de manera
  * correcta en el sistema, deberá seguir la siguiente estructura:
- * 
+ *
  * {
  *      "main": {
  *          "opción1": {            Nombre de la opción. Este será el que se visualice.
@@ -1602,11 +1602,11 @@ server.get('/asesor-cal2',(req,res)=>
  *          ...
  *      }
  * }
- * 
+ *
  * Donde [main] son las opciones "principales" que aparecerán en la
  * parte superior de la barra lateral. Las opciones de [secondary]
  * aparecerá en la parte inferior.
- * Para el menú principal en /home, la organización en [main] y 
+ * Para el menú principal en /home, la organización en [main] y
  * [secondary] serán irrelevantes y aparecerán todas juntas, una después
  * de otra.
  */
@@ -1625,7 +1625,7 @@ server.get('/getMenu', (req, res) => {
     } else {
         getResidentMenu(req.session.user.info.email).then(residentMenu =>
             res.send(Response.success(residentMenu))
-        ).catch(error => 
+        ).catch(error =>
             res.send(Response.unknownError(error.toString()))
         );
     }
@@ -1700,8 +1700,8 @@ server.post('/registrarDocente', (req, res) => {
 
             if (claves.length > 0) {
                 asociarDocenteConMateria(
-                    email, 
-                    claves, 
+                    email,
+                    claves,
                     claves.length,
                     () => {
                         console.log(`El proceso de asociación de materias ha terminado para [${email}]`);
@@ -1711,10 +1711,10 @@ server.post('/registrarDocente', (req, res) => {
                     }
                 );
             }
-            
+
             sendEmail(
-                email, 
-                'Registro como docente', 
+                email,
+                'Registro como docente',
                 `
                 <p>Usted ha recibido este correo porque su dirección de correo electrónico ha sido registrada como docente en el Sistema Gestor de Residencias (SIGER) del Instituto Tecnológico de Piedras Negras.</p>
 
@@ -1732,7 +1732,7 @@ server.post('/registrarDocente', (req, res) => {
                     }
                     res.send(Response.success(info, "El registro ha sido un éxito. Busque en su correo electrónico un email de confirmación y siga las instrucciones ahí descritas."));
                 }
-            );            
+            );
         }
     )
 });
@@ -1740,7 +1740,7 @@ server.post('/registrarDocente', (req, res) => {
 
 /**
  * Procedimiento recursivo que define a un docente como competente en un conjunto de asignaturas.
- * 
+ *
  * @param email Correo electrónico del docente.
  * @param claves Arreglo con las claves a asociar.
  * @param materiasRestantes Número restante de materias a asociar. En la primer llamada de la rutina tiene que ser [claves.length].
@@ -1748,7 +1748,7 @@ server.post('/registrarDocente', (req, res) => {
  * @param ifError Qué hacer si ocurre un error, siendo [error] el mensaje de error y [clave] la clave de la materia donde ocurrió el error. NOTA: Si ocurre un error, el procedimiento no se detendrá y seguirá asociando el resto de materias.
  */
 const asociarDocenteConMateria = (
-    email: string, claves: Array<string>, materiasRestantes: number, 
+    email: string, claves: Array<string>, materiasRestantes: number,
     onDone: () => void, ifError: (error: string, clave: string) => void
 ) => {
     con.query(
@@ -1765,7 +1765,7 @@ const asociarDocenteConMateria = (
 
             if (materiasRestantes > 1)
                 asociarDocenteConMateria(email, claves, materiasRestantes - 1, onDone, ifError);
-            else 
+            else
                 onDone();
         }
     );
@@ -1806,8 +1806,8 @@ server.get('/confirmarDocente', (req, res) => {
 /**
  * Regresa al cliente una lista de todas las residencias aptas para iniciar
  * un periodo de evaluación.
- * 
- * El criterio utilizado para determinar si una residencia es apta o no es que 
+ *
+ * El criterio utilizado para determinar si una residencia es apta o no es que
  * la residencia debe estar aprobada, NO estar terminada, y NO contar con
  * ninguna evaluación pendiente (Anexo 29 o 30).
  */
@@ -1841,10 +1841,10 @@ server.get('/residenciasAptasParaEvaluacion', (req, res) => {
 /**
  * Regresa al cliente una lista de las residencia que actualmente están siendo
  * evaluadas.
- * 
+ *
  * La información que incluirá cada fila será el ID de la residencia,
  * el nombre del proyecto, nombre completo del residente, anexo pendiente,
- * email y nombre del A.I y A.E, además de si indicar cuál de los asesores 
+ * email y nombre del A.I y A.E, además de si indicar cuál de los asesores
  * aún está pendiente de evaluación.
  */
 server.get('/residenciasEnEvaluacion', (req, res) => {
@@ -1900,26 +1900,26 @@ server.get('/activarAnexo29', (req, res) => {
 
 
 /**
- * Activa una evaluación con anexo 29 para un conjunto de 
+ * Activa una evaluación con anexo 29 para un conjunto de
  * residencias.
- * 
- * @param arr       Arreglo de IDs de residencias a activar. 
- * 
- * @param count     Número de residencias a activar. Al principio de la 
+ *
+ * @param arr       Arreglo de IDs de residencias a activar.
+ *
+ * @param count     Número de residencias a activar. Al principio de la
  *                  recursión debe ser [arr.length].
- * 
+ *
  * @param onDone    Qué hacer cuándo haya terminado el proceso.
- * 
- * @param onError   Qué hacer en caso de error. [msg] será el mensaje de 
+ *
+ * @param onError   Qué hacer en caso de error. [msg] será el mensaje de
  *                  error, y [n] será el número de residencia con error.
- * 
- * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una 
- * residencia no se le activará su evaluación, pero el procedimiento 
+ *
+ * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una
+ * residencia no se le activará su evaluación, pero el procedimiento
  * intenrtará seguir con las demás.
  */
 const activarA29Residencias = (
-    adminEmail:string, arr: Object[], count: number, 
-    onDone: () => void, 
+    adminEmail:string, arr: Object[], count: number,
+    onDone: () => void,
     onError: (msg: string, n: number) => void
 ) => {
     const currIdx: number = count - 1;
@@ -1967,7 +1967,7 @@ const activarA29Residencias = (
                     `Evaluación de Residencia Profesional :: SIGER`,
                     template(`evaluacion-a29-ai?id=${encodeURI(aiID)}`)
                 );
-                    
+
                 sendEmail(
                     aeEmail,
                     `Evaluación de Residencia Profesional :: SIGER`,
@@ -2009,26 +2009,26 @@ server.get('/activarAnexo30', (req, res) => {
 
 
 /**
- * Activa una evaluación con anexo 30 para un conjunto de 
+ * Activa una evaluación con anexo 30 para un conjunto de
  * residencias.
- * 
- * @param arr       Arreglo de IDs de residencias a activar. 
- * 
- * @param count     Número de residencias a activar. Al principio de la 
+ *
+ * @param arr       Arreglo de IDs de residencias a activar.
+ *
+ * @param count     Número de residencias a activar. Al principio de la
  *                  recursión debe ser [arr.length].
- * 
+ *
  * @param onDone    Qué hacer cuándo haya terminado el proceso.
- * 
- * @param onError   Qué hacer en caso de error. [msg] será el mensaje de 
+ *
+ * @param onError   Qué hacer en caso de error. [msg] será el mensaje de
  *                  error, y [n] será el número de residencia con error.
- * 
- * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una 
- * residencia no se le activará su evaluación, pero el procedimiento 
+ *
+ * NOTA: Si ocurre un error, el proceso no es cancelado. Tal vez una a una
+ * residencia no se le activará su evaluación, pero el procedimiento
  * intenrtará seguir con las demás.
  */
 const activarA30Residencias = (
-    adminEmail:string, arr: Object[], count: number, 
-    onDone: () => void, 
+    adminEmail:string, arr: Object[], count: number,
+    onDone: () => void,
     onError: (msg: string, n: number) => void
 ) => {
     const currIdx: number = count - 1;
@@ -2076,7 +2076,7 @@ const activarA30Residencias = (
                     `Última evaluación de Residencia Profesional :: SIGER`,
                     template(`evaluacion-a30?id=${encodeURI(aiID)}`)
                 );
-                    
+
                 sendEmail(
                     aeEmail,
                     `Última evaluación de Residencia Profesional :: SIGER`,
@@ -2095,7 +2095,7 @@ const activarA30Residencias = (
 /**
  * Regresa al cliente la información destacable de una residencia
  * que puede ser mostrada durante la evaluación usando el Anexo 29.
- * 
+ *
  * @param id ID único del enlace de evaluación del asesor.
  */
 server.get('/infoAnexo29DesdeURL', (req, res) => {
@@ -2133,7 +2133,7 @@ server.get('/infoAnexo29DesdeURL', (req, res) => {
 /**
  * Regresa al cliente la información destacable de una residencia
  * que puede ser mostrada durante la evaluación usando el Anexo 30.
- * 
+ *
  * @param id ID único del enlace de evaluación del asesor.
  */
 server.get('/infoAnexo30DesdeURL', (req, res) => {
@@ -2169,16 +2169,16 @@ server.get('/infoAnexo30DesdeURL', (req, res) => {
 
 
 /**
- * Registra en la base de datos la evaluación de un 
+ * Registra en la base de datos la evaluación de un
  * asesor (Ya sea interno o externo) sobre una residencia
  * profesional, usando el anexo 29.
- * 
+ *
  * @param id            ID único de la evaluación.
- * 
+ *
  * @param evaluacion    Cadena de texto que contiene la evaluacion
  *                      en cada rubro, separadas por coma.
  *                      Por ejemplo, "4,2,6,10,15,4".
- * 
+ *
  * @param observaciones Observaciones personales del asesor.
  */
 server.post('/registrarEvaluacionA29', (req, res) => {
@@ -2217,16 +2217,16 @@ server.post('/registrarEvaluacionA29', (req, res) => {
 
 
 /**
- * Registra en la base de datos la evaluación de un 
+ * Registra en la base de datos la evaluación de un
  * asesor (Ya sea interno o externo) sobre una residencia
  * profesional, usando el anexo 30.
- * 
+ *
  * @param id            ID único de la evaluación.
- * 
+ *
  * @param evaluacion    Cadena de texto que contiene la evaluacion
  *                      en cada rubro, separadas por coma.
  *                      Por ejemplo, "4,2,6,10,15,4".
- * 
+ *
  * @param observaciones Observaciones personales del asesor.
  */
 server.post('/registrarEvaluacionA30', (req, res) => {
@@ -2283,12 +2283,12 @@ server.get('/documentos/carta-aceptacion',(req,res)=>
 
 
 /**
- * Regresa al cliente la pantalla del 
+ * Regresa al cliente la pantalla del
  * anexo apropiada. Si no se incluye un
  * ID en la dirección, se enviará al cliente
  * el .html con el formato de ejemplo. En caso
  * de sí haber un ID, se enviará la página lista
- * para llenarse con información del anexo 
+ * para llenarse con información del anexo
  * especificado.
  */
 server.get('/documentos/anexo-29',(req,res)=>
@@ -2309,12 +2309,12 @@ server.get('/documentos/anexo-29',(req,res)=>
 
 
 /**
- * Regresa al cliente la pantalla del 
+ * Regresa al cliente la pantalla del
  * anexo apropiada. Si no se incluye un
  * ID en la dirección, se enviará al cliente
  * el .html con el formato de ejemplo. En caso
  * de sí haber un ID, se enviará la página lista
- * para llenarse con información del anexo 
+ * para llenarse con información del anexo
  * especificado.
  */
 server.get('/documentos/anexo-30',(req,res)=>
@@ -2380,7 +2380,7 @@ server.get('/idDeMiResidencia', (req, res) => {
 /**
  * Regresa al cliente los ID de los distintos documentos de la residencia.
  * Ver [SP_GetDocumentosDeResidencia] del archivo .sql para más información.
- * 
+ *
  * @param req.query.id ID de la residencia de la cual se extraerán los documentos.
  */
 server.get('/documentosDeResidencia', (req, res) => {
@@ -2416,8 +2416,8 @@ server.get('/documentosDeResidencia', (req, res) => {
 
 
 /**
- * Crea en disco la evidencia de carta de aceptación [file] enviada 
- * desde el cliente, para después hacer el registro en la base 
+ * Crea en disco la evidencia de carta de aceptación [file] enviada
+ * desde el cliente, para después hacer el registro en la base
  * de datos.
  */
 server.post('/anexarCartaAceptacion', async (req, res) => {
@@ -2426,28 +2426,28 @@ server.post('/anexarCartaAceptacion', async (req, res) => {
             res.send(Response.authError());
             return;
         }
-    
+
         if ((await getResidentState(req.session.user.info.email)) != 2) {
             res.send(Response.userError("Ya no puede enviar carta de aceptación"));
             return;
         }
-    
+
         const file = req.files.file;
         const idRes: number = await getResidenciaIDDeResidente(req.session.user.info.email);
-    
+
         // Genera la ruta dinámica para cada archivo. Por ejemplo:
         //      residentes/L17430057/2020523180455-carta.jpg
         const d = new Date();
         const fileName = `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}-${file.name}`;
         const directory = `residencias/${idRes}`;
         const fullPath = `${directory}/${fileName}`
-    
+
         file.mv(`files/${fullPath}`, err => {
             if (err) {
                 res.send(Response.unknownError(err.toString()));
                 return;
             }
-    
+
             con.query(
                 `call SP_AgregarCartaDeAceptacion(?, ?);`,
                 [idRes, fullPath],
@@ -2456,16 +2456,16 @@ server.post('/anexarCartaAceptacion', async (req, res) => {
                         res.send(Response.unknownError(e.toString()));
                         return;
                     }
-    
+
                     if (rows[0][0]['output'] < 1) {
                         res.send(Response.userError(rows[0][0]['message']));
                         return;
                     }
-    
+
                     res.send(Response.success());
                 }
             );
-        });    
+        });
     } catch (e) {
         res.send(Response.unknownError(e.toString()));
     }
@@ -2476,14 +2476,14 @@ server.post('/anexarCartaAceptacion', async (req, res) => {
  * Regresa al cliente una conversación entre el usuario
  * con sesión abierta en el navegador y el usuario con
  * correo [req.query.with].
- * 
+ *
  * Una conversación consiste en el conjunto de mensajes
  * intercambiados entre dos usuarios, ordenados de manera
- * cronológica, además de los archivos adjuntos a cada 
- * mensaje. Este será el primer elemento del arreglo 
+ * cronológica, además de los archivos adjuntos a cada
+ * mensaje. Este será el primer elemento del arreglo
  * enviado al cliente.
- * 
- * El segundo es un arreglo con los nombres completos de 
+ *
+ * El segundo es un arreglo con los nombres completos de
  * los involucrados en la conversación.
  */
 server.get('/getChatConversation', async (req, res) => {
@@ -2498,13 +2498,13 @@ server.get('/getChatConversation', async (req, res) => {
             res.send(Response.authError());
             return;
         }
-    
+
         const withEmail: string = req.query.with;
         if (!withEmail) {
             res.send(Response.notEnoughParams());
             return;
         }
-    
+
         con.query(
             `call SP_GetConversacion(?, ?);`,
             [req.session.user.info.email, withEmail],
@@ -2513,7 +2513,7 @@ server.get('/getChatConversation', async (req, res) => {
                     res.send(Response.unknownError(e.toString()));
                     return;
                 }
-    
+
                 for (let i = 0; i < rows[0].length; ++i) {
                     rows[0][i]['archivos'] = await getArchivosDeUnMensaje(rows[0][i]['id'], req.session.user.info.email);
                 }
@@ -2521,7 +2521,7 @@ server.get('/getChatConversation', async (req, res) => {
                 res.send(Response.success([
                     // Arreglo con los mensajes.
                     rows[0],
-                    // Nombres de los involucrados.    
+                    // Nombres de los involucrados.
                     rows[1][0]
                 ]));
             }
@@ -2534,7 +2534,7 @@ server.get('/getChatConversation', async (req, res) => {
 
 /**
  * Regresa los archivos anexados a un mensaje.
- * 
+ *
  * @param msgId ID del mensaje.
  * @param email Email de solicitante.
  */
@@ -2562,7 +2562,7 @@ const getArchivosDeUnMensaje = (msgId: number, email: string) => new Promise((re
 /**
  * Regresa al cliente una lista con información relevante
  * de cada conversación abierta por el usuario logeado.
- * 
+ *
  * Por cada conversación regresará el último mensaje enviado.
  */
 server.get('/getListaDeConversaciones', async (req, res) => {
@@ -2577,7 +2577,7 @@ server.get('/getListaDeConversaciones', async (req, res) => {
             res.send(Response.authError());
             return;
         }
-    
+
         con.query(
             `call SP_ListaConversaciones(?);`,
             req.session.user.info.email,
@@ -2586,10 +2586,10 @@ server.get('/getListaDeConversaciones', async (req, res) => {
                     res.send(Response.unknownError(e.toString()));
                     return;
                 }
-    
+
                 res.send(Response.success(rows[0]));
             }
-        );    
+        );
     } catch (error) {
         res.send(Response.unknownError(error.toString()));
     }
@@ -2599,9 +2599,9 @@ server.get('/getListaDeConversaciones', async (req, res) => {
 /**
  * Crea un nuevo mensaje en la base de datos, enviado
  * por el usuario con sesión abierta en el SIGER.
- * 
+ *
  * @param req.body.content Contenido del mensaje.
- * 
+ *
  * @param req.body.toEmail Correo electrónico del destinatario.
  */
 server.post('/sendMessage', async (req, res) => {
@@ -2627,7 +2627,7 @@ server.post('/sendMessage', async (req, res) => {
 
         con.query(
             `call SP_NuevoMensaje(?, ?, ?);`,
-            [msg, rEmail, dEmail], 
+            [msg, rEmail, dEmail],
             (e, rows, f) => {
                 if (e) {
                     res.send(Response.unknownError(e.toString()));
@@ -2661,7 +2661,7 @@ server.post('/sendMessage', async (req, res) => {
                 )
             }
         );
-    
+
     } catch (error) {
         res.send(Response.unknownError(error.toString()));
     }
@@ -2672,7 +2672,7 @@ server.post('/sendMessage', async (req, res) => {
  * Regresa al cliente una lista de usuarios del SIGER
  * con acceso al chat que cumplan con un cierto
  * criterio de búsqueada.
- * 
+ *
  * @param req.query.q Criterio de búsqueda.
  */
 server.get('/buscarEnChat', async (req, res) => {
@@ -2719,7 +2719,7 @@ server.get('/buscarEnChat', async (req, res) => {
 
 /**
  * Rutina recursiva que anexa a un mensaje un conjunto de archivos.
- * 
+ *
  * @param msgID ID del mensaje al cual anexar los archivos.
  * @param convID ID de la conversación del mensaje, para comprobar acceso.
  * @param filesArr Arreglo de archivos a asociar.
@@ -2753,15 +2753,15 @@ const anexarArchivosAMensaje = (msgID: number, convID: string, filesArr: any[], 
                     } else if (rows[0][0]['output'] < 1) {
                         onError(rows[0][0]['message']);
                     }
-        
+
                     if (filesCount > 1) {
                         anexarArchivosAMensaje(msgID, convID, filesArr,filesCount - 1, onDone, onError);
                         return;
                     }
-        
+
                     onDone();
                 }
-            )    
+            )
         }
     });
 };
@@ -2864,21 +2864,9 @@ server.get('/chat', async (req, res) => {
         res.redirect('/chat');
         return;
     }
-        
+
     res.sendFile('chat.html', { root: '../web-client/chat-pages/'});
 });
-/*
-const getPetition = (url) => new Promise<Object>((resolve, reject) => {
-    let xhr = new XMLHttpRequest();
-    xhr.open('get', url, true);
-    
-    xhr.onload = () => {
-        resolve(xhr.response);
-    };
-    
-    xhr.send();
-})
-*/
 
 
 /**
@@ -2890,12 +2878,12 @@ server.get('/asesorias', async (req, res) => {
         if (!req.session.loggedin || !UserUtils.belongsToClass(req.session.user.class, USER_CLASSES.RESIDENTE) || (await getResidentState(req.session.user.info.email)) < 3) {
             throw new Error("No tiene acceso a esta sección del sistema");
         }
-    
+
         res.sendFile("competentes.html", { root: "../web-client/" });
     } catch (error) {
         res.redirect('/home');
     }
-}); 
+});
 
 
 /* ================================================================================================
@@ -2904,9 +2892,9 @@ server.get('/asesorias', async (req, res) => {
 
 ================================================================================================ */
 /**
- * Escucha la peticón GET de la forma /encrypt?text=[txt]. 
- * 
- * Regresa al cliente el texto [txt] ya encriptado, o un cero si no se 
+ * Escucha la peticón GET de la forma /encrypt?text=[txt].
+ *
+ * Regresa al cliente el texto [txt] ya encriptado, o un cero si no se
  * proporcionó el parámetro text a la petición.
  */
 server.get('/encrypt', (req, res) => {
@@ -2922,11 +2910,11 @@ server.get('/encrypt', (req, res) => {
 
 
 // Toma como parámetro un string [txt], y regresa un string conteniendo el parámetro ya encriptado usando la clave secreta de [Keys.ts].
-const encrypt = (txt: string) => 
+const encrypt = (txt: string) =>
     AES.encrypt(txt, Keys.SECRET_KEY);
 
 // Toma como parámetro un string [txt], que debe ser una cadena de texto encriptada usando la clave de [Keys.ts]. Regresa el texto desencriptado.
-const decrypt = (txt: string) => 
+const decrypt = (txt: string) =>
     AES.decrypt(txt, Keys.SECRET_KEY);
 
 const getAdminMenu: () => Object = () => ({
@@ -2958,7 +2946,7 @@ const getAdminMenu: () => Object = () => ({
 
 /**
  * Consigue el menú con las opciones específicas del estado de un residente.
- * 
+ *
  * @param email Correo electrónico del residente del cual se quiere conocer su menú.
  */
 const getResidentMenu = (email: string) =>
@@ -3072,15 +3060,15 @@ const getResidentMenu = (email: string) =>
                     }
                 }; break;
             }
-            
+
             resolve(menu);
         }).catch(error => reject(error));
-    });    
+    });
 
-    
+
 /**
  * Consigue el menú con las opciones específicas del estado de un docente.
- * 
+ *
  * @param email Correo electrónico del docente del cual se quiere conocer su menú.
  * @param onDone Qué hacer cuándo un menú sea "calculado".
  */
@@ -3137,7 +3125,7 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
                             'Chat': {
                                 'href': '/chat',
                                 'icon': 'chat'
-                            },    
+                            },
                         },
                         'secondary': {
                             'Cerrar sesión': {
@@ -3155,7 +3143,7 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
                         secondary: Object.assign({}, menu['secondary'], getAdminMenu()['secondary']),
                     }
                 }
-                
+
                 onDone(menu);
             }
         );
@@ -3165,16 +3153,16 @@ const getTeacherMenu: (teacherEmail: string, onDone: (resultMenu :Object) => voi
 /**
  * Consigue de manera asíncrona el estado actual de un residente
  * en el sistema.
- * 
+ *
  * Regresa un valor numérico indicando el estado, acorde a
  * los siguientes valores:
- * 
+ *
  *      0: Sin confirmar.
- * 
+ *
  *      1: Confirmado.
- * 
+ *
  *      2: Con residencia aprobada.
- * 
+ *
  * @param email Correo electrónico del residente.
  */
 const getResidentState: (residentEmail: string) => Promise<number>
@@ -3197,14 +3185,14 @@ const getResidentState: (residentEmail: string) => Promise<number>
 /**
  * Consigue de manera asíncrona el estado actual de un docente
  * en el sistema.
- * 
+ *
  * Regresa un valor numérico indicando el estado, acorde a
  * los siguientes estados:
- * 
+ *
  *      0: Sin confirmar.
- * 
+ *
  *      1: Confirmado.
- * 
+ *
  * @param email Correo electrónico del docente.
  */
 
@@ -3226,10 +3214,10 @@ const getDocenteState = (docenteEmail: string) => new Promise<number>((resolve, 
 
 /**
  * Consigue el ID de la residencia en curso de un residente.
- * 
+ *
  * @param email Correo del residente autor de la residencia.
  */
-const getResidenciaIDDeResidente = (email: string) => 
+const getResidenciaIDDeResidente = (email: string) =>
     new Promise<number>((resolve, reject) => {
         con.query(
             `select idResidenciaDeAlumno(?) as 'id';`,
@@ -3254,16 +3242,16 @@ const getResidenciaIDDeResidente = (email: string) =>
 /**
  * Envía un email usando la cuenta de correo definida en el archivo [Keys.ts].
  * Se usará como plantilla para el contenido el archivo HTML [plantilla_correo.html].
- * 
+ *
  * @param to Correo electrónico del destinatario.
  * @param subject Asunto del correo.
  * @param content Contenido del correo electrónico. Puede ser en HTML.
  * @param onDone Qué hacer cuando el proceso haya terminado. Para más información, consultar la estructura de una función callback en https://nodemailer.com/usage/#sending-mail.
  */
-const sendEmail: (to: string, subject: string, content: string, onDone?: (error: string, info: string) => void) => void = 
+const sendEmail: (to: string, subject: string, content: string, onDone?: (error: string, info: string) => void) => void =
 (to, subject, content, onDone) => {
     const mailer: Mailer = new Mailer(Keys.GMAIL_EMAIL, Keys.GMAIL_PASSWORD);
-            
+
     mailer.sendEmail({
         "to": to,
         "from": "SIGER",
@@ -3275,10 +3263,10 @@ const sendEmail: (to: string, subject: string, content: string, onDone?: (error:
 
 /**
  * Promise que regresa un documento vacío, sin reemplazo en plantilla.
- * 
+ *
  * @param relativePath Localización del archivo, relativa a la carpeta [server]
  */
-const getEmptyDocument = (relativePath: string) => 
+const getEmptyDocument = (relativePath: string) =>
     generateDocument({}, path.resolve(__dirname, relativePath));
 
 
@@ -3288,10 +3276,10 @@ const getEmptyDocument = (relativePath: string) =>
 
 ================================================================================================ */
 /**
- * Regresa un objeto JSON con la información y 
+ * Regresa un objeto JSON con la información y
  * estructura necesaria para llenar la plantilla del
  * anexo 29.
- * 
+ *
  * @param id ID del anexo 29 a consultar.
  * @param email Email del usuario actual.
  */
@@ -3319,7 +3307,7 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
             dataObject['proyecto'] = rows[0][0]['proyecto'];
             dataObject['programa'] = rows[0][0]['programa'];
             dataObject['periodo'] = rows[0][0]['periodo'];
-            
+
             // Evaluación de asesor externo.
             const evalAE = (rows[0][0]['evaluacion_externa'] as string).split(',').map(c => Number(c));
             for (let i = 0; i < evalAE.length; ++i) {
@@ -3331,12 +3319,12 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
             dataObject['ae-observaciones'] = rows[0][0]['observaciones_externas'];
             const aeDate = new Date(Number(rows[0][0]['fecha_externa']));
             dataObject['ae-fecha'] = `${aeDate.getDate()}/${aeDate.getMonth()}/${aeDate.getFullYear()}`;
-            
+
             // Evaluación de asesor interno.
             const evalAI = (rows[0][0]['evaluacion_interna'] as string).split(',').map(c => Number(c));
             for (let i = 0; i < evalAI.length; ++i) {
                 dataObject[`ai-${i + 1}`] = evalAI[i];
-            }            
+            }
             dataObject['ai-total'] = evalAI.reduce((previosNumber, currentNumber) =>
                 previosNumber + currentNumber
             );
@@ -3344,7 +3332,7 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
             const aiDate = new Date(Number(rows[0][0]['fecha_interna']));
             dataObject['ai-fecha'] = `${aiDate.getDate()}/${aiDate.getMonth()}/${aiDate.getFullYear()}`;
 
-            dataObject['calificacion'] = 
+            dataObject['calificacion'] =
                 (Number(dataObject['ai-total']) + Number(dataObject['ae-total'])) / 2;
 
             resolve(dataObject);
@@ -3356,7 +3344,7 @@ const getAnexo29Info = (id: number, email: string) => new Promise<Object>((resol
 /**
  * Regresa al cliente la información necesaria para llenar
  * la vista web de un anexo 29.
- * 
+ *
  * @param req.query.id ID del anexo 29 a regresar.
  */
 server.get('/getAnexo29Info', (req, res) => {
@@ -3382,9 +3370,9 @@ server.get('/getAnexo29Info', (req, res) => {
 
 /**
  * Regresa al cliente un anexo 29 lleno con la información
- * del anexo cuyo id sea [id]. Si no se provee un id, se 
+ * del anexo cuyo id sea [id]. Si no se provee un id, se
  * regresará al cliente el formato vacío.
- * 
+ *
  * @param id ID del anexo 29 a regresar en forma de documento.
  */
 server.get('/getAnexo29', (req, res) => {
@@ -3402,7 +3390,7 @@ server.get('/getAnexo29', (req, res) => {
             res.send(Response.unknownError(error));
             return;
         })
-        
+
         return;
     }
 
@@ -3417,7 +3405,7 @@ server.get('/getAnexo29', (req, res) => {
             res.send(Response.unknownError(err));
         })
 
-    }).catch(errorMsg => 
+    }).catch(errorMsg =>
         res.send(Response.unknownError(errorMsg))
     );
 });
@@ -3426,7 +3414,7 @@ server.get('/getAnexo29', (req, res) => {
 /**
  * Regresa un JSON con la estructura e información para
  * llenar un formato de anexo 30.
- * 
+ *
  * @param id ID del anexo 30.
  * @param email Email del usuario actual.
  */
@@ -3491,7 +3479,7 @@ const getAnexo30Info = (id: number, email: string) => new Promise<Object>((resol
 /**
  * Regresa al cliente la información necesaria para llenar
  * la vista web de un anexo 30.
- * 
+ *
  * @param req.query.id ID del anexo 30 a regresar.
  */
 server.get('/getAnexo30Info', (req, res) => {
@@ -3519,7 +3507,7 @@ server.get('/getAnexo30Info', (req, res) => {
  * Regresa al cliente un anexo 30 lleno con la información
  * del anexo cuyo id sea [id]. Si no se proporciona un id
  * de anexo 30, se regresará al cliente el formato vacío.
- * 
+ *
  * @param id ID del anexo 30 a regresar en forma de documento.
  */
 server.get('/getAnexo30', (req, res) => {
@@ -3530,7 +3518,7 @@ server.get('/getAnexo30', (req, res) => {
 
     const id: number = req.query.id;
     const email: string = req.session.user.info.email;
-    
+
     if (!id) {
         getEmptyDocument('formatos/a30.docx').then(doc => {
             res.send(doc);
@@ -3544,7 +3532,7 @@ server.get('/getAnexo30', (req, res) => {
 
     getAnexo30Info(id, email).then(anexoObj => {
         generateDocument(
-            anexoObj, 
+            anexoObj,
             path.resolve(__dirname, 'formatos/a30-template.docx'),
         ).then(doc => {
             res.send(doc);
@@ -3558,8 +3546,8 @@ server.get('/getAnexo30', (req, res) => {
 
 
 /**
- * Envía al cliente el formato vacío de una 
- * Carta de Aceptación de ejemplo para las residencias 
+ * Envía al cliente el formato vacío de una
+ * Carta de Aceptación de ejemplo para las residencias
  * profesionales.
  */
 server.get('/getFormatoCartaAceptacion', (req, res) => {
@@ -3575,8 +3563,8 @@ server.get('/getFormatoCartaAceptacion', (req, res) => {
 
 
 /**
- * Envía al cliente el formato vacío de una 
- * Carta de Terminación de ejemplo para las residencias 
+ * Envía al cliente el formato vacío de una
+ * Carta de Terminación de ejemplo para las residencias
  * profesionales.
  */
 server.get('/getFormatoCartaTerminacion', (req, res) => {
@@ -3591,10 +3579,10 @@ server.get('/getFormatoCartaTerminacion', (req, res) => {
 });
 
 /**
- * Regresa un objeto JSON con la información y 
+ * Regresa un objeto JSON con la información y
  * estructura necesaria para llenar la plantilla del
  * reporte preliminar.
- * 
+ *
  * @param id ID de la residencia a consultar.
  * @param email Email del usuario actual.
  */
@@ -3652,13 +3640,13 @@ new Promise<Object>((resolve, reject)=> {
             dataObject['nombre_ai'] = rows[0][0]['nombre_ai'] ?? 'Aún no ha sido asignado'
             const tsToString = (ts: number) => {
                 const monthsArr: String[] = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-            
+
                 const d: Date = new Date(ts);
-            
+
                 return `${d.getDate()} de ${monthsArr[d.getMonth()]} del ${d.getFullYear()}`;
             }
             dataObject['fecha'] = tsToString(Number(rows[0][0]['fecha']));
-            
+
             resolve(dataObject);
         }
     );
@@ -3668,7 +3656,7 @@ new Promise<Object>((resolve, reject)=> {
 /**
  * Regresa al cliente la información necesaria para llenar
  * la vista web de un reporte preliminar.
- * 
+ *
  * @param req.query.id ID de la residencia a regresar.
  */
 server.get('/getReportePreliminarInfo', (req, res) => {
@@ -3694,9 +3682,9 @@ server.get('/getReportePreliminarInfo', (req, res) => {
 
 /**
  * Regresa al cliente un reporte preliminar lleno con la información
- * de la residencia cuyo id sea [id]. Si no se provee un id, se 
+ * de la residencia cuyo id sea [id]. Si no se provee un id, se
  * regresará al cliente el formato vacío.
- * 
+ *
  * @param id ID de la residencia a regresar en forma de documento.
  */
 server.get('/getReportePreliminar', (req, res) => {
@@ -3725,15 +3713,15 @@ server.get('/getReportePreliminar', (req, res) => {
             res.send(Response.unknownError(err));
         })
 
-    }).catch(errorMsg => 
+    }).catch(errorMsg =>
         res.send(Response.unknownError(errorMsg))
     );
 });
 
 
 /**
- * Regresa al cliente una lista de las materias en la base de datos. 
- * 
+ * Regresa al cliente una lista de las materias en la base de datos.
+ *
  * Si ocurre algún error, regresará un objeto de error al cliente.
  */
 server.get('/listaSimpleMaterias', (req, res) => {
@@ -3753,7 +3741,7 @@ server.get('/listaSimpleMaterias', (req, res) => {
 /**
  * Regresa al cliente la lista de docentes capacitados para dar
  * asesoría con la materia especificada.
- * 
+ *
  * @param id ID de la materia en la que se requiere asesoría.
  */
 server.get('/lista-competentes',(req,res)=>

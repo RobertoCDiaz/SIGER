@@ -25,7 +25,7 @@ const getAprobadoA=()=>
         residentName=response['n'];
         residentPatSurname=response['ap'];
         residentMatSurname=response['am'];
-        
+
         controlNumber=response['em'].substring(1,9);
 
         const maininfo = document.getElementById('maininfo');
@@ -154,7 +154,7 @@ const getAsesorA=()=>
             contright.appendChild(cont);
             tl.appendChild(contright);
         }
-        
+
     }
     b.send();
 }
@@ -179,7 +179,7 @@ const getRevisoresA=()=>
             inf.innerText = 'Revisores: '+ n1 + ' ' + ap1 + ' ' + am1 +' y ' + n2 + ' ' + ap2 + ' ' + am2 + '.';
             cont.appendChild(inf);
         }
-        
+
     }
     c.send();
 }
@@ -370,9 +370,9 @@ class DocumentsA {
     anexos_30: DocumentInfo[];
 
     constructor(
-        idRes: number, fechaRes: string, 
-        idCartaAceptacion: number, fechaCartaAceptacion: string, 
-        anexos_29: string, fechas_a29: string, 
+        idRes: number, fechaRes: string,
+        idCartaAceptacion: number, fechaCartaAceptacion: string,
+        anexos_29: string, fechas_a29: string,
         anexos_30: string, fechas_a30: string
     ) {
         this.preliminar = {id: Number(idRes), fecha: new Date(Number(fechaRes)).toDateString()};
@@ -386,7 +386,7 @@ class DocumentsA {
         });
         this.anexos_30 = anexos_30?.split(',').map((id, index) => {
             let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a30.split(',')[index])).toDateString()};
-            
+
             return a;
         });
     }
@@ -413,13 +413,13 @@ const getDocumentosA = (id: number) => new Promise<DocumentsA>((resolve, reject)
 const get_PetitionA = (petition: string, callback: (response: JSON) => void) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', `${petition}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         callback(response);
     };
-    
+
     xhr.send();
 }
 
@@ -438,7 +438,7 @@ const createLinksA = (id: number) => {
             {
                 location.href=`/documentos/reporte-preliminar?id=${docs.preliminar.id}`;
             });
-            
+
         }
 
         if (docs.anexos_29) {
@@ -466,7 +466,7 @@ const createLinksA = (id: number) => {
                     location.href=`/documentos/anexo-30?id=${docs.anexos_30[0].id}`;
                 });
             }
-                
+
         }
 
         if(docs.carta_aceptacion)
@@ -477,7 +477,7 @@ const createLinksA = (id: number) => {
                     location.href=`siger-cloud/files/`+String(route);
                 });
         }
-        
+
 
     }).catch(error => alert(error));
 

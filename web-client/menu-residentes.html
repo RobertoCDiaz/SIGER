@@ -21,7 +21,6 @@
     <body>
         <header>
             <div class="bar">
-                <!-- <h1>SIGER</h1> -->
                 <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
                 <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
@@ -33,36 +32,7 @@
                 <div class="main-container">
                     <div class="title">Hola, <span id="welcomeMessage" ></span></div>
                     <div id="optionsContainer" class="options-container">
-                        <!-- <a href="/nuevo-proyecto">
-                            <div class="menu-item">
-                                <i class="material-icons">note_add</i>
-                                <p>Nuevo proyecto</p>
-                            </div>
-                        </a>
-                        <a href="/avance-proyecto">
-                            <div class="menu-item">
-                                <i class="material-icons">flag</i>
-                                <p>Progreso actual</p>
-                            </div>
-                        </a>
-                        <a href="/documentos">
-                            <div class="menu-item">
-                                <i class="material-icons">description</i>
-                                <p>Documentos</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="menu-item">
-                                <i class="material-icons">chat</i>
-                                <p>Chat</p>
-                            </div>
-                        </a>
-                        <a href="/logout">
-                            <div class="menu-item">
-                                <i class="material-icons">exit_to_app</i>
-                                <p>Cerrar sesión</p>
-                            </div>
-                        </a> -->
+
                     </div>
                 </div>
             </div>
@@ -71,12 +41,12 @@
             const populateWelcomeMessage = () => {
                 let xhr = new XMLHttpRequest();
                 xhr.open('get', '/user-info', true);
-                
+
                 xhr.onload = () => {
                     let res = JSON.parse(xhr.response)['object'];
                     document.getElementById('welcomeMessage').innerHTML = `${res['nombre']}`;
                 };
-                
+
                 xhr.send();
             }
             populateWelcomeMessage();
@@ -93,7 +63,7 @@
             const getMenu = () => {
                 let xhr = new XMLHttpRequest();
                 xhr.open('get', '/getMenu', false);
-                
+
                 xhr.onload = () => {
                     const response = JSON.parse(xhr.response);
 
@@ -114,7 +84,7 @@
                     });
 
                 };
-                
+
                 xhr.send();
             }
             getMenu();

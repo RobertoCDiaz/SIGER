@@ -7,12 +7,11 @@
         <link rel="stylesheet" href="styles/global.css" />
         <link rel="stylesheet" href="styles/forms.css">
         <link rel="stylesheet" href="styles/registros.css">
-        
+
     </head>
     <body>
         <header class="header-extension">
             <div class="bar">
-                <!-- <h1><a href="/home">SIGER</a></h1> -->
                 <a href="/home" style="display: flex; flex-direction: row; align-items: center;">
                 <img src="assets/images/siger-img.png" height="40px" alt="SIGER">
                 <h1 style="margin-left: .5em;">SIGER</h1>
@@ -89,7 +88,7 @@
                         <option value="">Escoja una carrera</option>
                     </select>
                 </div>
-                
+
                 <div class="form-input">
                     <label>Número de teléfono celular*</label>
                     <input type="tel" pattern="[0-9]{10}|([0-9]{3}-[0-9]{4}-[0-9]{3})" required="required" name="cellNumber" id="cellNumberView">
@@ -182,7 +181,7 @@
                 xhr.open('get', `/listaSimpleDeCarreras`, true);
                 xhr.onload = () => {
                     let response = JSON.parse(xhr.responseText).object;
-                    
+
                     for (let i = 0; i < response.length; ++i) {
                         let c = response[i];
                         careerView.innerHTML += optionView(c['clave'], c['nombre_carrera']);

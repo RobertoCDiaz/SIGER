@@ -12,9 +12,9 @@ class Documentos {
     anexos_30: DocumentInfo[];
 
     constructor(
-        idRes: number, fechaRes: string, 
-        idCartaAceptacion: number, fechaCartaAceptacion: string, 
-        anexos_29: string, fechas_a29: string, 
+        idRes: number, fechaRes: string,
+        idCartaAceptacion: number, fechaCartaAceptacion: string,
+        anexos_29: string, fechas_a29: string,
         anexos_30: string, fechas_a30: string
     ) {
         this.preliminar = {id: Number(idRes), fecha: new Date(Number(fechaRes)).toDateString()};
@@ -28,7 +28,7 @@ class Documentos {
         });
         this.anexos_30 = anexos_30?.split(',').map((id, index) => {
             let a: DocumentInfo = {id: Number(id), fecha: new Date(Number(fechas_a30.split(',')[index])).toDateString()};
-            
+
             return a;
         });
     }
@@ -64,13 +64,13 @@ const getDocuments = () => new Promise<Documentos>((resolve, reject) => {
 const getPetition = (petition: string, callback: (response: JSON) => void) => {
     let xhr = new XMLHttpRequest();
     xhr.open('get', `${petition}`, true);
-    
+
     xhr.onload = () => {
         const response = JSON.parse(xhr.response);
-        
+
         callback(response);
     };
-    
+
     xhr.send();
 }
 
@@ -94,7 +94,7 @@ const populateDocuments = () => {
 
         if (docs.carta_aceptacion) {
             misDocumentosContainer.innerHTML += documentView(
-                'Carta de Aceptación', 
+                'Carta de Aceptación',
                 docs.carta_aceptacion.fecha,
                 `/siger-cloud/files/${docs.carta_aceptacion.id}`
             );
@@ -113,7 +113,7 @@ const populateDocuments = () => {
                     documentView('Anexo 30 (Evaluación intermedia)', a.fecha, `/documentos/anexo-30?id=${a.id}`);
             })
         }
-        
+
 
     }).catch(error => alert(error));
 

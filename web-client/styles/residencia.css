@@ -48,7 +48,7 @@ form > .buttons-container > button:not(:first-child) {
 
 form p {
     font-family: 'Arial';
-    color: var(--primary-text) !important; 
+    color: var(--primary-text) !important;
 }
 
 .page-header {

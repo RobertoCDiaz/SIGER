@@ -464,7 +464,7 @@ DELIMITER ;;
 
 
 /*
-	Comprueba si el docente con email [v_email_docente] es 
+	Comprueba si el docente con email [v_email_docente] es
 	adminstrador.
 
 	Regresa:
@@ -500,17 +500,17 @@ CREATE FUNCTION administraCarrera(
 		RETURN 0;
 
 	END; ELSEIF (
-		SELECT COUNT(*) FROM administradores AS a 
-		WHERE 
-			a.carreras_clave = v_carrera_clave AND 
+		SELECT COUNT(*) FROM administradores AS a
+		WHERE
+			a.carreras_clave = v_carrera_clave AND
 			a.docentes_email = v_email_docente
 	) = 0 THEN BEGIN
 		RETURN 0;
 
-	END; ELSE BEGIN 
+	END; ELSE BEGIN
 		RETURN 1;
 	END; END IF;
-	
+
 END;;
 
 /*
@@ -520,12 +520,12 @@ END;;
 
 	Regresa 1 si dicho administrador puede validar al residente.
 	Regresa 0 si no.
-*/	
+*/
 DROP FUNCTION IF EXISTS puedeValidarResidente;;
 CREATE FUNCTION puedeValidarResidente(
 	v_email_residente VARCHAR(64),
 	v_email_admin VARCHAR(64)
-) RETURNS TINYINT DETERMINISTIC BEGIN 
+) RETURNS TINYINT DETERMINISTIC BEGIN
 
 	RETURN administraCarrera(
 		v_email_admin,
@@ -536,13 +536,13 @@ END;;
 
 
 /*
-	Regresa un VARCHAR con el nombre completo del 
-	residente, docente, o administrador cuyo email 
+	Regresa un VARCHAR con el nombre completo del
+	residente, docente, o administrador cuyo email
 	concuerde con [v_email].
 
 	Si no encuentra un registro con email [v_email]
 	en ninguna de las tablas posibles (residentes,
-	docentes, o administradores), regresará una 
+	docentes, o administradores), regresará una
 	cadena vacía [''].
 */
 DROP FUNCTION IF EXISTS nombreCompleto;;
@@ -552,18 +552,18 @@ CREATE FUNCTION nombreCompleto(
 
 	IF v_email IN (SELECT email FROM residentes) THEN BEGIN
 		RETURN (
-			SELECT 
+			SELECT
 				CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', COALESCE(t.apellido_materno, ''))
-			FROM 
+			FROM
 				residentes as t
 			WHERE
 				t.email = v_email
 		);
 	END; ELSEIF v_email IN (SELECT email FROM docentes) THEN BEGIN
 		RETURN (
-			SELECT 
+			SELECT
 				CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', COALESCE(t.apellido_materno, ''))
-			FROM 
+			FROM
 				docentes as t
 			WHERE
 				t.email = v_email
@@ -596,14 +596,14 @@ CREATE FUNCTION concatenarHorarios(
 	v_id_residencia INT
 ) RETURNS VARCHAR(64) DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			GROUP_CONCAT(t.jornada SEPARATOR ', ')
 		FROM (
-			SELECT 
+			SELECT
 				CONCAT(h.inicio, " - ", h.fin) as 'jornada'
-			FROM 
-				horarios AS h 
-			WHERE 
+			FROM
+				horarios AS h
+			WHERE
 				h.id_residencia = v_id_residencia
 			ORDER BY
 				CONCAT(h.inicio, " - ", h.fin)
@@ -623,8 +623,8 @@ DROP FUNCTION IF EXISTS docenteConfirmado;;
 CREATE FUNCTION docenteConfirmado(
 	v_email_docente VARCHAR(64)
 ) RETURNS TINYINT DETERMINISTIC BEGIN
-	IF 
-		(SELECT confirmado FROM docentes AS d WHERE d.email = v_email_docente) = 1 AND 
+	IF
+		(SELECT confirmado FROM docentes AS d WHERE d.email = v_email_docente) = 1 AND
 		(SELECT confirmado FROM confirmaciones_docentes AS cd WHERE cd.docentes_email = v_email_docente)
 	THEN BEGIN
 		RETURN 1;
@@ -648,9 +648,9 @@ CREATE FUNCTION residenteConfirmado(
 	RETURN (
 		SELECT
 			aprobado
-		FROM 
+		FROM
 			residentes AS r
-		WHERE 
+		WHERE
 			r.email = v_email
 	);
 END;;
@@ -700,7 +700,7 @@ CREATE FUNCTION estadoResidente(
 		SET @estado := 3;
 	END; END IF;
 
-	RETURN @estado;	
+	RETURN @estado;
 END;;
 
 
@@ -748,7 +748,7 @@ END;;
 				- Documentos.
                 - Progreso.
                 - Chat.
-                
+
 			- Cerrar sesión.
 */
 DROP FUNCTION IF EXISTS estadoDocente;;
@@ -761,13 +761,13 @@ CREATE FUNCTION estadoDocente(
 		SET @estado := 1;
 	END; END IF;
 
-	RETURN @estado;	
+	RETURN @estado;
 END;;
 
 
 /*
 	Regresa la cantidad de registros que hay
-	en la tabla [anexo_29] asociados a la 
+	en la tabla [anexo_29] asociados a la
 	residencia con id [v_id_residencia].
 */
 DROP FUNCTION IF EXISTS cantidadDeAnexos29;;
@@ -775,11 +775,11 @@ CREATE FUNCTION cantidadDeAnexos29(
 	v_id_residencia INT
 ) RETURNS INT DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			count(a29.idanexo_29)
 		FROM
 			anexo_29 as a29
-		WHERE 
+		WHERE
 			a29.id_residencia = v_id_residencia
 	);
 END;;
@@ -787,7 +787,7 @@ END;;
 
 /*
 	Regresa la cantidad de registros que hay
-	en la tabla [anexo_30] asociados a la 
+	en la tabla [anexo_30] asociados a la
 	residencia con id [v_id_residencia].
 */
 DROP FUNCTION IF EXISTS cantidadDeAnexos30;;
@@ -795,11 +795,11 @@ CREATE FUNCTION cantidadDeAnexos30(
 	v_id_residencia INT
 ) RETURNS INT DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			count(a30.idanexo_30)
 		FROM
 			anexo_30 as a30
-		WHERE 
+		WHERE
 			a30.id_residencia = v_id_residencia
 	);
 END;;
@@ -821,9 +821,9 @@ CREATE FUNCTION tieneAnexo29Pendiente(
 		SELECT
 			IF (
 				(0 IN (
-					SELECT 
+					SELECT
 						IF (a29.fecha_externa IS NOT NULL AND a29.fecha_interna IS NOT NULL, 1, 0)
-					FROM 
+					FROM
 						residencias AS r LEFT JOIN anexo_29 AS a29
 							ON r.idresidencia = a29.id_residencia
 					WHERE
@@ -852,9 +852,9 @@ CREATE FUNCTION tieneAnexo30Pendiente(
 		SELECT
 			IF (
 				(0 IN (
-					SELECT 
+					SELECT
 						IF (a30.fecha_externa IS NOT NULL AND a30.fecha_interna IS NOT NULL, 1, 0)
-					FROM 
+					FROM
 						residencias AS r LEFT JOIN anexo_30 AS a30
 							ON r.idresidencia = a30.id_residencia
 					WHERE
@@ -908,13 +908,13 @@ DROP FUNCTION IF EXISTS residenciaAptaParaEvaluacion;;
 CREATE FUNCTION residenciaAptaParaEvaluacion(
 	v_id_residencia INT
 ) RETURNS INT DETERMINISTIC BEGIN
-	
+
 	RETURN (
-		SELECT 
+		SELECT
 			IF (
 				tieneAnexo29Pendiente(v_id_residencia) = 0 AND
-				tieneAnexo30Pendiente(v_id_residencia) = 0 AND 
-				residenciaAprobada(v_id_residencia) = 2 AND 
+				tieneAnexo30Pendiente(v_id_residencia) = 0 AND
+				residenciaAprobada(v_id_residencia) = 2 AND
 				residenciaTerminada(v_id_residencia) = 0
 			, 1, 0)
 	);
@@ -923,7 +923,7 @@ END;;
 
 
 /*
-	Regresa el ID del registro en la tabla [anexo_29] que 
+	Regresa el ID del registro en la tabla [anexo_29] que
 	corresponde a un url único, ya sea de un A.I. o A.E.
 */
 DROP FUNCTION IF EXISTS idAnexo29DeURL;;
@@ -931,9 +931,9 @@ CREATE FUNCTION idAnexo29DeURL(
 	v_url VARCHAR(256)
 ) RETURNS INT DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			e.id_anexo29
-		FROM 
+		FROM
 			enlaces_anexo29 AS e
 		WHERE
 			e.id = v_url
@@ -942,7 +942,7 @@ END;;
 
 
 /*
-	Regresa el ID del registro en la tabla [anexo_30] que 
+	Regresa el ID del registro en la tabla [anexo_30] que
 	corresponde a un url único, ya sea de un A.I. o A.E.
 */
 DROP FUNCTION IF EXISTS idAnexo30DeURL;;
@@ -950,9 +950,9 @@ CREATE FUNCTION idAnexo30DeURL(
 	v_url VARCHAR(256)
 ) RETURNS INT DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			e.id_anexo30
-		FROM 
+		FROM
 			enlaces_anexo30 AS e
 		WHERE
 			e.id = v_url
@@ -979,7 +979,7 @@ CREATE FUNCTION anexo29Evaluado(
 	END; END IF;
 
 	RETURN (
-		SELECT 
+		SELECT
 			a.fecha_externa IS NOT NULL AND
 			a.fecha_interna
 		FROM
@@ -1009,7 +1009,7 @@ CREATE FUNCTION anexo30Evaluado(
 	END; END IF;
 
 	RETURN (
-		SELECT 
+		SELECT
 			a.fecha_externa IS NOT NULL AND
 			a.fecha_interna
 		FROM
@@ -1036,11 +1036,11 @@ CREATE FUNCTION relacionadoAlProyecto(
 	v_id_residencia INT,
 	v_email VARCHAR(64)
 ) RETURNS INT DETERMINISTIC BEGIN
-	
+
 	RETURN (
 		SELECT IF (
 			-- Es el residente.
-			(SELECT r.email_residente FROM residencias AS r WHERE r.idresidencia = v_id_residencia) = v_email OR 
+			(SELECT r.email_residente FROM residencias AS r WHERE r.idresidencia = v_id_residencia) = v_email OR
 
 			-- Es admin de la carrera del residente.
 			puedeValidarResidente(
@@ -1057,11 +1057,11 @@ END;;
 
 
 /*
-	Regresa el ID de la residencia aprobada del alumno 
+	Regresa el ID de la residencia aprobada del alumno
 	con email [v_email]. En teoría solo debería haber
 	un proyecto aprobado por residente.
 
-	En caso de que el residente no tenga ninguna 
+	En caso de que el residente no tenga ninguna
 	residencia aprobada, la función regresará NULL.
 */
 DROP FUNCTION IF EXISTS idResidenciaDeAlumno;;
@@ -1072,27 +1072,27 @@ CREATE FUNCTION idResidenciaDeAlumno(
 	RETURN (
 		IF (
 			(
-				SELECT 
+				SELECT
 					COUNT(r.idresidencia)
-				FROM 
-					residencias AS r 
-				WHERE 
+				FROM
+					residencias AS r
+				WHERE
 					r.email_residente = v_email AND
 					residenciaAprobada(r.idresidencia) >= 1
 			) >= 1
 		, (
-			SELECT 
+			SELECT
 				r.idresidencia
-			FROM 
-				residencias AS r 
-			WHERE 
+			FROM
+				residencias AS r
+			WHERE
 				r.email_residente = v_email AND
 				residenciaAprobada(r.idresidencia) >= 1
-			LIMIT 
+			LIMIT
 				1
 		), NULL)
 	);
-	
+
 END;;
 
 
@@ -1102,12 +1102,12 @@ END;;
 	cumplan con el estado mínimo para usar el chat
 	del SIGER. En caso de que por lo menos uno no
 	pueda usar el chat, la función regresará 0.
-	Regresará 1 si ambos pueden mantener una 
+	Regresará 1 si ambos pueden mantener una
 	conversación.
 */
 DROP FUNCTION IF EXISTS puedenUsarChat;;
 CREATE FUNCTION puedenUsarChat(
-	v_email1 VARCHAR(64), 
+	v_email1 VARCHAR(64),
 	v_email2 VARCHAR(64)
 ) RETURNS INT DETERMINISTIC BEGIN
 	RETURN (SELECT IF ((
@@ -1134,14 +1134,14 @@ CREATE FUNCTION archivosDeMensaje(
 	v_id INT
 ) RETURNS VARCHAR(128) DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			GROUP_CONCAT(t.id SEPARATOR ',')
 		FROM (
-			SELECT 
+			SELECT
 				id as 'id'
-			FROM 
+			FROM
 				`archivos` AS a
-			WHERE 
+			WHERE
 				a.id_mensaje = v_id
 			ORDER BY
 				a.id
@@ -1153,7 +1153,7 @@ END;;
 /*
 	Partiendo de los correos de dos personas
 	involucradas en una conversación, genera un
-	nuevo VARCHAR que servirá para identificar 
+	nuevo VARCHAR que servirá para identificar
 	la conversación.
 
 	El "ID" simplemente será otro VARCHAR, el
@@ -1172,7 +1172,7 @@ CREATE FUNCTION idConversacion(
 	v_email2 VARCHAR(64)
 ) RETURNS VARCHAR(128) DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
+		SELECT
 			GROUP_CONCAT(t.email SEPARATOR "")
 		FROM (
 				SELECT
@@ -1183,7 +1183,7 @@ CREATE FUNCTION idConversacion(
 			ORDER BY
 				email
 		) AS t
-	);	
+	);
 END;;
 
 
@@ -1199,13 +1199,13 @@ CREATE FUNCTION accesoAlMensaje(
 	v_msg_id INT
 ) RETURNS INT DETERMINISTIC BEGIN
 	RETURN (
-		SELECT 
-			COUNT(*) 
-		FROM 
-			`siger`.`mensajes` AS `m` 
-		WHERE 
+		SELECT
+			COUNT(*)
+		FROM
+			`siger`.`mensajes` AS `m`
+		WHERE
 			`m`.`id` = v_msg_id AND (
-				`m`.`remitente_email` = v_email OR 
+				`m`.`remitente_email` = v_email OR
 				`m`.`destinatario_email` = v_email
 			)
 	);
@@ -1220,7 +1220,7 @@ END;;
 
 /*
 	Muestra una lista simplificada de las carreras disponibles.
-	Esta lista solo contendrá la clave de la carrera, así como 
+	Esta lista solo contendrá la clave de la carrera, así como
 	el nombre de esta.
 */
 DROP PROCEDURE IF EXISTS SP_MostrarCarreras;;
@@ -1231,7 +1231,7 @@ END;;
 
 /*
 	A partir de los datos proporcionados como parámetros,
-	crea las filas en las tablas necesarias para el 
+	crea las filas en las tablas necesarias para el
 	registro de un nuevo residente en el sistema.
 	Este residente nuevo no estará confirmado.
 
@@ -1256,9 +1256,9 @@ CREATE PROCEDURE SP_RegistroResidente(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1268,8 +1268,8 @@ CREATE PROCEDURE SP_RegistroResidente(
 		VALUES
 			(v_email, v_contrasena, v_nombre, v_apellido_paterno, v_apellido_materno, v_fecha_creacion, v_clave_carrera);
 
-	
-		INSERT INTO `siger`.`telefonos_residentes` 
+
+		INSERT INTO `siger`.`telefonos_residentes`
 			(telefono, email_residente, fijo)
 		VALUES
 			(v_tel_cel, v_email, 0),
@@ -1289,25 +1289,25 @@ DROP PROCEDURE IF EXISTS SP_ResidentesNoValidados;;
 CREATE PROCEDURE SP_ResidentesNoValidados(
 	v_email_admin VARCHAR(64)
 ) BEGIN
-	SELECT 
+	SELECT
 		r.email, substring(r.email, 2, 8) AS `noControl`, r.nombre, r.apellido_paterno, r.apellido_materno,
 		(SELECT t.telefono FROM telefonos_residentes AS t WHERE r.email = t.email_residente AND fijo = 0) AS `celular`,
 		(SELECT t.telefono FROM telefonos_residentes AS t WHERE r.email = t.email_residente AND fijo = 1) AS `tel`,
 		r.fecha_creacion, c.nombre_carrera AS `carrera`
-	FROM 
-		residentes AS r JOIN carreras AS c 
+	FROM
+		residentes AS r JOIN carreras AS c
 			on c.clave = r.clave_carrera
-	WHERE 
+	WHERE
 		aprobado = 0 AND
 		administraCarrera(v_email_admin, c.clave) = 1
-	ORDER BY 
+	ORDER BY
 		r.fecha_creacion, `noControl`;
 END;;
 
 
 /*
-	Valida al residente con correo [v_email_residente] 
-	solo si el administrador con el correo electrónico 
+	Valida al residente con correo [v_email_residente]
+	solo si el administrador con el correo electrónico
 	[v_email_admin] tiene la capacidad de hacerlo.
 
 	El [output] será 1 si se logró validar al residente.
@@ -1325,9 +1325,9 @@ CREATE PROCEDURE SP_ValidarResidente(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1335,19 +1335,19 @@ CREATE PROCEDURE SP_ValidarResidente(
 
 	IF (puedeValidarResidente(v_email_residente, v_email_admin)) != 1 THEN BEGIN
 		SELECT "0" AS output, "Este administrador no puede validar a este residente" AS message;
-		END; 
+		END;
 	ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente) = 0 THEN BEGIN
 			SELECT "0" AS output, "No existe un residente con este email" AS message;
-		END; 
+		END;
 		-- ELSEIF (SELECT COUNT(*) FROM `siger`.`residentes` AS r WHERE r.email = v_email_residente AND r.aprobado = 0) = 0 THEN BEGIN
 		ELSEIF (estadoResidente(v_email_residente)) >= 1 THEN BEGIN
 			SELECT "0" AS output, "Este residente ya está validado" AS message;
 		END; ELSE BEGIN
 			UPDATE `siger`.`residentes` AS r SET r.aprobado = 1 WHERE r.email = v_email_residente;
 
-			SELECT "1" AS output, "Residente validado con éxito" AS message; 
+			SELECT "1" AS output, "Residente validado con éxito" AS message;
 		END; END IF;
-	
+
 	COMMIT;
 END;;
 
@@ -1380,9 +1380,9 @@ BEGIN
   BEGIN
     GET DIAGNOSTICS CONDITION 1
     @p2 = MESSAGE_TEXT;
-    
+
     SELECT "0" AS output, @p2 AS message;
-    
+
     ROLLBACK;
   END;
 
@@ -1390,7 +1390,7 @@ BEGIN
 
 	SELECT "0" AS output, 'El residente no ha sido confirmado por un administrador' AS message;
 
-  END; ELSE BEGIN 
+  END; ELSE BEGIN
 
 	START TRANSACTION;
 		INSERT INTO `siger`.`residencias`
@@ -1399,13 +1399,13 @@ BEGIN
 		(v_nombre_proyecto, v_objetivo, v_justificacion, v_periodo, v_ano, v_descripcion_actividades, v_email_residente, v_fecha_elaboracion);
 
 		set @idr = last_insert_id();
-		
-		INSERT INTO `siger`.`empresas` 
+
+		INSERT INTO `siger`.`empresas`
 		(nombre, representante, direccion, ciudad, telefono, email, departamento, id_residencia)
 		VALUES
 		(v_nombre_empresa, v_representante, v_direccion,v_ciudad, v_telefono, v_email, v_departamento, @idr);
-		
-		INSERT INTO `siger`.`asesores_externos` 
+
+		INSERT INTO `siger`.`asesores_externos`
 		(email, nombre_completo, puesto, grado_estudios, telefono, id_residencia)
 		VALUES
 		(v_email_ae, v_nombre_ae, v_puesto,v_grado_estudios, v_tel_ae, @idr);
@@ -1427,9 +1427,9 @@ BEGIN
   BEGIN
     GET DIAGNOSTICS CONDITION 1
     @p2 = MESSAGE_TEXT;
-    
+
     SELECT "0" AS output, @p2 AS message;
-    
+
     ROLLBACK;
   END;
 
@@ -1454,7 +1454,7 @@ v_email VARCHAR(64)
 BEGIN
 	select "1" as output, "Transaction commited successfully" AS message,
     evaluacion_externa as ee, observaciones_externas as oe,
-    evaluacion_interna as ei, observaciones_internas as ie 
+    evaluacion_interna as ei, observaciones_internas as ie
     from residencias join anexo_29 on anexo_29.id_residencia=residencias.idresidencia
 	where residencias.email_residente=v_email;
 END;;
@@ -1466,7 +1466,7 @@ v_email VARCHAR(64)
 BEGIN
 	select "1" as output, "Transaction commited successfully" AS message,
     evaluacion_externa as ee, observaciones_externas as oe,
-    evaluacion_interna as ei, observaciones_internas as ie 
+    evaluacion_interna as ei, observaciones_internas as ie
     from residencias join anexo_30 on anexo_30.id_residencia=residencias.idresidencia
 	where residencias.email_residente=v_email;
 END;;
@@ -1511,7 +1511,7 @@ END;;
 
 
 /*
-	Muestra una lista de residencias sin confirmar que administra 
+	Muestra una lista de residencias sin confirmar que administra
 	el usuario con correo electrónico [v_admin_email].
 	[v_query] es un parámetro que servirá para filtrar las residencias
 	a mostrar. Este filtro se comparará con el nombre del proyecto,
@@ -1523,19 +1523,19 @@ CREATE PROCEDURE SP_ListaResidenciasSinDocentes(
 	v_email_admin VARCHAR(64),
 	v_query VARCHAR(128)
 ) BEGIN
-	SELECT 
+	SELECT
 		r.idresidencia as 'id', r.nombre_proyecto AS 'proyecto', e.nombre AS 'empresa',
 		c.nombre_carrera AS 'carrera', nombreCompleto(res.email) AS 'residente',
-		res.email AS 'email', r.fecha_elaboracion AS 'fecha', r.periodo AS 'periodo', 
+		res.email AS 'email', r.fecha_elaboracion AS 'fecha', r.periodo AS 'periodo',
 		r.ano AS 'ano'
-	FROM 
+	FROM
 		residencias AS r JOIN empresas AS e
 			on r.idresidencia = e.id_residencia
 		JOIN residentes AS res
 			on r.email_residente = res.email
 		JOIN carreras AS c
 			on c.clave = res.clave_carrera
-	WHERE 
+	WHERE
 		residenciaAprobada(r.idresidencia) < 1 AND
 		administraCarrera(v_email_admin, c.clave) = 1 AND (
 			r.nombre_proyecto LIKE CONCAT('%', v_query, '%') OR
@@ -1548,7 +1548,7 @@ END;;
 
 /*
 	Muestra la información necesaria para generar el formato
-	preliminar de la residencia con id [v_id_residencia], siempre 
+	preliminar de la residencia con id [v_id_residencia], siempre
 	y cuando el usuario con email [v_email] tenga acceso al formato
 	preeliminar de esta residencia.
 */
@@ -1557,9 +1557,9 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 	v_id_residencia INT,
 	v_email VARCHAR(64)
 ) BEGIN
-	SELECT 
+	SELECT
 		DISTINCT r.idresidencia,
-		'1' AS output, 
+		'1' AS output,
 		r.fecha_elaboracion AS 'fecha', r.nombre_proyecto AS 'proyecto',
 		r.objetivo AS 'objetivo', r.justificacion AS 'justificacion',
 		r.periodo AS 'periodo', r.ano AS 'ano', r.descripcion_actividades AS 'actividades',
@@ -1567,23 +1567,23 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 		e.nombre AS 'empresa', e.representante AS 'representante_e', e.direccion AS 'direccion_e',
 		e.telefono AS 'telefono_e', e.ciudad AS 'ciudad_e', e.email AS 'email_e', e.departamento AS 'departamento_e',
 
-		ae.nombre_completo AS 'nombre_ae', ae.puesto AS 'puesto_ae', ae.grado_estudios AS 'grado_ae', 
+		ae.nombre_completo AS 'nombre_ae', ae.puesto AS 'puesto_ae', ae.grado_estudios AS 'grado_ae',
 		ae.telefono AS 'telefono_ae', ae.email AS 'email_ae',
-        
+
         -- nombreCompleto(ai.email) AS 'nombre_ai',
 		(
-			SELECT 
+			SELECT
 				nombreCompleto(ai.email)
-			FROM 
-				involucrados AS i JOIN docentes AS ai 
+			FROM
+				involucrados AS i JOIN docentes AS ai
 					ON i.email_docente = ai.email
-			WHERE 
+			WHERE
 				i.es_asesor = 1 AND
 				i.id_residencia = r.idresidencia
 		) AS 'nombre_ai',
 
 		nombreCompleto(res.email) AS 'nombre_res', SUBSTRING(res.email, 2, 8) AS 'noControl_res',
-		c.nombre_carrera AS 'carrera', 
+		c.nombre_carrera AS 'carrera',
 		(
 			SELECT telefono FROM telefonos_residentes WHERE email_residente = res.email AND fijo = 1
 		) AS 'tel_casa',
@@ -1592,7 +1592,7 @@ CREATE PROCEDURE SP_FormatoPreliminar(
 		) AS 'celular',
 		res.email AS 'email_res',
 		concatenarHorarios(r.idresidencia) AS 'horarios'
-	FROM 
+	FROM
 		residencias AS r LEFT JOIN empresas AS e
 			ON r.idresidencia = e.id_residencia
 		LEFT JOIN asesores_externos AS ae
@@ -1616,18 +1616,18 @@ END;;
 
 
 /*
-	Regresa una lista de docentes confirmados cuyo correo 
-	electrónico, nombre, o apellidos se asemejen al criterio 
+	Regresa una lista de docentes confirmados cuyo correo
+	electrónico, nombre, o apellidos se asemejen al criterio
 	de  búsqueda [v_query].
 */
 DROP PROCEDURE IF EXISTS SP_BuscarDocente;;
 CREATE PROCEDURE SP_BuscarDocente(
 	v_query VARCHAR(256)
 ) BEGIN
-	SELECT 
+	SELECT
 		d.email as 'email',
 		nombreCompleto(d.email) as 'nombre'
-	FROM 
+	FROM
 		docentes AS d
 	WHERE
 		docenteConfirmado(d.email) = 1 AND (
@@ -1661,9 +1661,9 @@ CREATE PROCEDURE SP_AsignarDocentesAProyecto(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1689,7 +1689,7 @@ CREATE PROCEDURE SP_AsignarDocentesAProyecto(
 			SELECT "1" AS output, "Transaction committed successfully" AS message;
 		COMMIT;
 
-	END; END IF;	
+	END; END IF;
 END;;
 
 
@@ -1702,14 +1702,14 @@ DROP PROCEDURE IF EXISTS SP_BuscarMateria;;
 CREATE PROCEDURE SP_BuscarMateria(
 	v_query VARCHAR(256)
 ) BEGIN
-	SELECT 
+	SELECT
 		*
 	FROM
 		materias as m
 	WHERE
 		m.clave LIKE CONCAT('%', v_query, '%') OR
 		m.nombre LIKE CONCAT('%', v_query, '%')
-	ORDER BY 
+	ORDER BY
 		m.nombre;
 END;;
 
@@ -1731,9 +1731,9 @@ CREATE PROCEDURE SP_RegistrarDocente(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1768,9 +1768,9 @@ CREATE PROCEDURE SP_ConfirmarDocente(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1805,9 +1805,9 @@ CREATE PROCEDURE SP_AsociarDocenteMateria(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1853,7 +1853,7 @@ END;;
 
 /*
 	Se crea un nuevo registro en la tabla [anexo_29] para que el
-	asesor interno y externo puedan emitir una evaluación del 
+	asesor interno y externo puedan emitir una evaluación del
 	avance en la residencia.
 */
 DROP PROCEDURE IF EXISTS SP_ActivarAnexo29;;
@@ -1867,9 +1867,9 @@ CREATE PROCEDURE SP_ActivarAnexo29(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1881,29 +1881,29 @@ CREATE PROCEDURE SP_ActivarAnexo29(
 
 			SELECT "0" AS output, "Este usuario no puede activar evaluaciones para esta residencia" AS message;
 
-		END; ELSEIF residenciaAptaParaEvaluacion(v_id_residencia) != 1 THEN BEGIN 
+		END; ELSEIF residenciaAptaParaEvaluacion(v_id_residencia) != 1 THEN BEGIN
 
 			SELECT "0" AS output, "Esta residencia aún es apta para evaluación" AS message;
 
-		END; ELSE BEGIN 
+		END; ELSE BEGIN
 
 			-- Crear el anexo 29.
-			INSERT INTO 
+			INSERT INTO
 				anexo_29 (fecha_activacion, id_residencia)
-			VALUES 
+			VALUES
 				(UNIX_TIMESTAMP() * 1000, v_id_residencia);
 
 			SET @id = LAST_INSERT_ID();
 
 			-- Crear enlaces únicos para evaluación.
-			INSERT INTO 
+			INSERT INTO
 				enlaces_anexo29
-			VALUES 
+			VALUES
 				(urlAI, 0, default, @id), -- Asesor interno.
 				(urlAE, 1, default, @id); -- Asesor externo.
 
-			SELECT 
-				"1" AS output, 
+			SELECT
+				"1" AS output,
 				"Transaction committed successfully" AS message,
 
 				-- Información necesaria en el cliente.
@@ -1911,7 +1911,7 @@ CREATE PROCEDURE SP_ActivarAnexo29(
 				i.email_docente AS 'ai_email',
 				r.nombre_proyecto as 'proyecto',
 				nombreCompleto(r.email_residente) AS 'residente'
-			FROM 
+			FROM
 				residencias AS r JOIN involucrados AS i
 					ON r.idresidencia = i.id_residencia
 				JOIN asesores_externos AS ae
@@ -1929,7 +1929,7 @@ END;;
 
 /*
 	Se crea un nuevo registro en la tabla [anexo_30] para que el
-	asesor interno y externo puedan emitir una evaluación del 
+	asesor interno y externo puedan emitir una evaluación del
 	avance en la residencia.
 */
 DROP PROCEDURE IF EXISTS SP_ActivarAnexo30;;
@@ -1943,9 +1943,9 @@ CREATE PROCEDURE SP_ActivarAnexo30(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 
@@ -1957,29 +1957,29 @@ CREATE PROCEDURE SP_ActivarAnexo30(
 
 			SELECT "0" AS output, "Este usuario no puede activar evaluaciones para esta residencia" AS message;
 
-		END; ELSEIF residenciaAptaParaEvaluacion(v_id_residencia) != 1 THEN BEGIN 
+		END; ELSEIF residenciaAptaParaEvaluacion(v_id_residencia) != 1 THEN BEGIN
 
 			SELECT "0" AS output, "Esta residencia aún es apta para evaluación" AS message;
 
-		END; ELSE BEGIN 
+		END; ELSE BEGIN
 
 			-- Crear el anexo 30.
-			INSERT INTO 
+			INSERT INTO
 				anexo_30 (fecha_activacion, id_residencia)
-			VALUES 
+			VALUES
 				(UNIX_TIMESTAMP() * 1000, v_id_residencia);
 
 			SET @id = LAST_INSERT_ID();
 
 			-- Crear enlaces únicos para evaluación.
-			INSERT INTO 
+			INSERT INTO
 				enlaces_anexo30
-			VALUES 
+			VALUES
 				(urlAI, 0, default, @id), -- Asesor interno.
 				(urlAE, 1, default, @id); -- Asesor externo.
 
-			SELECT 
-				"1" AS output, 
+			SELECT
+				"1" AS output,
 				"Transaction committed successfully" AS message,
 
 				-- Información necesaria en el cliente.
@@ -1987,7 +1987,7 @@ CREATE PROCEDURE SP_ActivarAnexo30(
 				i.email_docente AS 'ai_email',
 				r.nombre_proyecto as 'proyecto',
 				nombreCompleto(r.email_residente) AS 'residente'
-			FROM 
+			FROM
 				residencias AS r JOIN involucrados AS i
 					ON r.idresidencia = i.id_residencia
 				JOIN asesores_externos AS ae
@@ -2013,7 +2013,7 @@ DROP PROCEDURE IF EXISTS SP_ResidenciasDisponiblesEvaluacion;;
 CREATE PROCEDURE SP_ResidenciasDisponiblesEvaluacion(
 	v_admin_email VARCHAR(64)
 ) BEGIN
-	SELECT 
+	SELECT
 		r.idresidencia as 'id',
 		r.nombre_proyecto AS 'proyecto', nombreCompleto(r.email_residente) AS 'residente',
 		e.nombre AS 'empresa', cantidadDeAnexos29(r.idresidencia) AS 'anexos29'
@@ -2032,31 +2032,31 @@ END;;
 
 	La información que incluirá cada fila será el ID de la residencia,
 	el nombre del proyecto, nombre completo del residente, anexo pendiente,
-	email y nombre del A.I y A.E, además de si indicar cuál de los asesores 
+	email y nombre del A.I y A.E, además de si indicar cuál de los asesores
 	aún está pendiente de evaluación.
 */
 DROP PROCEDURE IF EXISTS SP_ResidenciasEnEvaluacion;;
 CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
 	v_admin_email VARCHAR(64)
 ) BEGIN
-	SELECT 
-		r.idresidencia as 'id', r.nombre_proyecto AS 'proyecto', 
+	SELECT
+		r.idresidencia as 'id', r.nombre_proyecto AS 'proyecto',
 		nombreCompleto(r.email_residente) AS 'residente',
 		e.nombre AS 'empresa',
 		ae.email AS 'ae_email',
 		ae.nombre_completo AS 'ae_nombre',
 		IF(
 			(
-				SELECT 
+				SELECT
 					COUNT(*)
 				FROM
 					anexo_29
 				WHERE
 					fecha_externa IS NULL AND
 					id_residencia = r.idresidencia
-			) >= 1 OR 
+			) >= 1 OR
 			(
-				SELECT 
+				SELECT
 					COUNT(*)
 				FROM
 					anexo_30
@@ -2069,16 +2069,16 @@ CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
 		nombreCompleto(d.email) AS 'ai_nombre',
 		IF(
 			(
-				SELECT 
+				SELECT
 					COUNT(*)
 				FROM
 					anexo_29
 				WHERE
 					fecha_interna IS NULL AND
 					id_residencia = r.idresidencia
-			) >= 1 OR 
+			) >= 1 OR
 			(
-				SELECT 
+				SELECT
 					COUNT(*)
 				FROM
 					anexo_30
@@ -2100,7 +2100,7 @@ CREATE PROCEDURE SP_ResidenciasEnEvaluacion(
 		JOIN docentes AS d
 			ON i.email_docente = d.email
 	WHERE
-		i.es_asesor = 1 AND 
+		i.es_asesor = 1 AND
 		residenciaAprobada(r.idresidencia) = 2 AND
 		residenciaTerminada(r.idresidencia) = 0 AND
 		residenciaAptaParaEvaluacion(r.idresidencia) = 0 AND
@@ -2122,7 +2122,7 @@ CREATE PROCEDURE SP_InformacionResidenciaParaAnexo29(
 		SELECT "0" AS output, "URL inválido." AS message;
 
 	END; ELSE BEGIN
-		SELECT 
+		SELECT
 			"1" AS output, "Success" AS message,
 			r.nombre_proyecto AS 'proyecto',
 			nombreCompleto(r.email_residente) AS 'residente',
@@ -2151,7 +2151,7 @@ CREATE PROCEDURE SP_InformacionResidenciaParaAnexo30(
 		SELECT "0" AS output, "URL inválido." AS message;
 
 	END; ELSE BEGIN
-		SELECT 
+		SELECT
 			"1" AS output, "Success" AS message,
 			r.nombre_proyecto AS 'proyecto',
 			nombreCompleto(r.email_residente) AS 'residente',
@@ -2184,9 +2184,9 @@ CREATE PROCEDURE SP_EvaluacionA29(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 	START TRANSACTION;
@@ -2198,17 +2198,17 @@ CREATE PROCEDURE SP_EvaluacionA29(
 
 			IF (SELECT e.es_asesor_externo FROM enlaces_anexo29 AS e WHERE e.id = v_url) = 0 THEN BEGIN
 				-- Es asesor interno.
-				UPDATE anexo_29 SET 
-					fecha_interna = UNIX_TIMESTAMP() * 1000, 
-					evaluacion_interna = v_evaluacion, 
+				UPDATE anexo_29 SET
+					fecha_interna = UNIX_TIMESTAMP() * 1000,
+					evaluacion_interna = v_evaluacion,
 					observaciones_internas = v_observaciones
 				WHERE
 					idanexo_29 = idAnexo29DeURL(v_url);
 			END; ELSE BEGIN
 				-- Es asesor externo.
-				UPDATE anexo_29 SET 
-					fecha_externa = UNIX_TIMESTAMP() * 1000, 
-					evaluacion_externa = v_evaluacion, 
+				UPDATE anexo_29 SET
+					fecha_externa = UNIX_TIMESTAMP() * 1000,
+					evaluacion_externa = v_evaluacion,
 					observaciones_externas = v_observaciones
 				WHERE
 					idanexo_29 = idAnexo29DeURL(v_url);
@@ -2244,9 +2244,9 @@ CREATE PROCEDURE SP_EvaluacionA30(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
 	START TRANSACTION;
@@ -2258,17 +2258,17 @@ CREATE PROCEDURE SP_EvaluacionA30(
 
 			IF (SELECT e.es_asesor_externo FROM enlaces_anexo30 AS e WHERE e.id = v_url) = 0 THEN BEGIN
 				-- Es asesor interno.
-				UPDATE anexo_30 SET 
-					fecha_interna = UNIX_TIMESTAMP() * 1000, 
-					evaluacion_interna = v_evaluacion, 
+				UPDATE anexo_30 SET
+					fecha_interna = UNIX_TIMESTAMP() * 1000,
+					evaluacion_interna = v_evaluacion,
 					observaciones_internas = v_observaciones
 				WHERE
 					idanexo_30 = idAnexo30DeURL(v_url);
 			END; ELSE BEGIN
 				-- Es asesor externo.
-				UPDATE anexo_30 SET 
-					fecha_externa = UNIX_TIMESTAMP() * 1000, 
-					evaluacion_externa = v_evaluacion, 
+				UPDATE anexo_30 SET
+					fecha_externa = UNIX_TIMESTAMP() * 1000,
+					evaluacion_externa = v_evaluacion,
 					observaciones_externas = v_observaciones
 				WHERE
 					idanexo_30 = idAnexo30DeURL(v_url);
@@ -2290,7 +2290,7 @@ END;;
 	Muestra una tabla con toda la información necesaria
 	para llenar un anexo 29, partiendo del anexo con id
 	[v_id].
-*/	
+*/
 DROP PROCEDURE IF EXISTS SP_InfoAnexo29;;
 CREATE PROCEDURE SP_InfoAnexo29(
 	v_id INT,
@@ -2298,7 +2298,7 @@ CREATE PROCEDURE SP_InfoAnexo29(
 ) BEGIN
 
 	IF relacionadoAlProyecto((SELECT a.id_residencia FROM anexo_29 AS a WHERE a.idanexo_29 = v_id), v_email) != 1 THEN BEGIN
-		
+
 		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
 
 	END; ELSEIF v_id NOT IN (SELECT idanexo_29 FROM anexo_29) THEN BEGIN
@@ -2311,7 +2311,7 @@ CREATE PROCEDURE SP_InfoAnexo29(
 
 	END; ELSE BEGIN
 
-		SELECT 
+		SELECT
 			"1" AS output,
 			"Información recopilada" AS message,
 			a.*,
@@ -2324,7 +2324,7 @@ CREATE PROCEDURE SP_InfoAnexo29(
 					r.periodo = 1,
 					"Enero - Junio",
 					"Julio - Diciembre"
-				), 
+				),
 				" ",
 				r.ano
 			) AS 'periodo'
@@ -2346,7 +2346,7 @@ END;;
 	Muestra una tabla con toda la información necesaria
 	para llenar un anexo 30, partiendo del anexo con id
 	[v_id].
-*/	
+*/
 DROP PROCEDURE IF EXISTS SP_InfoAnexo30;;
 CREATE PROCEDURE SP_InfoAnexo30(
 	v_id INT,
@@ -2354,7 +2354,7 @@ CREATE PROCEDURE SP_InfoAnexo30(
 ) BEGIN
 
 	IF relacionadoAlProyecto((SELECT a.id_residencia FROM anexo_30 AS a WHERE a.idanexo_30 = v_id), v_email) != 1 THEN BEGIN
-		
+
 		SELECT "0" AS output, "Este usuario no tiene acceso a la residencia" AS message;
 
 	END; ELSEIF v_id NOT IN (SELECT idanexo_30 FROM anexo_30) THEN BEGIN
@@ -2367,7 +2367,7 @@ CREATE PROCEDURE SP_InfoAnexo30(
 
 	END; ELSE BEGIN
 
-		SELECT 
+		SELECT
 			"1" AS output,
 			"Información recopilada" AS message,
 			a.*,
@@ -2380,7 +2380,7 @@ CREATE PROCEDURE SP_InfoAnexo30(
 					r.periodo = 1,
 					"Enero - Junio",
 					"Julio - Diciembre"
-				), 
+				),
 				" ",
 				r.ano
 			) AS 'periodo'
@@ -2409,7 +2409,7 @@ END;;
 	* reporte_preliminar
 		Regresa el ID de la residencia (porque con eso es suficiente
 		para acceder al reporte preliminar) si es que la residencia
-		ya fue aprobada y está en marcha. En caso de que no haya 
+		ya fue aprobada y está en marcha. En caso de que no haya
 		docentes asignados al proyecto, esta columna será NULL.
 
 	* anexos_29
@@ -2434,10 +2434,10 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 
 	END; ELSE BEGIN
 
-		SELECT 
+		SELECT
 			"1" AS output, "Documentos de la residencia" AS message;
 
-		SELECT			
+		SELECT
 			-- Reporte preliminar.
 			IF (
 				residenciaAprobada(v_id) >= 1
@@ -2461,7 +2461,7 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 				SELECT
 					GROUP_CONCAT(t.id SEPARATOR ',')
 				FROM (
-					SELECT 
+					SELECT
 						idanexo_29 AS 'id'
 					FROM
 						anexo_29
@@ -2477,7 +2477,7 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 				SELECT
 					GROUP_CONCAT(t.fecha SEPARATOR ',')
 				FROM (
-					SELECT 
+					SELECT
 						fecha_activacion as 'fecha'
 					FROM
 						anexo_29
@@ -2495,7 +2495,7 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 				SELECT
 					GROUP_CONCAT(t.id SEPARATOR ',')
 				FROM (
-					SELECT 
+					SELECT
 						idanexo_30 AS 'id'
 					FROM
 						anexo_30
@@ -2511,7 +2511,7 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 				SELECT
 					GROUP_CONCAT(t.fecha SEPARATOR ',')
 				FROM (
-					SELECT 
+					SELECT
 						fecha_activacion as 'fecha'
 					FROM
 						anexo_30
@@ -2523,14 +2523,14 @@ CREATE PROCEDURE SP_GetDocumentosDeResidencia(
 			), NULL) AS 'fechas_anexos_30';
 
 	END; END IF;
-	
+
 END;;
 
 
 /*
-	Registra en la base de datos la existencia de una 
+	Registra en la base de datos la existencia de una
 	carta de aceptación para la residencia con id
-	[v_id_residencia]. 
+	[v_id_residencia].
 
 	[v_ruta] es la ruta dentro del servidor que hay
 	que seguir para llegar al archivo que almacena
@@ -2545,12 +2545,12 @@ CREATE PROCEDURE SP_AgregarCartaDeAceptacion(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
-	
+
 	START TRANSACTION;
 
 		IF residenciaAprobada(v_id_residencia) != 1 THEN BEGIN
@@ -2579,12 +2579,12 @@ CREATE PROCEDURE SP_AgregarCartaDeAceptacion(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
-	
+
 	START TRANSACTION;
 
 		IF residenciaAprobada(v_id_residencia) != 1 THEN BEGIN
@@ -2637,7 +2637,7 @@ END;;
 /*
 	Crea un nuevo registro en la tabla de mensajes.
 
-	Regresa en una segunda consulta (la primera es la 
+	Regresa en una segunda consulta (la primera es la
 	de confirmación) el ID del mensaje creado.
 */
 DROP PROCEDURE IF EXISTS SP_NuevoMensaje;;
@@ -2651,35 +2651,35 @@ CREATE PROCEDURE SP_NuevoMensaje(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
-	
+
 	START TRANSACTION;
 		IF v_remitente = v_destinatario THEN BEGIN
 			SELECT "0" AS output, "Una persona no puede mantener una conversación consigo misma" AS message;
 
-		END; ELSEIF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN 
+		END; ELSEIF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN
 			SELECT "0" AS output, "Uno de los involucrados en este chat no tiene permiso de usarlo" AS message;
 
 		END; ELSE BEGIN
 
-			INSERT INTO `siger`.`mensajes` 
+			INSERT INTO `siger`.`mensajes`
 				(`contenido`, `timestamp`, `remitente_email`, `destinatario_email`)
 			VALUES
 				(v_contenido, UNIX_TIMESTAMP() * 1000, v_remitente, v_destinatario);
-	
+
 			SELECT "1" AS output, "Transaction committed successfully" AS message;
 
-			SELECT 
-				LAST_INSERT_ID() AS `id_mensaje`, 
+			SELECT
+				LAST_INSERT_ID() AS `id_mensaje`,
 				idConversacion(v_remitente, v_destinatario) AS `id_conversacion`;
 
 		END; END IF;
 	COMMIT;
-	
+
 END;;
 
 
@@ -2697,14 +2697,14 @@ CREATE PROCEDURE SP_NuevoArchivo(
 	BEGIN
 		GET DIAGNOSTICS CONDITION 1
 		@p2 = MESSAGE_TEXT;
-		
+
 		SELECT "-1" AS output, @p2 AS message;
-		
+
 		ROLLBACK;
 	END;
-	
+
 	START TRANSACTION;
-		-- IF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN 
+		-- IF puedenUsarChat(v_remitente, v_destinatario) = 0 THEN BEGIN
 		-- 	SELECT "0" AS output, "Uno de los involucrados en este chat no tiene permiso de usarlo" AS message;
 		-- END; ELSE BEGIN
 
@@ -2745,11 +2745,11 @@ CREATE PROCEDURE SP_GetConversacion(
 			m.`remitente_email` = v_email2 &&
 			m.`destinatario_email` = v_email1
 		)
-	ORDER BY 
+	ORDER BY
 		m.`timestamp`,
 		m.`id`;
 
-	SELECT 
+	SELECT
 		nombreCompleto(v_email1) AS `nombre_email1`,
 		nombreCompleto(v_email2) AS `nombre_email2`,
 		v_email2 AS 'email2';
@@ -2757,7 +2757,7 @@ END;;
 
 
 /*
-	Regresa una lista de las conversaciones en las 
+	Regresa una lista de las conversaciones en las
 	que el usuario con email [v_email] participa,
 	ordenadas por fecha del último mensaje, de manera
 	descendente.
@@ -2773,8 +2773,8 @@ CREATE PROCEDURE SP_ListaConversaciones(
 ) BEGIN
 
 	SELECT * FROM (
-		SELECT 
-			DISTINCT idConversacion(m.`remitente_email`, m.`destinatario_email`) AS `id_conv`, 
+		SELECT
+			DISTINCT idConversacion(m.`remitente_email`, m.`destinatario_email`) AS `id_conv`,
 			`m`.*,
 			nombreCompleto(
 				IF (
@@ -2788,17 +2788,17 @@ CREATE PROCEDURE SP_ListaConversaciones(
 			IF (
 				v_email = `m`.`remitente_email`
 			, 1, 0) AS `enviado`
-		FROM 
-			`mensajes` AS `m` 
-		WHERE 
-			`m`.`remitente_email` = v_email || 
-			`m`.`destinatario_email` = v_email 
-		ORDER BY 
+		FROM
+			`mensajes` AS `m`
+		WHERE
+			`m`.`remitente_email` = v_email ||
+			`m`.`destinatario_email` = v_email
+		ORDER BY
 			timestamp DESC
 	) AS `t`
-	GROUP BY 
+	GROUP BY
 		`t`.`id_conv`
-	ORDER BY 
+	ORDER BY
 		`timestamp` DESC;
 END;;
 
@@ -2813,7 +2813,7 @@ CREATE PROCEDURE SP_BusquedaChat(
 	v_email VARCHAR(64),
 	v_query VARCHAR(256)
 ) BEGIN
-	
+
 	(
 		SELECT
 			r.email AS email,
@@ -2821,7 +2821,7 @@ CREATE PROCEDURE SP_BusquedaChat(
 		FROM
 			residentes AS r
 		WHERE
-			estadoResidente(r.email) >= 3 AND 
+			estadoResidente(r.email) >= 3 AND
 			r.email != v_email AND (
 				SUBSTRING_INDEX(r.email, '@', 1) LIKE CONCAT('%', v_query, '%') OR
 				nombreCompleto(r.email) LIKE CONCAT('%', v_query, '%')
@@ -2833,12 +2833,12 @@ CREATE PROCEDURE SP_BusquedaChat(
 		FROM
 			docentes AS d
 		WHERE
-			estadoDocente(d.email) >= 1 AND 
+			estadoDocente(d.email) >= 1 AND
 			d.email != v_email AND (
 				SUBSTRING_INDEX(d.email, '@', 1) LIKE CONCAT('%', v_query, '%') OR
 				nombreCompleto(d.email) LIKE CONCAT('%', v_query, '%')
 			)
-	) ORDER BY 
+	) ORDER BY
 		nombre;
 
 END;;
@@ -2862,11 +2862,11 @@ CREATE PROCEDURE SP_ArchivosDeMensaje(
 	IF accesoAlMensaje(v_email, v_id) < 1 THEN BEGIN
 		SELECT "0" AS output, "No tiene acceso a este mensaje" AS message;
 
-	END; ELSE BEGIN 
+	END; ELSE BEGIN
 		SELECT "1" AS output, "Sí tiene acceso al mensaje" AS message;
 
 		-- Segunda tabla, con los archivos.
-		SELECT 
+		SELECT
 			*
 		FROM
 			`siger`.`archivos` AS `a`
@@ -2975,100 +2975,100 @@ call SP_RegistroResidencia(
 );
 call SP_RegistraHorarios('01:00', '07:00', 1);
 call SP_RegistroResidencia(
-	'Alpha Entangler', 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
-	1, 2021, 
+	'Alpha Entangler',
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+	1, 2021,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
-	'L17430002@piedrasnegras.tecnm.mx', 
-	'1586570609000', 
-	'Butterfly Media', 
-	'Oliver Linares', 
-	'Ebon Avenue', 
-	'Gardelita', '8781234567', 
-	'butterflymedia@gmail.com', 
-	'Sistemas y Computación', 
+	'L17430002@piedrasnegras.tecnm.mx',
+	'1586570609000',
+	'Butterfly Media',
+	'Oliver Linares',
+	'Ebon Avenue',
+	'Gardelita', '8781234567',
+	'butterflymedia@gmail.com',
+	'Sistemas y Computación',
 	'oliverlinares@gmail.com',
-	'Oliver Linares', 
+	'Oliver Linares',
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('15:00', '20:00', 2);
 call SP_RegistroResidencia(
-	'Harmonic Diverter', 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
-	2, 2021, 
+	'Harmonic Diverter',
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+	2, 2021,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
-	'L17430003@piedrasnegras.tecnm.mx', 
-	'1586570609000', 
-	'Prodigy Aviation', 
-	'Izan Madrid', 
-	'Starfall Route', 
-	'San Ancazu', 
-	'8781234567', 
-	'prodigyaviation@gmail.com', 
-	'Sistemas y Computación', 
+	'L17430003@piedrasnegras.tecnm.mx',
+	'1586570609000',
+	'Prodigy Aviation',
+	'Izan Madrid',
+	'Starfall Route',
+	'San Ancazu',
+	'8781234567',
+	'prodigyaviation@gmail.com',
+	'Sistemas y Computación',
 	'izanmadrid@gmail.com',
-	'Izan Madrid', 
+	'Izan Madrid',
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('13:00', '16:00', 3);
 call SP_RegistraHorarios('17:30', '20:30', 3);
 call SP_RegistroResidencia(
-	'Cosmic Reactor', 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
-	2, 2020, 
+	'Cosmic Reactor',
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+	2, 2020,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
-	'L17430004@piedrasnegras.tecnm.mx', 
-	'1586570609000', 
-	'Alphacom', 
-	'Sergi Ferrero', 
-	'Windmill Avenue', 
-	'San Ancazu', 
-	'8781234567', 
-	'alphacom@gmail.com', 
-	'Sistemas y Computación', 
+	'L17430004@piedrasnegras.tecnm.mx',
+	'1586570609000',
+	'Alphacom',
+	'Sergi Ferrero',
+	'Windmill Avenue',
+	'San Ancazu',
+	'8781234567',
+	'alphacom@gmail.com',
+	'Sistemas y Computación',
 	'sergiferrero@gmail.com',
-	'Sergi Ferrero', 
+	'Sergi Ferrero',
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('13:00', '14:00', 4);
 call SP_RegistraHorarios('15:00', '17:00', 4);
 call SP_RegistraHorarios('20:00', '24:00', 4);
 call SP_RegistroResidencia(
-	'Particle Shaper', 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
-	2, 2020, 
+	'Particle Shaper',
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+	2, 2020,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
-	'L17430005@piedrasnegras.tecnm.mx', 
-	'1586570609000', 
-	'Alphacom', 
-	'Sergi Ferrero', 
-	'Windmill Avenue', 
-	'San Ancazu', 
-	'8781234567', 
-	'alphacom@gmail.com', 
-	'Sistemas y Computación', 
+	'L17430005@piedrasnegras.tecnm.mx',
+	'1586570609000',
+	'Alphacom',
+	'Sergi Ferrero',
+	'Windmill Avenue',
+	'San Ancazu',
+	'8781234567',
+	'alphacom@gmail.com',
+	'Sistemas y Computación',
 	'sergiferrero@gmail.com',
-	'Sergi Ferrero', 
+	'Sergi Ferrero',
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('13:30', '15:30', 5);
 call SP_RegistraHorarios('17:00', '19:00', 5);
 call SP_RegistroResidencia(
-	'Kwolek Communicator', 
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 
-	2, 2021, 
+	'Kwolek Communicator',
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+	2, 2021,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',/* 0, */
-	'L17430006@piedrasnegras.tecnm.mx', 
-	'1586570609000', 
-	'Oracleutions', 
-	'Mateo Escrivá', 
-	'Noble Route', 
-	'San Fracillo', 
-	'8781234567', 
-	'oracleutions@gmail.com', 
-	'Sistemas y Computación', 
+	'L17430006@piedrasnegras.tecnm.mx',
+	'1586570609000',
+	'Oracleutions',
+	'Mateo Escrivá',
+	'Noble Route',
+	'San Fracillo',
+	'8781234567',
+	'oracleutions@gmail.com',
+	'Sistemas y Computación',
 	'mateoescriva@gmail.com',
-	'Mateo Escrivá', 
+	'Mateo Escrivá',
 	'Jefe de departamento', 'Licenciatura', '8781234568'
 );
 call SP_RegistraHorarios('15:00', '20:00', 6);
