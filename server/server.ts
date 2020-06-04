@@ -1,4 +1,3 @@
-import { Keys } from "./Keys";
 import { Response } from "./Response";
 import { Mailer } from "./Mailer";
 import { generateDocument } from "./DocumentGenerator";
@@ -15,15 +14,18 @@ const server = express();
 const port: number = 8080;
 const website: string = `http://localhost:${port}`;
 
+// Cargar contenido de [.env] a las variables de entorno.
+require('dotenv').config();
+
 /* ================================================================================================
 
     Database configuration.
 
 ================================================================================================ */
 const con = mysql.createConnection({
-    host: Keys.DB_CONNECTION.host,
-    user: Keys.DB_CONNECTION.user,
-    password: Keys.DB_CONNECTION.password,
+    host: process.env.SIGER_DB_HOST,
+    user: process.env.SIGER_DB_USER,
+    password: process.env.SIGER_DB_PWD,
 
     database: 'siger',
     multipleStatements: true,
@@ -2951,11 +2953,11 @@ server.get('/encrypt', (req, res) => {
 
 // Toma como parámetro un string [txt], y regresa un string conteniendo el parámetro ya encriptado usando la clave secreta de [Keys.ts].
 const encrypt = (txt: string) =>
-    AES.encrypt(txt, Keys.SECRET_KEY);
+    AES.encrypt(txt, process.env.SIGER_SECRET_KEY);
 
 // Toma como parámetro un string [txt], que debe ser una cadena de texto encriptada usando la clave de [Keys.ts]. Regresa el texto desencriptado.
 const decrypt = (txt: string) =>
-    AES.decrypt(txt, Keys.SECRET_KEY);
+    AES.decrypt(txt, process.env.SIGER_SECRET_KEY);
 
 const getAdminMenu: () => Object = () => ({
     'main': {
@@ -3290,7 +3292,7 @@ const getResidenciaIDDeResidente = (email: string) =>
  */
 const sendEmail: (to: string, subject: string, content: string, onDone?: (error: string, info: string) => void) => void =
 (to, subject, content, onDone) => {
-    const mailer: Mailer = new Mailer(Keys.GMAIL_EMAIL, Keys.GMAIL_PASSWORD);
+    const mailer: Mailer = new Mailer(process.env.SIGER_EMAIL!, process.env.SIGER_EMAIL_PWD!);
 
     mailer.sendEmail({
         "to": to,

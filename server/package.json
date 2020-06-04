@@ -8,6 +8,7 @@
     "aes.js-wrapper": "^1.0.0",
     "body-parser": "^1.19.0",
     "docxtemplater": "^3.17.6",
+    "dotenv": "^8.2.0",
     "express-fileupload": "^1.1.7-alpha.3",
     "express-session": "^1.17.0",
     "express.js": "^1.0.0",
