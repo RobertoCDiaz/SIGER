@@ -3826,5 +3826,5 @@ server.get('/lista-competentes',(req,res)=>
 ================================================================================================ */
 server.listen(
     port,
-    () => console.log(`SIGER corriendo en  ${website}`)
+    () => console.log(`SIGER corriendo en ${website}`)
 );
