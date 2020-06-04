@@ -17,11 +17,10 @@
     "pizzip": "^3.0.6"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "typescript": "^3.9.3"
   },
   "scripts": {
-    "start": "tsc && cd ../web-client/ && tsc && cd ../server/ && node server.js",
-    "test": "tsc && cd ../web-client/ && tsc && cd ../server/ && nodemon server.js"
+    "start": "tsc && cd ../web-client/ && tsc && cd ../server/ && node server.js"
   },
   "author": "",
   "license": "ISC"
