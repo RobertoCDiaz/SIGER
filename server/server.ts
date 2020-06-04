@@ -11,8 +11,9 @@ const mysql             = require("mysql");
 const AES               = require("aes.js-wrapper");
 
 const server = express();
-const port: number = 8080;
-const website: string = `http://localhost:${port}`;
+
+const port              = process.env.PORT || 8080;
+const website: string   = process.env.WEBSITE || `http://localhost:${port}`;
 
 // Cargar contenido de [.env] a las variables de entorno.
 require('dotenv').config();
@@ -3825,5 +3826,5 @@ server.get('/lista-competentes',(req,res)=>
 ================================================================================================ */
 server.listen(
     port,
-    () => console.log(`SIGER corriendo en el puerto ${port}`)
+    () => console.log(`SIGER corriendo en  ${website}`)
 );
