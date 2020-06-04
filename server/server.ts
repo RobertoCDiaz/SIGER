@@ -22,14 +22,7 @@ require('dotenv').config();
     Database configuration.
 
 ================================================================================================ */
-const con = mysql.createConnection({
-    host: process.env.SIGER_DB_HOST,
-    user: process.env.SIGER_DB_USER,
-    password: process.env.SIGER_DB_PWD,
-
-    database: 'siger',
-    multipleStatements: true,
-});
+const con = mysql.createConnection(process.env.SIGER_DB_URL);
 
 /* ================================================================================================
 
